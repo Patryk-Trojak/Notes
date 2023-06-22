@@ -60,6 +60,10 @@ void NotesDisplayingTab::deleteNoteFromVector(Note *note)
 
 void NotesDisplayingTab::onNoteButtonDeleted()
 {
+    auto reply = QMessageBox::question(this, "Delete note?", "Are you sure you want to delete this note?");
+    if (reply == QMessageBox::No)
+        return;
+
     NoteButton *button = qobject_cast<NoteButton *>(QObject::sender());
     auto foundNote = buttonToNoteMap.find(button);
     if (foundNote != buttonToNoteMap.end())

@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QHash>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QRandomGenerator>
 #include <QScrollArea>
