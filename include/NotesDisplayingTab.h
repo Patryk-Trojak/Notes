@@ -41,7 +41,7 @@ class NotesDisplayingTab : public QWidget
   private:
     Ui::NotesDisplayingTab *ui;
     std::vector<std::unique_ptr<Note>> notes;
-    QHash<NoteButton *, Note *> buttonToNoteMap;
+    QHash<const NoteButton *, Note *> buttonToNoteMap;
     void createNewNoteButton(Note &note);
     void createNewNoteButtonsFromNotes();
     void deleteNoteFromVector(Note *note);
