@@ -3,6 +3,7 @@
 
 #include "Note.h"
 #include "NoteButton.h"
+#include "Utils.h"
 #include <QDebug>
 #include <QFile>
 #include <QFileDialog>
@@ -15,9 +16,10 @@
 #include <QString>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <algorithm>
+#include <functional>
 #include <memory>
 #include <vector>
-
 namespace Ui
 {
 class NotesDisplayingTab;
@@ -45,6 +47,7 @@ class NotesDisplayingTab : public QWidget
     void createNewNoteButton(Note &note);
     void createNewNoteButtonsFromNotes();
     void deleteNoteFromVector(Note *note);
+    void sortNoteButtons(std::function<bool(const QWidget *a, const QWidget *b)> compare);
 };
 
 #endif // NOTESDISPLAYINGTAB_H

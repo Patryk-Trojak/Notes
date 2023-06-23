@@ -58,6 +58,18 @@ void NotesDisplayingTab::deleteNoteFromVector(Note *note)
                 notes.end());
 }
 
+void NotesDisplayingTab::sortNoteButtons(std::function<bool(const QWidget *, const QWidget *)> compare)
+{
+    QList<QWidget *> list = myUtils::getWidgetsFromLayout(*ui->scrollArea->widget()->layout());
+    std::sort(list.begin(), list.end(), compare);
+    auto oldLayout = ui->scrollArea->widget()->layout();
+    delete oldLayout;
+    QVBoxLayout *layout = new QVBoxLayout();
+    ui->scrollArea->widget()->setLayout(layout);
+    for (auto const &i : list)
+        ui->scrollArea->widget()->layout()->addWidget(i);
+}
+
 void NotesDisplayingTab::onNoteButtonDeleted()
 {
     auto reply = QMessageBox::question(this, "Delete note?", "Are you sure you want to delete this note?");
