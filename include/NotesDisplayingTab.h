@@ -31,12 +31,13 @@ class NotesDisplayingTab : public QWidget
   public:
     explicit NotesDisplayingTab(QWidget *parent = nullptr);
     ~NotesDisplayingTab();
-    void onNewNoteButtonPressed();
-  public slots:
+
+  public:
     void updateNoteButton(const Note &note);
   signals:
     void enterEditingNote(Note &note);
   private slots:
+    void onNewNoteButtonPressed();
     void onNoteButtonClicked();
     void onNoteButtonChangedTitle();
     void onNoteButtonDeleted();
