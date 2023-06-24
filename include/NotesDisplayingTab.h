@@ -32,7 +32,6 @@ class NotesDisplayingTab : public QWidget
     explicit NotesDisplayingTab(QWidget *parent = nullptr);
     ~NotesDisplayingTab();
     void onNewNoteButtonPressed();
-    void saveNote();
   public slots:
     void updateNoteButton(const Note &note);
   signals:
