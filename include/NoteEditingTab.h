@@ -18,7 +18,7 @@ class NoteEditingTab : public QWidget
   public slots:
     void startEditingNewNote(Note *note);
   signals:
-    void exitEditingNote();
+    void exitEditingNote(Note &note);
 
   private:
     Ui::NoteEditingTab *ui;

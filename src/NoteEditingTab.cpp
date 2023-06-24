@@ -6,7 +6,9 @@ NoteEditingTab::NoteEditingTab(QWidget *parent) : QWidget(parent), ui(new Ui::No
 {
     ui->setupUi(this);
     QObject::connect(ui->saveAndReturn, &QPushButton::clicked, this, &NoteEditingTab::saveNote);
-    QObject::connect(ui->saveAndReturn, &QPushButton::clicked, this, &NoteEditingTab::exitEditingNote);
+
+    QObject::connect(ui->saveAndReturn, &QPushButton::clicked, this,
+                     [this]() { emit exitEditingNote(*currentEditingNote); });
 }
 
 NoteEditingTab::~NoteEditingTab()

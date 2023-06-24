@@ -25,7 +25,8 @@ void MainWindow::enterEditingNote(Note &note)
     ui->stackedWidget->setCurrentIndex(1);
 }
 
-void MainWindow::exitEditingNote()
+void MainWindow::exitEditingNote(Note &note)
 {
+    notesDisplayingTab.updateNoteButton(note);
     ui->stackedWidget->setCurrentIndex(0);
 }

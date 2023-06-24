@@ -30,6 +30,13 @@ void NotesDisplayingTab::onNewNoteButtonPressed()
     notes.push_back(std::move(note));
 }
 
+void NotesDisplayingTab::updateNoteButton(const Note &note)
+{
+    auto button = noteToButtonMap.find(&note);
+    if (button != noteToButtonMap.end())
+        (*button)->setTitle(note.getTitle());
+}
+
 void NotesDisplayingTab::onNoteButtonChangedTitle()
 {
     NoteButton *button = qobject_cast<NoteButton *>(QObject::sender());

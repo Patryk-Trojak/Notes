@@ -20,7 +20,7 @@ class MainWindow : public QMainWindow
     ~MainWindow();
   public slots:
     void enterEditingNote(Note &note);
-    void exitEditingNote();
+    void exitEditingNote(Note &note);
 
   private:
     Ui::MainWindow *ui;

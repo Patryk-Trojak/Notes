@@ -33,6 +33,8 @@ class NotesDisplayingTab : public QWidget
     ~NotesDisplayingTab();
     void onNewNoteButtonPressed();
     void saveNote();
+  public slots:
+    void updateNoteButton(const Note &note);
   signals:
     void enterEditingNote(Note &note);
   private slots:
