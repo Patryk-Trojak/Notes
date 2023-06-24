@@ -81,6 +81,7 @@ void NotesDisplayingTab::onNoteButtonDeleted()
     if (foundNote != buttonToNoteMap.end())
     {
         PersistenceManager::deleteNoteFile((*foundNote)->getFilename());
+        noteToButtonMap.erase(noteToButtonMap.find(*foundNote));
         deleteNoteFromVector(*foundNote);
         buttonToNoteMap.erase(foundNote);
     }
@@ -95,5 +96,6 @@ void NotesDisplayingTab::createNewNoteButton(Note &note)
     QObject::connect(noteButton, &NoteButton::deleteNote, this, &NotesDisplayingTab::onNoteButtonDeleted);
 
     buttonToNoteMap.insert(noteButton, &note);
+    noteToButtonMap.insert(static_cast<const Note *>(&note), noteButton);
     ui->scrollArea->widget()->layout()->addWidget(noteButton);
 }
