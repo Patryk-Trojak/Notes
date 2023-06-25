@@ -34,7 +34,11 @@ void NotesDisplayingTab::updateNoteButton(const Note &note)
 {
     auto button = noteToButtonMap.find(&note);
     if (button != noteToButtonMap.end())
+    {
         (*button)->setTitle(note.getTitle());
+        (*button)->setCreationTime(note.getCreationTime());
+        (*button)->setModificationTime(note.getModificationTime());
+    }
 }
 
 void NotesDisplayingTab::onNoteButtonChangedTitle()
@@ -45,6 +49,7 @@ void NotesDisplayingTab::onNoteButtonChangedTitle()
     {
         (*foundNote)->setTitle(button->getTitle());
         PersistenceManager::saveNoteToFile(**foundNote);
+        updateNoteButton(**foundNote);
     }
 }
 
@@ -97,7 +102,7 @@ void NotesDisplayingTab::onNoteButtonDeleted()
 
 void NotesDisplayingTab::createNewNoteButton(Note &note)
 {
-    NoteButton *noteButton = new NoteButton(note.getTitle());
+    NoteButton *noteButton = new NoteButton(note.getTitle(), note.getCreationTime(), note.getModificationTime());
     QObject::connect(noteButton, &NoteButton::saveNote, this, &NotesDisplayingTab::onNoteButtonChangedTitle);
     QObject::connect(noteButton, &NoteButton::enterEditingNote, this, &NotesDisplayingTab::onNoteButtonClicked);
     QObject::connect(noteButton, &NoteButton::deleteNote, this, &NotesDisplayingTab::onNoteButtonDeleted);
