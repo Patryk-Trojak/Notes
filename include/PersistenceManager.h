@@ -11,9 +11,10 @@
 class PersistenceManager
 {
   public:
-    static void saveNoteToFile(const Note &note);
+    static void saveNoteToFile(Note &note);
     static void saveAllNotes(const std::vector<std::unique_ptr<Note>> &notes);
     static std::unique_ptr<Note> loadNoteFromFile(const QString &filename);
+    static void updateCreationAndModificationTime(Note &note);
     static std::unique_ptr<Note> createNewNoteFile();
     static std::vector<std::unique_ptr<Note>> loadAllNotes();
     static void deleteNoteFile(const QString &filename);

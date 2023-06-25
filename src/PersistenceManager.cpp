@@ -2,12 +2,13 @@
 
 QString PersistenceManager::notesDirectoryPathname;
 
-void PersistenceManager::saveNoteToFile(const Note &note)
+void PersistenceManager::saveNoteToFile(Note &note)
 {
     QFile file(notesDirectoryPathname + note.getFilename());
     file.open(QFile::WriteOnly);
     QTextStream textStream(&file);
     textStream << note.getTitle() << '\n' << note.getContent();
+    updateCreationAndModificationTime(note);
     file.close();
 }
 
@@ -20,7 +21,15 @@ std::unique_ptr<Note> PersistenceManager::loadNoteFromFile(const QString &filena
     note->setTitle(textStream.readLine());
     note->setContent(textStream.readAll());
     file.close();
+    updateCreationAndModificationTime(*note);
     return note;
+}
+
+void PersistenceManager::updateCreationAndModificationTime(Note &note)
+{
+    QFileInfo noteFile(notesDirectoryPathname + note.getFilename());
+    note.setCreationTime(noteFile.birthTime());
+    note.setModificationTime(noteFile.lastModified());
 }
 
 std::unique_ptr<Note> PersistenceManager::createNewNoteFile()
