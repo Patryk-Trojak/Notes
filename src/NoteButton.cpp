@@ -3,7 +3,7 @@
 
 NoteButton::NoteButton(const QString &title, const QDateTime &creationTime, const QDateTime &modificationTime,
                        QWidget *parent)
-    : QWidget{parent}, ui(new Ui::NoteButton)
+    : QWidget{parent}, ui(new Ui::NoteButton), lastSavedTitle(title)
 {
     this->setMinimumHeight(130);
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -18,7 +18,13 @@ NoteButton::NoteButton(const QString &title, const QDateTime &creationTime, cons
     setCreationTime(creationTime);
     setModificationTime(modificationTime);
     ui->titleEdit->setText(title);
-    QObject::connect(ui->titleEdit, &QLineEdit::editingFinished, this, &NoteButton::saveNote);
+    QObject::connect(ui->titleEdit, &QLineEdit::editingFinished, this, [this]() {
+        if (ui->titleEdit->text() != lastSavedTitle)
+        {
+            emit saveNote();
+            lastSavedTitle = ui->titleEdit->text();
+        }
+    });
     QObject::connect(button, &QPushButton::clicked, this, &NoteButton::enterEditingNote);
     QObject::connect(ui->deleteButton, &QPushButton::clicked, this, &NoteButton::deleteNote);
 }

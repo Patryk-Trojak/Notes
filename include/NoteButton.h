@@ -33,5 +33,6 @@ class NoteButton : public QWidget
     QDateTime creationTime;
     QDateTime modificationTime;
     QString convertDateTimeToString(const QDateTime &dateTime);
+    QString lastSavedTitle;
 };
 #endif // NOTEBUTTON_H
