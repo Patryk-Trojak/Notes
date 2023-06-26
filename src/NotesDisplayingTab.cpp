@@ -41,6 +41,7 @@ void NotesDisplayingTab::onNewNoteButtonPressed()
     std::unique_ptr<Note> note = PersistenceManager::createNewNoteFile();
     createNewNoteButton(*note);
     notes.push_back(std::move(note));
+    emit enterEditingNote(*notes.back());
 }
 
 void NotesDisplayingTab::updateNoteButton(const Note &note)
