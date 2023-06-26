@@ -7,8 +7,21 @@ NotesDisplayingTab::NotesDisplayingTab(QWidget *parent)
 {
     ui->setupUi(this);
     QObject::connect(ui->newNoteButton, &QPushButton::clicked, this, &NotesDisplayingTab::onNewNoteButtonPressed);
+
+    QObject::connect(ui->sortByTitleButton, &QRadioButton::toggled, this,
+                     &NotesDisplayingTab::onSortByTitleButtonToggled);
+    QObject::connect(ui->sortByCreationDateButton, &QRadioButton::toggled, this,
+                     &NotesDisplayingTab::onSortByCreationDateButtonToggled);
+    QObject::connect(ui->sortByModificationDateButton, &QRadioButton::toggled, this,
+                     &NotesDisplayingTab::onSortByModificationDateButtonToggled);
+    QObject::connect(ui->sortInAscendingOrderButton, &QRadioButton::toggled, this,
+                     &NotesDisplayingTab::onSortOrderButtonToggled);
+    QObject::connect(ui->sortInDescendingOrder, &QRadioButton::toggled, this,
+                     &NotesDisplayingTab::onSortOrderButtonToggled);
+
     QVBoxLayout *layout = new QVBoxLayout();
     ui->scrollArea->widget()->setLayout(layout);
+    currentNoteButtonsSortingMethod = &NotesDisplayingTab::sortNoteButtonsByCreationDate;
     createNewNoteButtonsFromNotes();
 }
 
@@ -39,6 +52,7 @@ void NotesDisplayingTab::updateNoteButton(const Note &note)
         (*button)->setCreationTime(note.getCreationTime());
         (*button)->setModificationTime(note.getModificationTime());
     }
+    currentNoteButtonsSortingMethod(this, ui->sortInAscendingOrderButton->isChecked());
 }
 
 void NotesDisplayingTab::onNoteButtonChangedTitle()
@@ -82,6 +96,54 @@ void NotesDisplayingTab::sortNoteButtons(std::function<bool(const QWidget *, con
         ui->scrollArea->widget()->layout()->addWidget(i);
 }
 
+void NotesDisplayingTab::sortNoteButtonsByTitle(bool ascendingOrder)
+{
+    sortNoteButtons([ascendingOrder](const QWidget *a, const QWidget *b) -> bool {
+        if (ascendingOrder)
+        {
+            return static_cast<const NoteButton *>(a)->getTitle().toLower() <
+                   static_cast<const NoteButton *>(b)->getTitle().toLower();
+        }
+        else
+        {
+            return static_cast<const NoteButton *>(a)->getTitle().toLower() >
+                   static_cast<const NoteButton *>(b)->getTitle().toLower();
+        }
+    });
+}
+
+void NotesDisplayingTab::sortNoteButtonsByCreationDate(bool ascendingOrder)
+{
+    sortNoteButtons([ascendingOrder](const QWidget *a, const QWidget *b) -> bool {
+        if (ascendingOrder)
+        {
+            return static_cast<const NoteButton *>(a)->getCreationTime() <
+                   static_cast<const NoteButton *>(b)->getCreationTime();
+        }
+        else
+        {
+            return static_cast<const NoteButton *>(a)->getCreationTime() >
+                   static_cast<const NoteButton *>(b)->getCreationTime();
+        }
+    });
+}
+
+void NotesDisplayingTab::sortNoteButtonsByModificationDate(bool ascendingOrder)
+{
+    sortNoteButtons([ascendingOrder](const QWidget *a, const QWidget *b) -> bool {
+        if (ascendingOrder)
+        {
+            return static_cast<const NoteButton *>(a)->getModificationTime() <
+                   static_cast<const NoteButton *>(b)->getModificationTime();
+        }
+        else
+        {
+            return static_cast<const NoteButton *>(a)->getModificationTime() >
+                   static_cast<const NoteButton *>(b)->getModificationTime();
+        }
+    });
+}
+
 void NotesDisplayingTab::onNoteButtonDeleted()
 {
     auto reply = QMessageBox::question(this, "Delete note?", "Are you sure you want to delete this note?");
@@ -100,6 +162,32 @@ void NotesDisplayingTab::onNoteButtonDeleted()
     delete button;
 }
 
+void NotesDisplayingTab::onSortByTitleButtonToggled()
+{
+    bool ascendingOrder = ui->sortInAscendingOrderButton->isChecked();
+    sortNoteButtonsByTitle(ascendingOrder);
+    currentNoteButtonsSortingMethod = &NotesDisplayingTab::sortNoteButtonsByTitle;
+}
+
+void NotesDisplayingTab::onSortByCreationDateButtonToggled()
+{
+    bool ascendingOrder = ui->sortInAscendingOrderButton->isChecked();
+    sortNoteButtonsByCreationDate(ascendingOrder);
+    currentNoteButtonsSortingMethod = &NotesDisplayingTab::sortNoteButtonsByCreationDate;
+}
+
+void NotesDisplayingTab::onSortByModificationDateButtonToggled()
+{
+    bool ascendingOrder = ui->sortInAscendingOrderButton->isChecked();
+    sortNoteButtonsByModificationDate(ascendingOrder);
+    currentNoteButtonsSortingMethod = &NotesDisplayingTab::sortNoteButtonsByModificationDate;
+}
+
+void NotesDisplayingTab::onSortOrderButtonToggled()
+{
+    currentNoteButtonsSortingMethod(this, ui->sortInAscendingOrderButton->isChecked());
+}
+
 void NotesDisplayingTab::createNewNoteButton(Note &note)
 {
     NoteButton *noteButton = new NoteButton(note.getTitle(), note.getCreationTime(), note.getModificationTime());
@@ -110,4 +198,5 @@ void NotesDisplayingTab::createNewNoteButton(Note &note)
     buttonToNoteMap.insert(noteButton, &note);
     noteToButtonMap.insert(static_cast<const Note *>(&note), noteButton);
     ui->scrollArea->widget()->layout()->addWidget(noteButton);
+    currentNoteButtonsSortingMethod(this, ui->sortInAscendingOrderButton->isChecked());
 }

@@ -41,16 +41,24 @@ class NotesDisplayingTab : public QWidget
     void onNoteButtonClicked();
     void onNoteButtonChangedTitle();
     void onNoteButtonDeleted();
+    void onSortByTitleButtonToggled();
+    void onSortByCreationDateButtonToggled();
+    void onSortByModificationDateButtonToggled();
+    void onSortOrderButtonToggled();
 
   private:
     Ui::NotesDisplayingTab *ui;
     std::vector<std::unique_ptr<Note>> notes;
     QHash<const NoteButton *, Note *> buttonToNoteMap;
     QHash<const Note *, NoteButton *> noteToButtonMap;
+    std::function<void(NotesDisplayingTab *, bool)> currentNoteButtonsSortingMethod;
     void createNewNoteButton(Note &note);
     void createNewNoteButtonsFromNotes();
     void deleteNoteFromVector(Note *note);
     void sortNoteButtons(std::function<bool(const QWidget *a, const QWidget *b)> compare);
+    void sortNoteButtonsByTitle(bool ascendingOrder);
+    void sortNoteButtonsByCreationDate(bool ascendingOrder);
+    void sortNoteButtonsByModificationDate(bool ascendingOrder);
 };
 
 #endif // NOTESDISPLAYINGTAB_H
