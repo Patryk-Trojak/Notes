@@ -12,22 +12,22 @@
 class Note
 {
   public:
-    explicit Note(const QString &filename = "");
+    explicit Note(int id);
+    int getId() const;
     const QString &getContent() const;
     const QString &getTitle() const;
-    const QString &getFilename() const;
     const QDateTime &getCreationTime() const;
     const QDateTime &getModificationTime() const;
+    void setId(int id);
     void setTitle(const QString &title);
     void setContent(const QString &content);
-    void setFilename(const QString &filename);
     void setCreationTime(const QDateTime &newCreationTime);
     void setModificationTime(const QDateTime &newModificationTime);
 
   private:
+    int id;
     QString title;
     QString content;
-    QString filename;
     QDateTime creationTime;
     QDateTime modificationTime;
 };

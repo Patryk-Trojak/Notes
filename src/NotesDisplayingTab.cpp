@@ -159,7 +159,7 @@ void NotesDisplayingTab::onNoteButtonDeleted()
     auto foundNote = buttonToNoteMap.find(button);
     if (foundNote != buttonToNoteMap.end())
     {
-        PersistenceManager::deleteNoteFile((*foundNote)->getFilename());
+        PersistenceManager::deleteNoteFile((*foundNote)->getId());
         noteToButtonMap.erase(noteToButtonMap.find(*foundNote));
         deleteNoteFromVector(*foundNote);
         buttonToNoteMap.erase(foundNote);
