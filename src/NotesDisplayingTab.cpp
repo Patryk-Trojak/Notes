@@ -1,6 +1,7 @@
 #include "NotesDisplayingTab.h"
 #include "PersistenceManager.h"
 #include "ui_NotesDisplayingTab.h"
+#include <QShortcut>
 
 NotesDisplayingTab::NotesDisplayingTab(QWidget *parent)
     : QWidget(parent), ui(new Ui::NotesDisplayingTab), notes(PersistenceManager::loadAllNotes())
@@ -18,6 +19,9 @@ NotesDisplayingTab::NotesDisplayingTab(QWidget *parent)
                      &NotesDisplayingTab::onSortOrderButtonToggled);
     QObject::connect(ui->sortInDescendingOrder, &QRadioButton::toggled, this,
                      &NotesDisplayingTab::onSortOrderButtonToggled);
+
+    QShortcut *createNewNoteShortcut = new QShortcut(QKeySequence(QKeySequence::New), this);
+    QObject::connect(createNewNoteShortcut, &QShortcut::activated, this, &NotesDisplayingTab::onNewNoteButtonPressed);
 
     QVBoxLayout *layout = new QVBoxLayout();
     ui->scrollArea->widget()->setLayout(layout);
