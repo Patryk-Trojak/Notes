@@ -59,6 +59,25 @@ std::vector<std::unique_ptr<Note>> PersistenceManager::loadAllNotes()
     return notes;
 }
 
+std::vector<int> PersistenceManager::getAllIdsOfSavedNotes()
+{
+    std::vector<int> ids;
+    QDir direcory(notesDirectoryPathname);
+    if (!direcory.exists())
+    {
+        direcory.mkpath(".");
+        return ids;
+    }
+
+    QStringList listOfNotes = direcory.entryList(QDir::Filter::Files);
+    for (auto const &noteFilename : listOfNotes)
+    {
+        int id = noteFilename.first(noteFilename.size() - 4).toInt();
+        ids.emplace_back(id);
+    }
+    return ids;
+}
+
 void PersistenceManager::saveAllNotes(const std::vector<std::unique_ptr<Note>> &notes)
 {
     for (auto const &note : notes)

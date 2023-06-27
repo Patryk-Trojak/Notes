@@ -17,6 +17,7 @@ class PersistenceManager
     static void updateCreationAndModificationTime(Note &note);
     static std::unique_ptr<Note> createNewNoteFile();
     static std::vector<std::unique_ptr<Note>> loadAllNotes();
+    static std::vector<int> getAllIdsOfSavedNotes();
     static void deleteNoteFile(int id);
     static QString generateUniqueNoteFilename();
     static QString notesDirectoryPathname;
