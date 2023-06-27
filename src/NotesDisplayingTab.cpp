@@ -3,8 +3,8 @@
 #include "ui_NotesDisplayingTab.h"
 #include <QShortcut>
 
-NotesDisplayingTab::NotesDisplayingTab(QWidget *parent)
-    : QWidget(parent), ui(new Ui::NotesDisplayingTab), notes(PersistenceManager::loadAllNotes())
+NotesDisplayingTab::NotesDisplayingTab(NotesManager &notesManager, QWidget *parent)
+    : QWidget(parent), ui(new Ui::NotesDisplayingTab), notesManager(notesManager)
 {
     ui->setupUi(this);
     QObject::connect(ui->newNoteButton, &QPushButton::clicked, this, &NotesDisplayingTab::onNewNoteButtonPressed);
@@ -36,16 +36,15 @@ NotesDisplayingTab::~NotesDisplayingTab()
 
 void NotesDisplayingTab::createNewNoteButtonsFromNotes()
 {
-    for (auto const &note : notes)
+    for (auto const &note : notesManager.getNotes())
         createNewNoteButton(*note);
 }
 
 void NotesDisplayingTab::onNewNoteButtonPressed()
 {
-    std::unique_ptr<Note> note = PersistenceManager::createNewNoteFile();
-    createNewNoteButton(*note);
-    notes.push_back(std::move(note));
-    emit enterEditingNote(*notes.back());
+    Note &note = notesManager.createNewDefaultNote();
+    createNewNoteButton(note);
+    emit enterEditingNote(note);
 }
 
 void NotesDisplayingTab::updateNoteButton(const Note &note)
@@ -67,7 +66,7 @@ void NotesDisplayingTab::onNoteButtonChangedTitle()
     if (foundNote != buttonToNoteMap.end())
     {
         (*foundNote)->setTitle(button->getTitle());
-        PersistenceManager::saveNoteToFile(**foundNote);
+        notesManager.saveNote(**foundNote);
         updateNoteButton(**foundNote);
     }
 }
@@ -80,13 +79,6 @@ void NotesDisplayingTab::onNoteButtonClicked()
     {
         emit enterEditingNote(**foundNote);
     }
-}
-
-void NotesDisplayingTab::deleteNoteFromVector(Note *note)
-{
-    notes.erase(std::remove_if(notes.begin(), notes.end(),
-                               [note](const std::unique_ptr<Note> &notePtr) { return notePtr.get() == note; }),
-                notes.end());
 }
 
 void NotesDisplayingTab::sortNoteButtons(std::function<bool(const QWidget *, const QWidget *)> compare)
@@ -159,9 +151,8 @@ void NotesDisplayingTab::onNoteButtonDeleted()
     auto foundNote = buttonToNoteMap.find(button);
     if (foundNote != buttonToNoteMap.end())
     {
-        PersistenceManager::deleteNoteFile((*foundNote)->getId());
         noteToButtonMap.erase(noteToButtonMap.find(*foundNote));
-        deleteNoteFromVector(*foundNote);
+        notesManager.deleteNote(**foundNote);
         buttonToNoteMap.erase(foundNote);
     }
     delete button;

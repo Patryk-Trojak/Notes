@@ -19,11 +19,12 @@ class NoteEditingTab : public QWidget
     void startEditingNewNote(Note *note);
   signals:
     void exitEditingNote(Note &note);
+    void saveNote(Note &note);
 
   private:
     Ui::NoteEditingTab *ui;
     Note *currentEditingNote;
-    void saveNote();
+    void onSaveNoteButtonPressed();
     QString lastSavedTitle;
     QString lastSavedContent;
     bool hasNoteChanged();

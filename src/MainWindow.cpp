@@ -1,13 +1,13 @@
 #include "MainWindow.h"
 #include "./ui_MainWindow.h"
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), notesDisplayingTab(notesManager)
 {
     ui->setupUi(this);
     ui->stackedWidget->setCurrentIndex(0);
     QObject::connect(&noteEditTab, &NoteEditingTab::exitEditingNote, this, &MainWindow::exitEditingNote);
     QObject::connect(&notesDisplayingTab, &NotesDisplayingTab::enterEditingNote, this, &MainWindow::enterEditingNote);
-
+    QObject::connect(&noteEditTab, &NoteEditingTab::saveNote, &notesManager, &NotesManager::saveNote);
     ui->stackedWidget->insertWidget(0, &notesDisplayingTab);
     ui->stackedWidget->setCurrentIndex(0);
     ui->stackedWidget->insertWidget(1, &noteEditTab);

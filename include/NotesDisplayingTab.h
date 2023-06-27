@@ -3,6 +3,7 @@
 
 #include "Note.h"
 #include "NoteButton.h"
+#include "NotesManager.h"
 #include "Utils.h"
 #include <QDebug>
 #include <QFile>
@@ -20,6 +21,7 @@
 #include <functional>
 #include <memory>
 #include <vector>
+
 namespace Ui
 {
 class NotesDisplayingTab;
@@ -29,13 +31,15 @@ class NotesDisplayingTab : public QWidget
 {
     Q_OBJECT
   public:
-    explicit NotesDisplayingTab(QWidget *parent = nullptr);
+    explicit NotesDisplayingTab(NotesManager &notesManager, QWidget *parent = nullptr);
     ~NotesDisplayingTab();
 
   public:
     void updateNoteButton(const Note &note);
   signals:
     void enterEditingNote(Note &note);
+    void saveNote(Note &note);
+    void deleteNote(Note &note);
   private slots:
     void onNewNoteButtonPressed();
     void onNoteButtonClicked();
@@ -48,7 +52,7 @@ class NotesDisplayingTab : public QWidget
 
   private:
     Ui::NotesDisplayingTab *ui;
-    std::vector<std::unique_ptr<Note>> notes;
+    NotesManager &notesManager;
     QHash<const NoteButton *, Note *> buttonToNoteMap;
     QHash<const Note *, NoteButton *> noteToButtonMap;
     std::function<void(NotesDisplayingTab *, bool)> currentNoteButtonsSortingMethod;
