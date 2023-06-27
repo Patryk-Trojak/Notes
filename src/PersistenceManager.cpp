@@ -32,33 +32,6 @@ void PersistenceManager::updateCreationAndModificationTime(Note &note)
     note.setModificationTime(noteFile.lastModified());
 }
 
-std::unique_ptr<Note> PersistenceManager::createNewNoteFile()
-{
-    QString uniqueFilename = PersistenceManager::generateUniqueNoteFilename();
-    std::unique_ptr<Note> note = std::make_unique<Note>(uniqueFilename.left(9).toInt());
-    note->setTitle("Untitled");
-    PersistenceManager::saveNoteToFile(*note);
-    return note;
-}
-
-std::vector<std::unique_ptr<Note>> PersistenceManager::loadAllNotes()
-{
-    std::vector<std::unique_ptr<Note>> notes;
-    QDir direcory(notesDirectoryPathname);
-    if (!direcory.exists())
-    {
-        direcory.mkpath(".");
-        return notes;
-    }
-    QStringList listOfNotes = direcory.entryList(QDir::Filter::Files);
-    for (auto const &noteFilename : listOfNotes)
-    {
-        notes.emplace_back(loadNoteFromFile(noteFilename.toInt()));
-    }
-
-    return notes;
-}
-
 std::vector<int> PersistenceManager::getAllIdsOfSavedNotes()
 {
     std::vector<int> ids;
@@ -76,29 +49,6 @@ std::vector<int> PersistenceManager::getAllIdsOfSavedNotes()
         ids.emplace_back(id);
     }
     return ids;
-}
-
-void PersistenceManager::saveAllNotes(const std::vector<std::unique_ptr<Note>> &notes)
-{
-    for (auto const &note : notes)
-    {
-        saveNoteToFile(*note);
-    }
-}
-
-QString PersistenceManager::generateUniqueNoteFilename()
-{
-    QString filename = QString("");
-    do
-    {
-        for (int i = 0; i < 9; i++)
-        {
-            std::uniform_int_distribution dist(48, 57);
-            filename.append(QChar(dist(*QRandomGenerator::global())));
-        }
-        filename.append(".txt");
-    } while (QFile::exists(filename));
-    return filename;
 }
 
 QString PersistenceManager::createFullPathToNote(int id)
