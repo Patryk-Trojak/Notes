@@ -1,6 +1,9 @@
 #include "PersistenceManager.h"
 
-QString PersistenceManager::notesDirectoryPathname;
+PersistenceManager::PersistenceManager()
+    : notesDirectoryPathname(QCoreApplication::applicationDirPath() + QString("/notesDir/"))
+{
+}
 
 void PersistenceManager::saveNoteToFile(Note &note)
 {

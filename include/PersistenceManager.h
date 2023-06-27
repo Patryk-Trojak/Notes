@@ -11,16 +11,17 @@
 class PersistenceManager
 {
   public:
-    static void saveNoteToFile(Note &note);
-    static std::unique_ptr<Note> loadNoteFromFile(int id);
-    static void updateCreationAndModificationTime(Note &note);
-    static std::vector<int> getAllIdsOfSavedNotes();
-    static void deleteNoteFile(int id);
-    static QString notesDirectoryPathname;
+    PersistenceManager();
+    void saveNoteToFile(Note &note);
+    std::unique_ptr<Note> loadNoteFromFile(int id);
+    void updateCreationAndModificationTime(Note &note);
+    std::vector<int> getAllIdsOfSavedNotes();
+    void deleteNoteFile(int id);
 
   private:
-    static QString createFullPathToNote(int id);
-    static std::unique_ptr<Note> loadNoteFromFile(const QString &filename, int idOfNote);
+    QString notesDirectoryPathname;
+    QString createFullPathToNote(int id);
+    std::unique_ptr<Note> loadNoteFromFile(const QString &filename, int idOfNote);
 };
 
 #endif // PERSISTENCEMANAGER_H
