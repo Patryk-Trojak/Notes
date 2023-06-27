@@ -121,6 +121,6 @@ std::unique_ptr<Note> PersistenceManager::loadNoteFromFile(const QString &filena
 
 void PersistenceManager::deleteNoteFile(int id)
 {
-    QFile file(notesDirectoryPathname + QString::number(id));
+    QFile file(createFullPathToNote(id));
     file.remove();
 }
