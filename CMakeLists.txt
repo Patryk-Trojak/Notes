@@ -29,6 +29,7 @@ set(PROJECT_SOURCES
         ${INCLUDE_DIR}/NotesDisplayingTab.h ${SOURCE_DIR}/NotesDisplayingTab.cpp ${FORMS_DIR}/NotesDisplayingTab.ui
         ${INCLUDE_DIR}/PersistenceManager.h ${SOURCE_DIR}/PersistenceManager.cpp
         ${INCLUDE_DIR}/Utils.h ${SOURCE_DIR}/Utils.cpp
+        ${INCLUDE_DIR}/NotesManager.h ${SOURCE_DIR}/NotesManager.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
