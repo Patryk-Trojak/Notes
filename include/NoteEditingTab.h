@@ -32,6 +32,7 @@ class NoteEditingTab : public QWidget
 
   private slots:
     void onDeleteNoteButtonPressed();
+    void onReturnWithoutSavingButtonPressed();
 };
 
 #endif // NOTEEDITINGTAB_H

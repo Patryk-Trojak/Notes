@@ -10,6 +10,8 @@ NoteEditingTab::NoteEditingTab(QWidget *parent) : QWidget(parent), ui(new Ui::No
     QObject::connect(ui->saveAndReturn, &QPushButton::clicked, this,
                      [this]() { emit exitEditingNote(*currentEditingNote); });
     QObject::connect(ui->deleteButton, &QPushButton::clicked, this, &NoteEditingTab::onDeleteNoteButtonPressed);
+    QObject::connect(ui->returnWithoutSavingButton, &QPushButton::clicked, this,
+                     &NoteEditingTab::onReturnWithoutSavingButtonPressed);
 }
 
 NoteEditingTab::~NoteEditingTab()
@@ -52,4 +54,26 @@ void NoteEditingTab::onDeleteNoteButtonPressed()
     if (reply == QMessageBox::No)
         return;
     emit deleteNote(*currentEditingNote);
+}
+
+void NoteEditingTab::onReturnWithoutSavingButtonPressed()
+{
+    if (!hasNoteChanged())
+    {
+        emit exitEditingNote(*currentEditingNote);
+        return;
+    }
+
+    auto reply =
+        QMessageBox::question(this, "Discard changes?", "Are you sure you want to discard unsaved changes and return?",
+                              QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::Save);
+
+    if (reply == QMessageBox::Yes)
+        emit exitEditingNote(*currentEditingNote);
+
+    if (reply == QMessageBox::Save)
+    {
+        onSaveNoteButtonPressed();
+        emit exitEditingNote(*currentEditingNote);
+    }
 }
