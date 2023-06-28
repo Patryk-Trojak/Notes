@@ -39,8 +39,6 @@ class NotesDisplayingTab : public QWidget
     void deleteNoteButton(const Note &note);
   signals:
     void enterEditingNote(Note &note);
-    void saveNote(Note &note);
-    void deleteNote(Note &note);
   private slots:
     void onNewNoteButtonPressed();
     void onNoteButtonClicked();
@@ -59,7 +57,6 @@ class NotesDisplayingTab : public QWidget
     std::function<void(NotesDisplayingTab *, bool)> currentNoteButtonsSortingMethod;
     void createNewNoteButton(Note &note);
     void createNewNoteButtonsFromNotes();
-    void deleteNoteFromVector(Note *note);
     void sortNoteButtons(std::function<bool(const QWidget *a, const QWidget *b)> compare);
     void sortNoteButtonsByTitle(bool ascendingOrder);
     void sortNoteButtonsByCreationDate(bool ascendingOrder);
