@@ -8,6 +8,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     QObject::connect(&noteEditTab, &NoteEditingTab::exitEditingNote, this, &MainWindow::exitEditingNote);
     QObject::connect(&notesDisplayingTab, &NotesDisplayingTab::enterEditingNote, this, &MainWindow::enterEditingNote);
     QObject::connect(&noteEditTab, &NoteEditingTab::saveNote, &notesManager, &NotesManager::saveNote);
+    QObject::connect(&noteEditTab, &NoteEditingTab::deleteNote, this, &MainWindow::onDeletingNoteInEditingTab);
+
     ui->stackedWidget->insertWidget(0, &notesDisplayingTab);
     ui->stackedWidget->setCurrentIndex(0);
     ui->stackedWidget->insertWidget(1, &noteEditTab);
@@ -28,5 +30,13 @@ void MainWindow::enterEditingNote(Note &note)
 void MainWindow::exitEditingNote(Note &note)
 {
     notesDisplayingTab.updateNoteButton(note);
+    ui->stackedWidget->setCurrentIndex(0);
+}
+
+void MainWindow::onDeletingNoteInEditingTab(Note &note)
+{
+    qInfo() << "DONE" << '\n';
+    notesManager.deleteNote(note);
+    notesDisplayingTab.deleteNoteButton(note);
     ui->stackedWidget->setCurrentIndex(0);
 }

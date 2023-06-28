@@ -20,6 +20,7 @@ class NoteEditingTab : public QWidget
   signals:
     void exitEditingNote(Note &note);
     void saveNote(Note &note);
+    void deleteNote(Note &note);
 
   private:
     Ui::NoteEditingTab *ui;
@@ -28,6 +29,9 @@ class NoteEditingTab : public QWidget
     QString lastSavedTitle;
     QString lastSavedContent;
     bool hasNoteChanged();
+
+  private slots:
+    void onDeleteNoteButtonPressed();
 };
 
 #endif // NOTEEDITINGTAB_H

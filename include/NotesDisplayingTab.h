@@ -36,6 +36,7 @@ class NotesDisplayingTab : public QWidget
 
   public:
     void updateNoteButton(const Note &note);
+    void deleteNoteButton(const Note &note);
   signals:
     void enterEditingNote(Note &note);
     void saveNote(Note &note);

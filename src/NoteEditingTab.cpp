@@ -1,6 +1,7 @@
 #include "NoteEditingTab.h"
 #include "PersistenceManager.h"
 #include "ui_NoteEditingTab.h"
+#include <QMessageBox>
 
 NoteEditingTab::NoteEditingTab(QWidget *parent) : QWidget(parent), ui(new Ui::NoteEditingTab)
 {
@@ -8,6 +9,7 @@ NoteEditingTab::NoteEditingTab(QWidget *parent) : QWidget(parent), ui(new Ui::No
     QObject::connect(ui->saveAndReturn, &QPushButton::clicked, this, &NoteEditingTab::onSaveNoteButtonPressed);
     QObject::connect(ui->saveAndReturn, &QPushButton::clicked, this,
                      [this]() { emit exitEditingNote(*currentEditingNote); });
+    QObject::connect(ui->deleteButton, &QPushButton::clicked, this, &NoteEditingTab::onDeleteNoteButtonPressed);
 }
 
 NoteEditingTab::~NoteEditingTab()
@@ -42,4 +44,12 @@ bool NoteEditingTab::hasNoteChanged()
         return false;
 
     return true;
+}
+
+void NoteEditingTab::onDeleteNoteButtonPressed()
+{
+    auto reply = QMessageBox::question(this, "Delete note?", "Are you sure you want to delete this note?");
+    if (reply == QMessageBox::No)
+        return;
+    emit deleteNote(*currentEditingNote);
 }

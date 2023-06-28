@@ -22,6 +22,7 @@ class MainWindow : public QMainWindow
   public slots:
     void enterEditingNote(Note &note);
     void exitEditingNote(Note &note);
+    void onDeletingNoteInEditingTab(Note &note);
 
   private:
     Ui::MainWindow *ui;

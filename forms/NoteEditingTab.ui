@@ -43,7 +43,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="2,1,2">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="2,1,1,2">
      <item>
       <spacer name="verticalSpacer">
        <property name="orientation">
@@ -67,6 +67,19 @@
        </property>
        <property name="text">
         <string>Save and return</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="deleteButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Delete note</string>
        </property>
       </widget>
      </item>

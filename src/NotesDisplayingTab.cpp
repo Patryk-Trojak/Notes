@@ -59,6 +59,14 @@ void NotesDisplayingTab::updateNoteButton(const Note &note)
     currentNoteButtonsSortingMethod(this, ui->sortInAscendingOrderButton->isChecked());
 }
 
+void NotesDisplayingTab::deleteNoteButton(const Note &note)
+{
+    auto foundButton = noteToButtonMap.find(&note);
+    buttonToNoteMap.erase(buttonToNoteMap.find(*foundButton));
+    delete *foundButton;
+    noteToButtonMap.erase(foundButton);
+}
+
 void NotesDisplayingTab::onNoteButtonChangedTitle()
 {
     NoteButton *button = qobject_cast<NoteButton *>(QObject::sender());
