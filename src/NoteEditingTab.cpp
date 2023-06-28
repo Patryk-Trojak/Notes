@@ -13,6 +13,7 @@ NoteEditingTab::NoteEditingTab(QWidget *parent) : QWidget(parent), ui(new Ui::No
     QObject::connect(ui->deleteButton, &QPushButton::clicked, this, &NoteEditingTab::onDeleteNoteButtonPressed);
     QObject::connect(ui->returnWithoutSavingButton, &QPushButton::clicked, this,
                      &NoteEditingTab::onReturnWithoutSavingButtonPressed);
+    QObject::connect(ui->saveButton, &QPushButton::clicked, this, &NoteEditingTab::saveNoteIfChanged);
     QObject::connect(new QShortcut(QKeySequence(QKeySequence::Save), this), &QShortcut::activated, this,
                      &NoteEditingTab::saveNoteIfChanged);
 }
