@@ -2,6 +2,7 @@
 #include "PersistenceManager.h"
 #include "ui_NoteEditingTab.h"
 #include <QMessageBox>
+#include <QShortcut>
 
 NoteEditingTab::NoteEditingTab(QWidget *parent) : QWidget(parent), ui(new Ui::NoteEditingTab)
 {
@@ -12,6 +13,8 @@ NoteEditingTab::NoteEditingTab(QWidget *parent) : QWidget(parent), ui(new Ui::No
     QObject::connect(ui->deleteButton, &QPushButton::clicked, this, &NoteEditingTab::onDeleteNoteButtonPressed);
     QObject::connect(ui->returnWithoutSavingButton, &QPushButton::clicked, this,
                      &NoteEditingTab::onReturnWithoutSavingButtonPressed);
+    QObject::connect(new QShortcut(QKeySequence(QKeySequence::Save), this), &QShortcut::activated, this,
+                     &NoteEditingTab::saveNoteIfChanged);
 }
 
 NoteEditingTab::~NoteEditingTab()
