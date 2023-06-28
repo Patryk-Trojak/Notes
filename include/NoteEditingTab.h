@@ -25,7 +25,7 @@ class NoteEditingTab : public QWidget
   private:
     Ui::NoteEditingTab *ui;
     Note *currentEditingNote;
-    void onSaveNoteButtonPressed();
+    void saveNoteIfChanged();
     QString lastSavedTitle;
     QString lastSavedContent;
     bool hasNoteChanged();

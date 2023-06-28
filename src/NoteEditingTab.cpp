@@ -6,7 +6,7 @@
 NoteEditingTab::NoteEditingTab(QWidget *parent) : QWidget(parent), ui(new Ui::NoteEditingTab)
 {
     ui->setupUi(this);
-    QObject::connect(ui->saveAndReturn, &QPushButton::clicked, this, &NoteEditingTab::onSaveNoteButtonPressed);
+    QObject::connect(ui->saveAndReturn, &QPushButton::clicked, this, &NoteEditingTab::saveNoteIfChanged);
     QObject::connect(ui->saveAndReturn, &QPushButton::clicked, this,
                      [this]() { emit exitEditingNote(*currentEditingNote); });
     QObject::connect(ui->deleteButton, &QPushButton::clicked, this, &NoteEditingTab::onDeleteNoteButtonPressed);
@@ -28,7 +28,7 @@ void NoteEditingTab::startEditingNewNote(Note *note)
     lastSavedContent = note->getContent();
 }
 
-void NoteEditingTab::onSaveNoteButtonPressed()
+void NoteEditingTab::saveNoteIfChanged()
 {
     if (!hasNoteChanged())
         return;
@@ -73,7 +73,7 @@ void NoteEditingTab::onReturnWithoutSavingButtonPressed()
 
     if (reply == QMessageBox::Save)
     {
-        onSaveNoteButtonPressed();
+        saveNoteIfChanged();
         emit exitEditingNote(*currentEditingNote);
     }
 }
