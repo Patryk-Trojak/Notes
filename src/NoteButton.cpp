@@ -3,18 +3,9 @@
 
 NoteButton::NoteButton(const QString &title, const QDateTime &creationTime, const QDateTime &modificationTime,
                        QWidget *parent)
-    : QWidget{parent}, ui(new Ui::NoteButton), lastSavedTitle(title)
+    : QPushButton{parent}, ui(new Ui::NoteButton), lastSavedTitle(title)
 {
-    this->setMinimumHeight(130);
-    this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    QVBoxLayout *verticalLayout = new QVBoxLayout(this);
-    verticalLayout->setSpacing(0);
-    verticalLayout->setContentsMargins(0, 0, 0, 0);
-
-    button = new QPushButton(this);
-    verticalLayout->addWidget(button);
-
-    ui->setupUi(button);
+    ui->setupUi(this);
     setCreationTime(creationTime);
     setModificationTime(modificationTime);
     ui->titleEdit->setText(title);
@@ -25,7 +16,7 @@ NoteButton::NoteButton(const QString &title, const QDateTime &creationTime, cons
             lastSavedTitle = ui->titleEdit->text();
         }
     });
-    QObject::connect(button, &QPushButton::clicked, this, &NoteButton::enterEditingNote);
+    QObject::connect(this, &QPushButton::clicked, this, &NoteButton::enterEditingNote);
     QObject::connect(ui->deleteButton, &QPushButton::clicked, this, &NoteButton::deleteNote);
 }
 

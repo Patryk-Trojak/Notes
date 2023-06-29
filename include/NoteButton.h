@@ -10,7 +10,7 @@ namespace Ui
 class NoteButton;
 }
 
-class NoteButton : public QWidget
+class NoteButton : public QPushButton
 {
     Q_OBJECT
   public:
@@ -29,7 +29,6 @@ class NoteButton : public QWidget
 
   private:
     Ui::NoteButton *ui;
-    QPushButton *button;
     QDateTime creationTime;
     QDateTime modificationTime;
     QString convertDateTimeToString(const QDateTime &dateTime);
