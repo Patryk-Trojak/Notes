@@ -30,6 +30,7 @@ set(PROJECT_SOURCES
         ${INCLUDE_DIR}/PersistenceManager.h ${SOURCE_DIR}/PersistenceManager.cpp
         ${INCLUDE_DIR}/Utils.h ${SOURCE_DIR}/Utils.cpp
         ${INCLUDE_DIR}/NotesManager.h ${SOURCE_DIR}/NotesManager.cpp
+        ${INCLUDE_DIR}/AboutWindow.h ${SOURCE_DIR}/AboutWindow.cpp ${FORMS_DIR}/AboutWindow.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

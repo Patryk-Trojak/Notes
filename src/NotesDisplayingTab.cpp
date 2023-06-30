@@ -1,12 +1,18 @@
 #include "NotesDisplayingTab.h"
 #include "PersistenceManager.h"
 #include "ui_NotesDisplayingTab.h"
+#include <AboutWindow.h>
 #include <QShortcut>
 
 NotesDisplayingTab::NotesDisplayingTab(NotesManager &notesManager, QWidget *parent)
     : QWidget(parent), ui(new Ui::NotesDisplayingTab), notesManager(notesManager)
 {
     ui->setupUi(this);
+    QObject::connect(ui->aboutNotes, &QPushButton::clicked, this, [this]() {
+        auto aboutWindow = new AboutWindow(this);
+        aboutWindow->show();
+        qInfo() << "Clicke!";
+    });
     QObject::connect(ui->newNoteButton, &QPushButton::clicked, this, &NotesDisplayingTab::onNewNoteButtonPressed);
 
     QObject::connect(ui->sortByTitleButton, &QRadioButton::toggled, this,
