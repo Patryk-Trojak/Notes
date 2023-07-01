@@ -12,6 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
 set(FORMS_DIR ${CMAKE_SOURCE_DIR}/forms)
+set(RESOURCES_DIR ${CMAKE_SOURCE_DIR}/resources)
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${FORMS_DIR})
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
@@ -31,6 +32,7 @@ set(PROJECT_SOURCES
         ${INCLUDE_DIR}/Utils.h ${SOURCE_DIR}/Utils.cpp
         ${INCLUDE_DIR}/NotesManager.h ${SOURCE_DIR}/NotesManager.cpp
         ${INCLUDE_DIR}/AboutWindow.h ${SOURCE_DIR}/AboutWindow.cpp ${FORMS_DIR}/AboutWindow.ui
+        ${RESOURCES_DIR}/images.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
