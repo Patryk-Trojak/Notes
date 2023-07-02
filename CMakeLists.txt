@@ -33,6 +33,7 @@ set(PROJECT_SOURCES
         ${INCLUDE_DIR}/NotesManager.h ${SOURCE_DIR}/NotesManager.cpp
         ${INCLUDE_DIR}/AboutWindow.h ${SOURCE_DIR}/AboutWindow.cpp ${FORMS_DIR}/AboutWindow.ui
         ${RESOURCES_DIR}/images.qrc
+        ${INCLUDE_DIR}/SearchBar.h ${SOURCE_DIR}/SearchBar.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

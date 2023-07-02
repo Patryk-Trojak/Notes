@@ -23,6 +23,9 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_4">
      <item>
+      <widget class="SearchBar" name="searchBar"/>
+     </item>
+     <item>
       <widget class="QScrollArea" name="scrollArea">
        <property name="widgetResizable">
         <bool>true</bool>
@@ -203,6 +206,13 @@ margin: 0;</string>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>SearchBar</class>
+   <extends>QLineEdit</extends>
+   <header>SearchBar.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../resources/images.qrc"/>
  </resources>

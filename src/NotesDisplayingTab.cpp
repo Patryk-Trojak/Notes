@@ -28,7 +28,7 @@ NotesDisplayingTab::NotesDisplayingTab(NotesManager &notesManager, QWidget *pare
 
     QShortcut *createNewNoteShortcut = new QShortcut(QKeySequence(QKeySequence::New), this);
     QObject::connect(createNewNoteShortcut, &QShortcut::activated, this, &NotesDisplayingTab::onNewNoteButtonPressed);
-
+    QObject::connect(ui->searchBar, &QLineEdit::textChanged, this, &NotesDisplayingTab::filterSortButtonsByTitle);
     QVBoxLayout *layout = new QVBoxLayout();
     ui->scrollArea->widget()->setLayout(layout);
     currentNoteButtonsSortingMethod = &NotesDisplayingTab::sortNoteButtonsByCreationDate;
@@ -196,6 +196,19 @@ void NotesDisplayingTab::onSortByModificationDateButtonToggled()
 void NotesDisplayingTab::onSortOrderButtonToggled()
 {
     currentNoteButtonsSortingMethod(this, ui->sortInAscendingOrderButton->isChecked());
+}
+
+void NotesDisplayingTab::filterSortButtonsByTitle(const QString &searched)
+{
+    QList<QWidget *> list = myUtils::getWidgetsFromLayout(*ui->scrollArea->widget()->layout());
+
+    for (auto const &noteButton : list)
+    {
+        if (static_cast<NoteButton *>(noteButton)->getTitle().contains(searched, Qt::CaseInsensitive))
+            noteButton->setVisible(true);
+        else
+            noteButton->setVisible(false);
+    }
 }
 
 void NotesDisplayingTab::createNewNoteButton(Note &note)

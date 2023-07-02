@@ -48,6 +48,7 @@ class NotesDisplayingTab : public QWidget
     void onSortByCreationDateButtonToggled();
     void onSortByModificationDateButtonToggled();
     void onSortOrderButtonToggled();
+    void filterSortButtonsByTitle(const QString &searched);
 
   private:
     Ui::NotesDisplayingTab *ui;

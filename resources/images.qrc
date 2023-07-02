@@ -3,5 +3,7 @@
         <file>images/about.png</file>
         <file>images/delete.png</file>
         <file>images/add.png</file>
+        <file>images/clear.png</file>
+        <file>images/search.png</file>
     </qresource>
 </RCC>
