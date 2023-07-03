@@ -1,5 +1,4 @@
 #include "NotesDisplayingTab.h"
-#include "PersistenceManager.h"
 #include "ui_NotesDisplayingTab.h"
 #include <AboutWindow.h>
 #include <QShortcut>

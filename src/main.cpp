@@ -1,5 +1,4 @@
 #include "MainWindow.h"
-#include "PersistenceManager.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
