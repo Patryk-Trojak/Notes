@@ -16,6 +16,8 @@ NoteEditingTab::NoteEditingTab(QWidget *parent) : QWidget(parent), ui(new Ui::No
     QObject::connect(ui->saveButton, &QPushButton::clicked, this, &NoteEditingTab::saveNoteIfChanged);
     QObject::connect(new QShortcut(QKeySequence(QKeySequence::Save), this), &QShortcut::activated, this,
                      &NoteEditingTab::saveNoteIfChanged);
+    QObject::connect(new QShortcut(QKeySequence(Qt::Key_Escape), this), &QShortcut::activated, this,
+                     &NoteEditingTab::onReturnWithoutSavingButtonPressed);
 }
 
 NoteEditingTab::~NoteEditingTab()
