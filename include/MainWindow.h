@@ -20,9 +20,9 @@ class MainWindow : public QMainWindow
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
   public slots:
-    void enterEditingNote(Note &note);
-    void exitEditingNote(Note &note);
-    void onDeletingNoteInEditingTab(Note &note);
+    void enterEditingNote(NoteData &note);
+    void exitEditingNote(NoteData &note);
+    void onDeletingNoteInEditingTab(NoteData &note);
 
   private:
     Ui::MainWindow *ui;

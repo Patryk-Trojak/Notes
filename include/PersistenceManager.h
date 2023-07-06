@@ -1,7 +1,7 @@
 #ifndef PERSISTENCEMANAGER_H
 #define PERSISTENCEMANAGER_H
 
-#include "Note.h"
+#include "NoteData.h"
 #include <QCoreApplication>
 #include <QDir>
 #include <QRandomGenerator>
@@ -12,16 +12,16 @@ class PersistenceManager
 {
   public:
     PersistenceManager();
-    void saveNoteToFile(Note &note);
-    std::unique_ptr<Note> loadNoteFromFile(int id);
-    void updateCreationAndModificationTime(Note &note);
+    void saveNoteToFile(NoteData &note);
+    std::unique_ptr<NoteData> loadNoteFromFile(int id);
+    void updateCreationAndModificationTime(NoteData &note);
     std::vector<int> getAllIdsOfSavedNotes();
     void deleteNoteFile(int id);
 
   private:
     QString notesDirectoryPathname;
     QString createFullPathToNote(int id);
-    std::unique_ptr<Note> loadNoteFromFile(const QString &filename, int idOfNote);
+    std::unique_ptr<NoteData> loadNoteFromFile(const QString &filename, int idOfNote);
 };
 
 #endif // PERSISTENCEMANAGER_H

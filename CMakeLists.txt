@@ -23,7 +23,7 @@ set(PROJECT_SOURCES
         ${SOURCE_DIR}/MainWindow.cpp
         ${INCLUDE_DIR}/MainWindow.h
         ${FORMS_DIR}/MainWindow.ui
-        ${INCLUDE_DIR}/Note.h ${SOURCE_DIR}/Note.cpp
+        ${INCLUDE_DIR}/NoteData.h ${SOURCE_DIR}/NoteData.cpp
         ${FORMS_DIR}/NoteButton.ui
         ${INCLUDE_DIR}/NoteButton.h ${SOURCE_DIR}/NoteButton.cpp
         ${INCLUDE_DIR}/NoteEditingTab.h ${SOURCE_DIR}/NoteEditingTab.cpp ${FORMS_DIR}/NoteEditingTab.ui

@@ -1,7 +1,7 @@
 #ifndef NOTEEDITINGTAB_H
 #define NOTEEDITINGTAB_H
 
-#include "Note.h"
+#include "NoteData.h"
 #include <QWidget>
 
 namespace Ui
@@ -16,15 +16,15 @@ class NoteEditingTab : public QWidget
     explicit NoteEditingTab(QWidget *parent = nullptr);
     ~NoteEditingTab();
   public slots:
-    void startEditingNewNote(Note *note);
+    void startEditingNewNote(NoteData *note);
   signals:
-    void exitEditingNote(Note &note);
-    void saveNote(Note &note);
-    void deleteNote(Note &note);
+    void exitEditingNote(NoteData &note);
+    void saveNote(NoteData &note);
+    void deleteNote(NoteData &note);
 
   private:
     Ui::NoteEditingTab *ui;
-    Note *currentEditingNote;
+    NoteData *currentEditingNote;
     void saveNoteIfChanged();
     QString lastSavedTitle;
     QString lastSavedContent;

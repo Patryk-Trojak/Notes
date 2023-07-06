@@ -1,8 +1,8 @@
 #ifndef NOTESDISPLAYINGTAB_H
 #define NOTESDISPLAYINGTAB_H
 
-#include "Note.h"
 #include "NoteButton.h"
+#include "NoteData.h"
 #include "NotesManager.h"
 #include "Utils.h"
 #include <QDebug>
@@ -35,10 +35,10 @@ class NotesDisplayingTab : public QWidget
     ~NotesDisplayingTab();
 
   public:
-    void updateNoteButton(const Note &note);
-    void deleteNoteButton(const Note &note);
+    void updateNoteButton(const NoteData &note);
+    void deleteNoteButton(const NoteData &note);
   signals:
-    void enterEditingNote(Note &note);
+    void enterEditingNote(NoteData &note);
   private slots:
     void onNewNoteButtonPressed();
     void onNoteButtonClicked();
@@ -53,10 +53,10 @@ class NotesDisplayingTab : public QWidget
   private:
     Ui::NotesDisplayingTab *ui;
     NotesManager &notesManager;
-    QHash<const NoteButton *, Note *> buttonToNoteMap;
-    QHash<const Note *, NoteButton *> noteToButtonMap;
+    QHash<const NoteButton *, NoteData *> buttonToNoteMap;
+    QHash<const NoteData *, NoteButton *> noteToButtonMap;
     std::function<void(NotesDisplayingTab *, bool)> currentNoteButtonsSortingMethod;
-    void createNewNoteButton(Note &note);
+    void createNewNoteButton(NoteData &note);
     void createNewNoteButtonsFromNotes();
     void sortNoteButtons(std::function<bool(const QWidget *a, const QWidget *b)> compare);
     void sortNoteButtonsByTitle(bool ascendingOrder);

@@ -47,12 +47,12 @@ void NotesDisplayingTab::createNewNoteButtonsFromNotes()
 
 void NotesDisplayingTab::onNewNoteButtonPressed()
 {
-    Note &note = notesManager.createNewDefaultNote();
+    NoteData &note = notesManager.createNewDefaultNote();
     createNewNoteButton(note);
     emit enterEditingNote(note);
 }
 
-void NotesDisplayingTab::updateNoteButton(const Note &note)
+void NotesDisplayingTab::updateNoteButton(const NoteData &note)
 {
     auto button = noteToButtonMap.find(&note);
     if (button != noteToButtonMap.end())
@@ -64,7 +64,7 @@ void NotesDisplayingTab::updateNoteButton(const Note &note)
     currentNoteButtonsSortingMethod(this, ui->sortInAscendingOrderButton->isChecked());
 }
 
-void NotesDisplayingTab::deleteNoteButton(const Note &note)
+void NotesDisplayingTab::deleteNoteButton(const NoteData &note)
 {
     auto foundButton = noteToButtonMap.find(&note);
     buttonToNoteMap.erase(buttonToNoteMap.find(*foundButton));
@@ -210,7 +210,7 @@ void NotesDisplayingTab::filterSortButtonsByTitle(const QString &searched)
     }
 }
 
-void NotesDisplayingTab::createNewNoteButton(Note &note)
+void NotesDisplayingTab::createNewNoteButton(NoteData &note)
 {
     NoteButton *noteButton = new NoteButton(note.getTitle(), note.getCreationTime(), note.getModificationTime());
     QObject::connect(noteButton, &NoteButton::saveNote, this, &NotesDisplayingTab::onNoteButtonChangedTitle);
@@ -218,7 +218,7 @@ void NotesDisplayingTab::createNewNoteButton(Note &note)
     QObject::connect(noteButton, &NoteButton::deleteNote, this, &NotesDisplayingTab::onNoteButtonDeleted);
 
     buttonToNoteMap.insert(noteButton, &note);
-    noteToButtonMap.insert(static_cast<const Note *>(&note), noteButton);
+    noteToButtonMap.insert(static_cast<const NoteData *>(&note), noteButton);
     ui->scrollArea->widget()->layout()->addWidget(noteButton);
     currentNoteButtonsSortingMethod(this, ui->sortInAscendingOrderButton->isChecked());
 }

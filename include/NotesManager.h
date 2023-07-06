@@ -1,6 +1,6 @@
 #ifndef NOTESMANAGER_H
 #define NOTESMANAGER_H
-#include "Note.h"
+#include "NoteData.h"
 #include "PersistenceManager.h"
 #include <QObject>
 #include <memory>
@@ -11,13 +11,13 @@ class NotesManager : public QObject
     Q_OBJECT
   public:
     NotesManager();
-    Note &createNewDefaultNote();
-    void saveNote(Note &note);
-    void deleteNote(Note &note);
-    const std::vector<std::unique_ptr<Note>> &getNotes() const;
+    NoteData &createNewDefaultNote();
+    void saveNote(NoteData &note);
+    void deleteNote(NoteData &note);
+    const std::vector<std::unique_ptr<NoteData>> &getNotes() const;
 
   private:
-    std::vector<std::unique_ptr<Note>> notes;
+    std::vector<std::unique_ptr<NoteData>> notes;
     PersistenceManager persistenceManager;
     void loadAllNotes();
     int generateUniqueId();

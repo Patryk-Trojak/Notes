@@ -21,19 +21,19 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::enterEditingNote(Note &note)
+void MainWindow::enterEditingNote(NoteData &note)
 {
     noteEditTab.startEditingNewNote(&note);
     ui->stackedWidget->setCurrentIndex(1);
 }
 
-void MainWindow::exitEditingNote(Note &note)
+void MainWindow::exitEditingNote(NoteData &note)
 {
     notesDisplayingTab.updateNoteButton(note);
     ui->stackedWidget->setCurrentIndex(0);
 }
 
-void MainWindow::onDeletingNoteInEditingTab(Note &note)
+void MainWindow::onDeletingNoteInEditingTab(NoteData &note)
 {
     qInfo() << "DONE" << '\n';
     notesManager.deleteNote(note);

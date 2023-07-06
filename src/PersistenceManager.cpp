@@ -5,7 +5,7 @@ PersistenceManager::PersistenceManager()
 {
 }
 
-void PersistenceManager::saveNoteToFile(Note &note)
+void PersistenceManager::saveNoteToFile(NoteData &note)
 {
     QFile file(createFullPathToNote(note.getId()));
     file.open(QFile::WriteOnly);
@@ -15,12 +15,12 @@ void PersistenceManager::saveNoteToFile(Note &note)
     file.close();
 }
 
-std::unique_ptr<Note> PersistenceManager::loadNoteFromFile(int id)
+std::unique_ptr<NoteData> PersistenceManager::loadNoteFromFile(int id)
 {
     QFile file(createFullPathToNote(id));
     file.open(QFile::ReadOnly);
     QTextStream textStream(&file);
-    std::unique_ptr<Note> note = std::make_unique<Note>(id);
+    std::unique_ptr<NoteData> note = std::make_unique<NoteData>(id);
     note->setTitle(textStream.readLine());
     note->setContent(textStream.readAll());
     file.close();
@@ -28,7 +28,7 @@ std::unique_ptr<Note> PersistenceManager::loadNoteFromFile(int id)
     return note;
 }
 
-void PersistenceManager::updateCreationAndModificationTime(Note &note)
+void PersistenceManager::updateCreationAndModificationTime(NoteData &note)
 {
     QFileInfo noteFile(createFullPathToNote(note.getId()));
     note.setCreationTime(noteFile.birthTime());
@@ -59,12 +59,12 @@ QString PersistenceManager::createFullPathToNote(int id)
     return notesDirectoryPathname + QString::number(id) + QString(".txt");
 }
 
-std::unique_ptr<Note> PersistenceManager::loadNoteFromFile(const QString &filename, int idOfNote)
+std::unique_ptr<NoteData> PersistenceManager::loadNoteFromFile(const QString &filename, int idOfNote)
 {
     QFile file(filename);
     file.open(QFile::ReadOnly);
     QTextStream textStream(&file);
-    std::unique_ptr<Note> note = std::make_unique<Note>(idOfNote);
+    std::unique_ptr<NoteData> note = std::make_unique<NoteData>(idOfNote);
     note->setTitle(textStream.readLine());
     note->setContent(textStream.readAll());
     file.close();

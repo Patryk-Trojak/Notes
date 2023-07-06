@@ -9,10 +9,10 @@
 #include <QTextStream>
 #include <random>
 
-class Note
+class NoteData
 {
   public:
-    explicit Note(int id);
+    explicit NoteData(int id);
     int getId() const;
     const QString &getContent() const;
     const QString &getTitle() const;

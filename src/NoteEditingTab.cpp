@@ -25,7 +25,7 @@ NoteEditingTab::~NoteEditingTab()
     delete ui;
 }
 
-void NoteEditingTab::startEditingNewNote(Note *note)
+void NoteEditingTab::startEditingNewNote(NoteData *note)
 {
     currentEditingNote = note;
     ui->titleEdit->setText(note->getTitle());
