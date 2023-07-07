@@ -79,6 +79,7 @@ void NotesDisplayingTab::onNoteButtonChangedTitle()
     if (foundNote != buttonToNoteMap.end())
     {
         (*foundNote)->setTitle(button->getTitle());
+        (*foundNote)->setModificationTime(QDateTime::currentDateTime());
         notesManager.saveNote(**foundNote);
         updateNoteButton(**foundNote);
     }

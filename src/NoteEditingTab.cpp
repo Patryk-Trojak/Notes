@@ -41,6 +41,7 @@ void NoteEditingTab::saveNoteIfChanged()
 
     currentEditingNote->setTitle(ui->titleEdit->text());
     currentEditingNote->setContent(ui->contentEdit->toPlainText());
+    currentEditingNote->setModificationTime(QDateTime::currentDateTime());
     lastSavedTitle = currentEditingNote->getTitle();
     lastSavedContent = currentEditingNote->getContent();
     emit saveNote(*currentEditingNote);
