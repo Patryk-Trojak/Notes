@@ -15,8 +15,8 @@ set(FORMS_DIR ${CMAKE_SOURCE_DIR}/forms)
 set(RESOURCES_DIR ${CMAKE_SOURCE_DIR}/resources)
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${FORMS_DIR})
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql)
 
 set(PROJECT_SOURCES
         ${SOURCE_DIR}/main.cpp
@@ -59,7 +59,7 @@ else()
     endif()
 endif()
 
-target_link_libraries(Notes PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(Notes PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Sql)
 target_include_directories(Notes PRIVATE ${INCLUDE_DIR})
 set_target_properties(Notes PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

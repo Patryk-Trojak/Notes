@@ -6,22 +6,25 @@
 #include <QDir>
 #include <QRandomGenerator>
 #include <QString>
+#include <QtSql/QSqlDatabase>
 #include <random>
 
 class PersistenceManager
 {
   public:
     PersistenceManager();
-    void saveNoteToFile(NoteData &note);
-    std::unique_ptr<NoteData> loadNoteFromFile(int id);
-    void updateCreationAndModificationTime(NoteData &note);
+    int addNote(const NoteData &note);
+    void updateNote(const NoteData &note);
+    NoteData loadNoteFromFile(int id);
     std::vector<int> getAllIdsOfSavedNotes();
     void deleteNoteFile(int id);
 
   private:
-    QString notesDirectoryPathname;
-    QString createFullPathToNote(int id);
-    std::unique_ptr<NoteData> loadNoteFromFile(const QString &filename, int idOfNote);
+    QString dbFullFilepath;
+    QSqlDatabase db;
+
+    void createNewDefaultTables();
+    int getIdOfLastInsertedNote();
 };
 
 #endif // PERSISTENCEMANAGER_H

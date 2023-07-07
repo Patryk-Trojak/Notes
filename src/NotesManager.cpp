@@ -9,17 +9,19 @@ NotesManager::NotesManager()
 
 NoteData &NotesManager::createNewDefaultNote()
 {
-    int id = generateUniqueId();
-    std::unique_ptr<NoteData> note = std::make_unique<NoteData>(id);
+    std::unique_ptr<NoteData> note = std::make_unique<NoteData>(-1);
     note->setTitle("Untitled");
-    persistenceManager.saveNoteToFile(*note);
+    note->setCreationTime(QDateTime::currentDateTime());
+    note->setModificationTime(QDateTime::currentDateTime());
+    int id = persistenceManager.addNote(*note);
+    note->setId(id);
     notes.emplace_back(std::move(note));
     return *notes.back().get();
 }
 
 void NotesManager::saveNote(NoteData &note)
 {
-    persistenceManager.saveNoteToFile(note);
+    persistenceManager.updateNote(note);
 }
 
 void NotesManager::deleteNote(NoteData &note)
@@ -41,7 +43,7 @@ void NotesManager::loadAllNotes()
     notes.reserve(ids.size());
     for (auto const &id : ids)
     {
-        notes.emplace_back(persistenceManager.loadNoteFromFile(id));
+        notes.emplace_back(std::make_unique<NoteData>(persistenceManager.loadNoteFromFile(id)));
     }
 }
 
