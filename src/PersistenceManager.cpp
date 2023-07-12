@@ -1,5 +1,4 @@
 #include "PersistenceManager.h"
-
 #include <QSqlError>
 #include <QSqlQuery>
 
@@ -109,6 +108,72 @@ void PersistenceManager::deleteNoteFile(int id)
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
 }
 
+QVector<FolderData> PersistenceManager::loadAllFolders()
+{
+    QVector<FolderData> folders;
+    QSqlQuery query(db);
+    query.prepare("SELECT * FROM folder");
+    if (!query.exec())
+    {
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+        return folders;
+    }
+
+    while (query.next())
+    {
+        folders.emplace_back();
+        folders.back().setId(query.value(0).toInt());
+        folders.back().setName(query.value(1).toString());
+        folders.back().setParentId(query.value(2).toInt());
+    }
+
+    return folders;
+}
+
+int PersistenceManager::addFolder(const FolderData &folder)
+{
+    QSqlQuery query(db);
+    query.prepare("INSERT INTO folder "
+                  "(name, parent_id)"
+                  "VALUES(:name, :parent_id)");
+
+    query.bindValue(":name", folder.getName());
+    query.bindValue(":parent_id", folder.getParentId());
+
+    if (!query.exec())
+    {
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+        return -1;
+    }
+    return getIdOfLastInsertedNote();
+}
+
+void PersistenceManager::updateFolder(const FolderData &folder)
+{
+    QSqlQuery query(db);
+
+    query.prepare("UPDATE folder "
+                  "SET name = :name, parent_id = :parent_id "
+                  "WHERE id = :id");
+
+    query.bindValue(":name", folder.getName());
+    query.bindValue(":parent_id", folder.getParentId());
+    query.bindValue(":id", folder.getId());
+
+    if (!query.exec())
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+}
+
+void PersistenceManager::deleteFolder(int id)
+{
+    QSqlQuery query(db);
+    query.prepare("DELETE FROM folder WHERE id = :id");
+    query.bindValue(":id", id);
+
+    if (!query.exec())
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+}
+
 void PersistenceManager::createNewDefaultTables()
 {
     QSqlQuery query(db);
@@ -122,6 +187,26 @@ void PersistenceManager::createNewDefaultTables()
 
     if (!query.exec(createNoteTable))
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+
+    query.finish();
+    QString createFolderTable = "CREATE TABLE folder("
+                                "id INTEGER PRIMARY KEY, "
+                                "name TEXT, "
+                                "parent_id INTEGER"
+                                ")";
+
+    if (!query.exec(createFolderTable))
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+
+    FolderData rootFolder;
+    rootFolder.setName("/");
+    rootFolder.setParentId(-1);
+    int rootId = addFolder(rootFolder);
+
+    FolderData notesFolder;
+    notesFolder.setName("Folder");
+    notesFolder.setParentId(rootId);
+    addFolder(notesFolder);
 }
 
 int PersistenceManager::getIdOfLastInsertedNote()

@@ -1,6 +1,7 @@
 #ifndef PERSISTENCEMANAGER_H
 #define PERSISTENCEMANAGER_H
 
+#include "FolderData.h"
 #include "NoteData.h"
 #include <QCoreApplication>
 #include <QDir>
@@ -19,9 +20,14 @@ class PersistenceManager
     std::vector<int> getAllIdsOfSavedNotes();
     void deleteNoteFile(int id);
 
+    QVector<FolderData> loadAllFolders();
+    int addFolder(const FolderData &folder);
+    void updateFolder(const FolderData &folder);
+    void deleteFolder(int id);
+
   private:
-    QString dbFullFilepath;
     QSqlDatabase db;
+    QString dbFullFilepath;
 
     void createNewDefaultTables();
     int getIdOfLastInsertedNote();
