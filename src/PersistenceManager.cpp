@@ -37,7 +37,7 @@ int PersistenceManager::addNote(const NoteData &note)
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
         return -1;
     }
-    return getIdOfLastInsertedNote();
+    return getIdOfLastInsertedRow();
 }
 
 void PersistenceManager::updateNote(const NoteData &note)
@@ -146,7 +146,7 @@ int PersistenceManager::addFolder(const FolderData &folder)
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
         return -1;
     }
-    return getIdOfLastInsertedNote();
+    return getIdOfLastInsertedRow();
 }
 
 void PersistenceManager::updateFolder(const FolderData &folder)
@@ -210,7 +210,7 @@ void PersistenceManager::createNewDefaultTables()
     addFolder(notesFolder);
 }
 
-int PersistenceManager::getIdOfLastInsertedNote()
+int PersistenceManager::getIdOfLastInsertedRow()
 {
     QSqlQuery query(db);
     query.prepare("SELECT last_insert_rowid()");

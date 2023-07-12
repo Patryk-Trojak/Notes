@@ -30,7 +30,7 @@ class PersistenceManager
     QString dbFullFilepath;
 
     void createNewDefaultTables();
-    int getIdOfLastInsertedNote();
+    int getIdOfLastInsertedRow();
 };
 
 #endif // PERSISTENCEMANAGER_H
