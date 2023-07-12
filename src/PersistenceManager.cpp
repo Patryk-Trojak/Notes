@@ -1,14 +1,15 @@
 #include "PersistenceManager.h"
 #include <QSqlError>
 #include <QSqlQuery>
-
+#include <QtGlobal>
 PersistenceManager::PersistenceManager() : dbFullFilepath(QCoreApplication::applicationDirPath() + QString("/notes.db"))
 {
     bool needCreateNewDefaultTables = false;
     if (!QFile::exists(dbFullFilepath))
         needCreateNewDefaultTables = true;
 
-    db = QSqlDatabase::addDatabase("QSQLITE");
+    db = QSqlDatabase::addDatabase("QSQLITE", QString::number(QRandomGenerator::global()->generate()));
+
     db.setDatabaseName(dbFullFilepath);
 
     if (!db.open())
