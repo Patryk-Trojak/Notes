@@ -35,6 +35,8 @@ set(PROJECT_SOURCES
         ${RESOURCES_DIR}/images.qrc
         ${INCLUDE_DIR}/SearchBar.h ${SOURCE_DIR}/SearchBar.cpp
         ${INCLUDE_DIR}/FolderData.h ${SOURCE_DIR}/FolderData.cpp
+        ${INCLUDE_DIR}/FolderTreeModel.h ${SOURCE_DIR}/FolderTreeModel.cpp
+        ${INCLUDE_DIR}/FolderTreeItem.h ${SOURCE_DIR}/FolderTreeItem.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
