@@ -10,6 +10,7 @@ class FolderTreeModel : public QAbstractItemModel
   public:
     FolderTreeModel(PersistenceManager &persistenceManager);
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
+    FolderTreeItem *getItemFromIndex(const QModelIndex &index) const;
     QModelIndex parent(const QModelIndex &child) const;
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;

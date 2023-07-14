@@ -7,13 +7,16 @@ FolderTreeModel::FolderTreeModel(PersistenceManager &persistenceManager) : persi
 
 QModelIndex FolderTreeModel::index(int row, int column, const QModelIndex &parent) const
 {
-    const FolderTreeItem *parentItem;
-    if (!parent.isValid())
-        parentItem = rootItem.get();
-    else
-        parentItem = static_cast<const FolderTreeItem *>(parent.constInternalPointer());
-
+    const FolderTreeItem *parentItem = getItemFromIndex(parent);
     return createIndex(row, column, parentItem->getChild(row));
+}
+
+FolderTreeItem *FolderTreeModel::getItemFromIndex(const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return rootItem.get();
+
+    return static_cast<FolderTreeItem *>(index.internalPointer());
 }
 
 QModelIndex FolderTreeModel::parent(const QModelIndex &child) const
@@ -25,15 +28,15 @@ QModelIndex FolderTreeModel::parent(const QModelIndex &child) const
     if (item == rootItem.get())
         return QModelIndex();
 
+    if (item->getParent() == nullptr || item->getParent() == rootItem.get())
+        return QModelIndex();
+
     return createIndex(item->getParent()->row(), 0, item->getParent());
 }
 
 int FolderTreeModel::rowCount(const QModelIndex &parent) const
 {
-    if (!parent.isValid())
-        return rootItem->getChildren().size();
-
-    const FolderTreeItem *item = static_cast<const FolderTreeItem *>(parent.constInternalPointer());
+    const FolderTreeItem *item = getItemFromIndex(parent);
     if (item)
         return item->getChildren().size();
 
@@ -47,7 +50,8 @@ int FolderTreeModel::columnCount(const QModelIndex &parent) const
 
 QVariant FolderTreeModel::data(const QModelIndex &index, int role) const
 {
-    const FolderTreeItem *item = static_cast<const FolderTreeItem *>(index.constInternalPointer());
+    const FolderTreeItem *item = getItemFromIndex(index);
+
     switch (role)
     {
     case Qt::EditRole:
@@ -60,7 +64,8 @@ QVariant FolderTreeModel::data(const QModelIndex &index, int role) const
 
 bool FolderTreeModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    FolderTreeItem *item = static_cast<FolderTreeItem *>(index.internalPointer());
+    FolderTreeItem *item = getItemFromIndex(index);
+
     switch (role)
     {
     case Qt::EditRole:
@@ -79,11 +84,7 @@ Qt::ItemFlags FolderTreeModel::flags(const QModelIndex &index) const
 
 bool FolderTreeModel::insertRows(int row, int count, const QModelIndex &parent)
 {
-    FolderTreeItem *parentItem;
-    if (parent.isValid())
-        parentItem = static_cast<FolderTreeItem *>(parent.internalPointer());
-    else
-        parentItem = rootItem.get();
+    FolderTreeItem *parentItem = getItemFromIndex(parent);
 
     for (int i = 0; i < count; i++)
     {
@@ -101,7 +102,8 @@ bool FolderTreeModel::insertRows(int row, int count, const QModelIndex &parent)
 
 bool FolderTreeModel::removeRows(int row, int count, const QModelIndex &parent)
 {
-    FolderTreeItem *parentItem = static_cast<FolderTreeItem *>(parent.internalPointer());
+    FolderTreeItem *parentItem = getItemFromIndex(parent);
+
     for (int i = 0; i < count; i++)
     {
         persistenceManager.deleteFolder(parentItem->getChild(row + i)->data.getId());
