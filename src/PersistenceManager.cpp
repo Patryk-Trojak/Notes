@@ -74,14 +74,28 @@ NoteData PersistenceManager::loadNoteFromFile(int id)
         return note;
     }
     query.next();
-    note.setId(query.value(0).toInt());
-    note.setParentFolderId(query.value(1).toInt());
-    note.setTitle(query.value(2).toString());
-    note.setContent(query.value(3).toString());
-    note.setCreationTime(QDateTime::fromMSecsSinceEpoch(query.value(4).toLongLong()));
-    note.setModificationTime(QDateTime::fromMSecsSinceEpoch(query.value(5).toLongLong()));
+    note = createNoteDataFromQueryRecord(query);
 
     return note;
+}
+
+QVector<NoteData> PersistenceManager::loadAllNotes()
+{
+    QVector<NoteData> notes;
+    QSqlQuery query(db);
+    query.prepare("SELECT * FROM note");
+    if (!query.exec())
+    {
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+        return notes;
+    }
+
+    while (query.next())
+    {
+        notes.emplace_back(createNoteDataFromQueryRecord(query));
+    }
+
+    return notes;
 }
 
 std::vector<int> PersistenceManager::getAllIdsOfSavedNotes()
@@ -229,4 +243,17 @@ int PersistenceManager::getIdOfLastInsertedRow()
     query.next();
     int id = query.value(0).toInt();
     return id;
+}
+
+NoteData PersistenceManager::createNoteDataFromQueryRecord(const QSqlQuery &query)
+{
+    NoteData noteData;
+    noteData.setId(query.value(0).toInt());
+    noteData.setParentFolderId(query.value(1).toInt());
+    noteData.setTitle(query.value(2).toString());
+    noteData.setContent(query.value(3).toString());
+    noteData.setCreationTime(QDateTime::fromMSecsSinceEpoch(query.value(4).toLongLong()));
+    noteData.setModificationTime(QDateTime::fromMSecsSinceEpoch(query.value(5).toLongLong()));
+
+    return noteData;
 }

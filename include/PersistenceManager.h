@@ -17,6 +17,7 @@ class PersistenceManager
     int addNote(const NoteData &note);
     void updateNote(const NoteData &note);
     NoteData loadNoteFromFile(int id);
+    QVector<NoteData> loadAllNotes();
     std::vector<int> getAllIdsOfSavedNotes();
     void deleteNoteFile(int id);
 
@@ -31,6 +32,7 @@ class PersistenceManager
 
     void createNewDefaultTables();
     int getIdOfLastInsertedRow();
+    NoteData createNoteDataFromQueryRecord(const QSqlQuery &query);
 };
 
 #endif // PERSISTENCEMANAGER_H
