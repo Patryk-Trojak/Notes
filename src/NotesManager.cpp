@@ -9,7 +9,7 @@ NotesManager::NotesManager()
 
 NoteData &NotesManager::createNewDefaultNote()
 {
-    std::unique_ptr<NoteData> note = std::make_unique<NoteData>(-1);
+    std::unique_ptr<NoteData> note = std::make_unique<NoteData>();
     note->setTitle("Untitled");
     note->setCreationTime(QDateTime::currentDateTime());
     note->setModificationTime(QDateTime::currentDateTime());

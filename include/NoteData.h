@@ -12,7 +12,7 @@
 class NoteData
 {
   public:
-    explicit NoteData(int id);
+    explicit NoteData();
     int getId() const;
     const QString &getContent() const;
     const QString &getTitle() const;

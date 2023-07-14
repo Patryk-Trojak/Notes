@@ -64,7 +64,7 @@ NoteData PersistenceManager::loadNoteFromFile(int id)
     QSqlQuery query(db);
     query.prepare("SELECT * FROM note WHERE id = :id LIMIT 1");
     query.bindValue(":id", id);
-    NoteData note(-1);
+    NoteData note;
     if (!query.exec())
     {
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();

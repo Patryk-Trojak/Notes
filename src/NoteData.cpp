@@ -1,6 +1,6 @@
 #include "NoteData.h"
 
-NoteData::NoteData(int id) : id(id)
+NoteData::NoteData() : id(-1)
 {
 }
 
