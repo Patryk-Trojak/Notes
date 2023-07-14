@@ -26,6 +26,7 @@ class MainWindow : public QMainWindow
 
   private:
     Ui::MainWindow *ui;
+    PersistenceManager persistenceManager;
     NotesManager notesManager;
     NotesDisplayingTab notesDisplayingTab;
     NoteEditingTab noteEditTab;

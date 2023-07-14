@@ -37,6 +37,7 @@ set(PROJECT_SOURCES
         ${INCLUDE_DIR}/FolderData.h ${SOURCE_DIR}/FolderData.cpp
         ${INCLUDE_DIR}/FolderTreeModel.h ${SOURCE_DIR}/FolderTreeModel.cpp
         ${INCLUDE_DIR}/FolderTreeItem.h ${SOURCE_DIR}/FolderTreeItem.cpp
+        ${INCLUDE_DIR}/FolderTreeView.h ${SOURCE_DIR}/FolderTreeView.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

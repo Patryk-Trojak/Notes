@@ -2,9 +2,11 @@
 #include "ui_NotesDisplayingTab.h"
 #include <AboutWindow.h>
 #include <QShortcut>
-
-NotesDisplayingTab::NotesDisplayingTab(NotesManager &notesManager, QWidget *parent)
-    : QWidget(parent), ui(new Ui::NotesDisplayingTab), notesManager(notesManager)
+#include <QStringListModel>
+NotesDisplayingTab::NotesDisplayingTab(NotesManager &notesManager, PersistenceManager &persistenceManager,
+                                       QWidget *parent)
+    : QWidget(parent), ui(new Ui::NotesDisplayingTab), notesManager(notesManager), folderModel(persistenceManager),
+      persistenceManager(persistenceManager)
 {
     ui->setupUi(this);
     QObject::connect(ui->aboutNotes, &QPushButton::clicked, this, [this]() {
@@ -32,6 +34,9 @@ NotesDisplayingTab::NotesDisplayingTab(NotesManager &notesManager, QWidget *pare
     ui->scrollArea->widget()->setLayout(layout);
     currentNoteButtonsSortingMethod = &NotesDisplayingTab::sortNoteButtonsByCreationDate;
     createNewNoteButtonsFromNotes();
+
+    ui->folderTreeView->setModel(&folderModel);
+    ui->folderTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
 NotesDisplayingTab::~NotesDisplayingTab()

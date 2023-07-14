@@ -1,6 +1,7 @@
 #ifndef NOTESDISPLAYINGTAB_H
 #define NOTESDISPLAYINGTAB_H
 
+#include "FolderTreeModel.h"
 #include "NoteButton.h"
 #include "NoteData.h"
 #include "NotesManager.h"
@@ -31,7 +32,8 @@ class NotesDisplayingTab : public QWidget
 {
     Q_OBJECT
   public:
-    explicit NotesDisplayingTab(NotesManager &notesManager, QWidget *parent = nullptr);
+    explicit NotesDisplayingTab(NotesManager &notesManager, PersistenceManager &persistenceManager,
+                                QWidget *parent = nullptr);
     ~NotesDisplayingTab();
 
   public:
@@ -52,6 +54,8 @@ class NotesDisplayingTab : public QWidget
 
   private:
     Ui::NotesDisplayingTab *ui;
+    PersistenceManager &persistenceManager;
+    FolderTreeModel folderModel;
     NotesManager &notesManager;
     QHash<const NoteButton *, NoteData *> buttonToNoteMap;
     QHash<const NoteData *, NoteButton *> noteToButtonMap;

@@ -1,7 +1,8 @@
 #include "MainWindow.h"
 #include "./ui_MainWindow.h"
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), notesDisplayingTab(notesManager)
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow), notesDisplayingTab(notesManager, persistenceManager)
 {
     ui->setupUi(this);
     ui->stackedWidget->setCurrentIndex(0);

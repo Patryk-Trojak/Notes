@@ -19,7 +19,23 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
+  <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2,1">
+   <item>
+    <widget class="FolderTreeView" name="folderTreeView">
+     <property name="contextMenuPolicy">
+      <enum>Qt::NoContextMenu</enum>
+     </property>
+     <property name="acceptDrops">
+      <bool>false</bool>
+     </property>
+     <property name="animated">
+      <bool>true</bool>
+     </property>
+     <property name="headerHidden">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_4">
      <item>
@@ -35,7 +51,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>477</width>
+          <width>313</width>
           <height>16</height>
          </rect>
         </property>
@@ -211,6 +227,11 @@ margin: 0;</string>
    <class>SearchBar</class>
    <extends>QLineEdit</extends>
    <header>SearchBar.h</header>
+  </customwidget>
+  <customwidget>
+   <class>FolderTreeView</class>
+   <extends>QTreeView</extends>
+   <header location="global">FolderTreeView.h</header>
   </customwidget>
  </customwidgets>
  <resources>
