@@ -14,11 +14,13 @@ class NoteData
   public:
     explicit NoteData();
     int getId() const;
+    int getParentFolderId() const;
     const QString &getContent() const;
     const QString &getTitle() const;
     const QDateTime &getCreationTime() const;
     const QDateTime &getModificationTime() const;
     void setId(int id);
+    void setParentFolderId(int newParentFolderId);
     void setTitle(const QString &title);
     void setContent(const QString &content);
     void setCreationTime(const QDateTime &newCreationTime);
@@ -26,6 +28,7 @@ class NoteData
 
   private:
     int id;
+    int parentFolderId;
     QString title;
     QString content;
     QDateTime creationTime;

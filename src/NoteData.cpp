@@ -1,12 +1,17 @@
 #include "NoteData.h"
 
-NoteData::NoteData() : id(-1)
+NoteData::NoteData() : id(-1), parentFolderId(-1)
 {
 }
 
 int NoteData::getId() const
 {
     return id;
+}
+
+int NoteData::getParentFolderId() const
+{
+    return parentFolderId;
 }
 
 const QString &NoteData::getContent() const
@@ -32,6 +37,11 @@ const QDateTime &NoteData::getModificationTime() const
 void NoteData::setId(int id)
 {
     this->id = id;
+}
+
+void NoteData::setParentFolderId(int newParentFolderId)
+{
+    parentFolderId = newParentFolderId;
 }
 
 void NoteData::setTitle(const QString &title)
