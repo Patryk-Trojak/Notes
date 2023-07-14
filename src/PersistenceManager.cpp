@@ -25,8 +25,9 @@ int PersistenceManager::addNote(const NoteData &note)
 {
     QSqlQuery query(db);
     query.prepare("INSERT INTO note "
-                  "(title, content, creation_time, modification_time)"
-                  "VALUES(:title, :content, :creation_time, :modification_time)");
+                  "(parent_folder_id, title, content, creation_time, modification_time)"
+                  "VALUES(:parent_folder_id, :title, :content, :creation_time, :modification_time)");
+    query.bindValue(":parent_folder_id", note.getParentFolderId());
     query.bindValue(":title", note.getTitle());
     query.bindValue(":content", note.getContent());
     query.bindValue(":creation_time", note.getCreationTime().toMSecsSinceEpoch());
@@ -45,10 +46,12 @@ void PersistenceManager::updateNote(const NoteData &note)
     QSqlQuery query(db);
 
     query.prepare("UPDATE note "
-                  "SET title = :title, content = :content, creation_time = :creation_time, modification_time = "
+                  "SET parent_folder_id = :parent_folder_id, title = :title, content = :content, creation_time = "
+                  ":creation_time, modification_time = "
                   ":modification_time "
                   "WHERE id = :id");
 
+    query.bindValue(":parent_folder_id", note.getParentFolderId());
     query.bindValue(":title", note.getTitle());
     query.bindValue(":content", note.getContent());
     query.bindValue(":creation_time", note.getCreationTime().toMSecsSinceEpoch());
@@ -72,10 +75,11 @@ NoteData PersistenceManager::loadNoteFromFile(int id)
     }
     query.next();
     note.setId(query.value(0).toInt());
-    note.setTitle(query.value(1).toString());
-    note.setContent(query.value(2).toString());
-    note.setCreationTime(QDateTime::fromMSecsSinceEpoch(query.value(3).toLongLong()));
-    note.setModificationTime(QDateTime::fromMSecsSinceEpoch(query.value(4).toLongLong()));
+    note.setParentFolderId(query.value(1).toInt());
+    note.setTitle(query.value(2).toString());
+    note.setContent(query.value(3).toString());
+    note.setCreationTime(QDateTime::fromMSecsSinceEpoch(query.value(4).toLongLong()));
+    note.setModificationTime(QDateTime::fromMSecsSinceEpoch(query.value(5).toLongLong()));
 
     return note;
 }
@@ -180,6 +184,7 @@ void PersistenceManager::createNewDefaultTables()
     QSqlQuery query(db);
     QString createNoteTable = "CREATE TABLE note("
                               "id INTEGER PRIMARY KEY, "
+                              "parent_folder_id INTEGER, "
                               "title TEXT, "
                               "content TEXT, "
                               "creation_time INTEGER NOT NULL DEFAULT 0, "
