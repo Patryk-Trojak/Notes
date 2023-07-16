@@ -98,6 +98,27 @@ QVector<NoteData> PersistenceManager::loadAllNotes()
     return notes;
 }
 
+QVector<NoteData> PersistenceManager::loadAllNotesFromFolder(int folderId)
+{
+    QVector<NoteData> notes;
+    QSqlQuery query(db);
+    query.prepare("SELECT * FROM note WHERE parent_folder_id = :parent_folder_id");
+    query.bindValue(":parent_folder_id", folderId);
+
+    if (!query.exec())
+    {
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+        return notes;
+    }
+
+    while (query.next())
+    {
+        notes.emplace_back(createNoteDataFromQueryRecord(query));
+    }
+
+    return notes;
+}
+
 std::vector<int> PersistenceManager::getAllIdsOfSavedNotes()
 {
     std::vector<int> ids;

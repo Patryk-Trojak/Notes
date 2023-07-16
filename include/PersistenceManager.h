@@ -18,9 +18,9 @@ class PersistenceManager
     void updateNote(const NoteData &note);
     NoteData loadNoteFromFile(int id);
     QVector<NoteData> loadAllNotes();
+    QVector<NoteData> loadAllNotesFromFolder(int folderId);
     std::vector<int> getAllIdsOfSavedNotes();
     void deleteNoteFile(int id);
-
     QVector<FolderData> loadAllFolders();
     int addFolder(const FolderData &folder);
     void updateFolder(const FolderData &folder);
