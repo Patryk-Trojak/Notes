@@ -21,7 +21,7 @@ PersistenceManager::PersistenceManager() : dbFullFilepath(QCoreApplication::appl
         createNewDefaultTables();
 }
 
-int PersistenceManager::addNote(const NoteData &note)
+int PersistenceManager::addNote(const NoteData &note) const
 {
     QSqlQuery query(db);
     query.prepare("INSERT INTO note "
@@ -41,7 +41,7 @@ int PersistenceManager::addNote(const NoteData &note)
     return getIdOfLastInsertedRow();
 }
 
-void PersistenceManager::updateNote(const NoteData &note)
+void PersistenceManager::updateNote(const NoteData &note) const
 {
     QSqlQuery query(db);
 
@@ -62,7 +62,7 @@ void PersistenceManager::updateNote(const NoteData &note)
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
 }
 
-NoteData PersistenceManager::loadNoteFromFile(int id)
+NoteData PersistenceManager::loadNoteFromFile(int id) const
 {
     QSqlQuery query(db);
     query.prepare("SELECT * FROM note WHERE id = :id LIMIT 1");
@@ -79,7 +79,7 @@ NoteData PersistenceManager::loadNoteFromFile(int id)
     return note;
 }
 
-QVector<NoteData> PersistenceManager::loadAllNotes()
+QVector<NoteData> PersistenceManager::loadAllNotes() const
 {
     QVector<NoteData> notes;
     QSqlQuery query(db);
@@ -98,7 +98,7 @@ QVector<NoteData> PersistenceManager::loadAllNotes()
     return notes;
 }
 
-QVector<NoteData> PersistenceManager::loadAllNotesFromFolder(int folderId)
+QVector<NoteData> PersistenceManager::loadAllNotesFromFolder(int folderId) const
 {
     QVector<NoteData> notes;
     QSqlQuery query(db);
@@ -119,7 +119,7 @@ QVector<NoteData> PersistenceManager::loadAllNotesFromFolder(int folderId)
     return notes;
 }
 
-std::vector<int> PersistenceManager::getAllIdsOfSavedNotes()
+std::vector<int> PersistenceManager::getAllIdsOfSavedNotes() const
 {
     std::vector<int> ids;
     QSqlQuery query(db);
@@ -138,7 +138,7 @@ std::vector<int> PersistenceManager::getAllIdsOfSavedNotes()
     return ids;
 }
 
-void PersistenceManager::deleteNoteFile(int id)
+void PersistenceManager::deleteNoteFile(int id) const
 {
     QSqlQuery query(db);
     query.prepare("DELETE FROM note WHERE id = :id");
@@ -148,7 +148,7 @@ void PersistenceManager::deleteNoteFile(int id)
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
 }
 
-QVector<FolderData> PersistenceManager::loadAllFolders()
+QVector<FolderData> PersistenceManager::loadAllFolders() const
 {
     QVector<FolderData> folders;
     QSqlQuery query(db);
@@ -170,7 +170,7 @@ QVector<FolderData> PersistenceManager::loadAllFolders()
     return folders;
 }
 
-int PersistenceManager::addFolder(const FolderData &folder)
+int PersistenceManager::addFolder(const FolderData &folder) const
 {
     QSqlQuery query(db);
     query.prepare("INSERT INTO folder "
@@ -188,7 +188,7 @@ int PersistenceManager::addFolder(const FolderData &folder)
     return getIdOfLastInsertedRow();
 }
 
-void PersistenceManager::updateFolder(const FolderData &folder)
+void PersistenceManager::updateFolder(const FolderData &folder) const
 {
     QSqlQuery query(db);
 
@@ -204,7 +204,7 @@ void PersistenceManager::updateFolder(const FolderData &folder)
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
 }
 
-void PersistenceManager::deleteFolder(int id)
+void PersistenceManager::deleteFolder(int id) const
 {
     QSqlQuery query(db);
     query.prepare("DELETE FROM folder WHERE id = :id");
@@ -214,7 +214,7 @@ void PersistenceManager::deleteFolder(int id)
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
 }
 
-void PersistenceManager::createNewDefaultTables()
+void PersistenceManager::createNewDefaultTables() const
 {
     QSqlQuery query(db);
     QString createNoteTable = "CREATE TABLE note("
@@ -250,7 +250,7 @@ void PersistenceManager::createNewDefaultTables()
     addFolder(notesFolder);
 }
 
-int PersistenceManager::getIdOfLastInsertedRow()
+int PersistenceManager::getIdOfLastInsertedRow() const
 {
     QSqlQuery query(db);
     query.prepare("SELECT last_insert_rowid()");
@@ -266,7 +266,7 @@ int PersistenceManager::getIdOfLastInsertedRow()
     return id;
 }
 
-NoteData PersistenceManager::createNoteDataFromQueryRecord(const QSqlQuery &query)
+NoteData PersistenceManager::createNoteDataFromQueryRecord(const QSqlQuery &query) const
 {
     NoteData noteData;
     noteData.setId(query.value(0).toInt());
