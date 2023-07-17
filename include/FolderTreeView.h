@@ -4,6 +4,8 @@
 
 class FolderTreeView : public QTreeView
 {
+    Q_OBJECT
+
   public:
     FolderTreeView(QWidget *parent = nullptr);
 
