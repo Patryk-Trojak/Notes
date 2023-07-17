@@ -1,6 +1,8 @@
 #include "FolderTreeView.h"
 
+#include "FolderData.h"
 #include <QMenu>
+#include <QModelIndex>
 
 FolderTreeView::FolderTreeView(QWidget *parent) : QTreeView(parent)
 {
@@ -32,4 +34,15 @@ void FolderTreeView::onCustomContextMenuRequested(const QPoint &pos)
     }
 
     menu->exec(mapToGlobal(pos));
+}
+
+void FolderTreeView::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    QTreeView::selectionChanged(selected, deselected);
+    auto selectedIndexes = selected.indexes();
+    if (selectedIndexes.size() > 0)
+    {
+        FolderData *selectedFolder = static_cast<FolderData *>(selectedIndexes[0].internalPointer());
+        emit newFolderSelected(selectedFolder->getId());
+    }
 }

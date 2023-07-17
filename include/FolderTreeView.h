@@ -9,8 +9,14 @@ class FolderTreeView : public QTreeView
   public:
     FolderTreeView(QWidget *parent = nullptr);
 
+  signals:
+    void newFolderSelected(int selectedFolderId);
+
   private slots:
     void onCustomContextMenuRequested(const QPoint &pos);
+
+  protected slots:
+    void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 };
 
 #endif // FOLDERTREEVIEW_H
