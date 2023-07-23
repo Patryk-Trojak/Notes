@@ -13,6 +13,7 @@ NoteButton::NoteButton(const QString &title, const QDateTime &creationTime, cons
         if (ui->titleEdit->text() != lastSavedTitle)
         {
             emit saveNote();
+            setModificationTime(QDateTime::currentDateTime());
             lastSavedTitle = ui->titleEdit->text();
         }
     });
