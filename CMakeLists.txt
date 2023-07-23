@@ -40,6 +40,7 @@ set(PROJECT_SOURCES
         ${INCLUDE_DIR}/FolderTreeView.h ${SOURCE_DIR}/FolderTreeView.cpp
         ${INCLUDE_DIR}/NoteListModel.h ${SOURCE_DIR}/NoteListModel.cpp
         ${INCLUDE_DIR}/NoteListDelegate.h ${SOURCE_DIR}/NoteListDelegate.cpp
+        ${INCLUDE_DIR}/NoteListView.h ${SOURCE_DIR}/NoteListView.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
