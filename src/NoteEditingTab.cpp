@@ -1,10 +1,12 @@
 #include "NoteEditingTab.h"
-#include "PersistenceManager.h"
 #include "ui_NoteEditingTab.h"
+#include <NoteListModel.h>
 #include <QMessageBox>
+#include <QModelIndex>
 #include <QShortcut>
 
-NoteEditingTab::NoteEditingTab(QWidget *parent) : QWidget(parent), ui(new Ui::NoteEditingTab)
+NoteEditingTab::NoteEditingTab(NoteListModel &noteModel, QWidget *parent)
+    : QWidget(parent), ui(new Ui::NoteEditingTab), noteModel(noteModel)
 {
     ui->setupUi(this);
     QObject::connect(ui->saveAndReturn, &QPushButton::clicked, this, &NoteEditingTab::saveNoteIfChanged);
@@ -25,9 +27,11 @@ NoteEditingTab::~NoteEditingTab()
     delete ui;
 }
 
-void NoteEditingTab::startEditingNewNote(NoteData *note)
+void NoteEditingTab::startEditingNewNote(const QModelIndex &index)
 {
-    currentEditingNote = note;
+    currentEditingNote = &index;
+    const NoteData *note = static_cast<const NoteData *>(index.constInternalPointer());
+
     ui->titleEdit->setText(note->getTitle());
     ui->contentEdit->setText(note->getContent());
     lastSavedTitle = note->getTitle();
@@ -39,12 +43,17 @@ void NoteEditingTab::saveNoteIfChanged()
     if (!hasNoteChanged())
         return;
 
-    currentEditingNote->setTitle(ui->titleEdit->text());
-    currentEditingNote->setContent(ui->contentEdit->toPlainText());
-    currentEditingNote->setModificationTime(QDateTime::currentDateTime());
-    lastSavedTitle = currentEditingNote->getTitle();
-    lastSavedContent = currentEditingNote->getContent();
-    emit saveNote(*currentEditingNote);
+    const NoteData *oldNote = static_cast<const NoteData *>(currentEditingNote->constInternalPointer());
+    NoteData newNote;
+    newNote.setContent(ui->contentEdit->toPlainText());
+    newNote.setTitle(ui->titleEdit->text());
+    newNote.setModificationTime(QDateTime::currentDateTime());
+    newNote.setCreationTime(oldNote->getCreationTime());
+    newNote.setId(oldNote->getId());
+    newNote.setParentFolderId(oldNote->getParentFolderId());
+    noteModel.setNoteData(*currentEditingNote, newNote);
+    lastSavedTitle = newNote.getTitle();
+    lastSavedContent = newNote.getContent();
 }
 
 bool NoteEditingTab::hasNoteChanged()
@@ -60,7 +69,7 @@ void NoteEditingTab::onDeleteNoteButtonPressed()
     auto reply = QMessageBox::question(this, "Delete note?", "Are you sure you want to delete this note?");
     if (reply == QMessageBox::No)
         return;
-    emit deleteNote(*currentEditingNote);
+    noteModel.removeRows(currentEditingNote->row(), 1, QModelIndex());
 }
 
 void NoteEditingTab::onReturnWithoutSavingButtonPressed()

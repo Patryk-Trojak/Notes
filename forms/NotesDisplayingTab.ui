@@ -42,27 +42,7 @@
       <widget class="SearchBar" name="searchBar"/>
      </item>
      <item>
-      <widget class="QScrollArea" name="scrollArea">
-       <property name="widgetResizable">
-        <bool>true</bool>
-       </property>
-       <widget class="QWidget" name="scrollAreaWidgetContents">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>313</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </widget>
+      <widget class="NoteListView" name="noteListView"/>
      </item>
     </layout>
    </item>
@@ -231,7 +211,12 @@ margin: 0;</string>
   <customwidget>
    <class>FolderTreeView</class>
    <extends>QTreeView</extends>
-   <header location="global">FolderTreeView.h</header>
+   <header>FolderTreeView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>NoteListView</class>
+   <extends>QListView</extends>
+   <header location="global">NoteListView.h</header>
   </customwidget>
  </customwidgets>
  <resources>

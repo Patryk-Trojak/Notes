@@ -3,10 +3,9 @@
 #include <AboutWindow.h>
 #include <QShortcut>
 #include <QStringListModel>
-NotesDisplayingTab::NotesDisplayingTab(NotesManager &notesManager, PersistenceManager &persistenceManager,
+NotesDisplayingTab::NotesDisplayingTab(NoteListModel &noteModel, PersistenceManager &persistenceManager,
                                        QWidget *parent)
-    : QWidget(parent), ui(new Ui::NotesDisplayingTab), notesManager(notesManager), folderModel(persistenceManager),
-      persistenceManager(persistenceManager)
+    : QWidget(parent), ui(new Ui::NotesDisplayingTab), folderModel(persistenceManager), noteModel(noteModel)
 {
     ui->setupUi(this);
     QObject::connect(ui->aboutNotes, &QPushButton::clicked, this, [this]() {
@@ -30,13 +29,17 @@ NotesDisplayingTab::NotesDisplayingTab(NotesManager &notesManager, PersistenceMa
     QShortcut *createNewNoteShortcut = new QShortcut(QKeySequence(QKeySequence::New), this);
     QObject::connect(createNewNoteShortcut, &QShortcut::activated, this, &NotesDisplayingTab::onNewNoteButtonPressed);
     QObject::connect(ui->searchBar, &QLineEdit::textChanged, this, &NotesDisplayingTab::filterSortButtonsByTitle);
-    QVBoxLayout *layout = new QVBoxLayout();
-    ui->scrollArea->widget()->setLayout(layout);
+
     currentNoteButtonsSortingMethod = &NotesDisplayingTab::sortNoteButtonsByCreationDate;
-    createNewNoteButtonsFromNotes();
 
     ui->folderTreeView->setModel(&folderModel);
     ui->folderTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    ui->noteListView->setModel(&noteModel);
+
+    QObject::connect(ui->folderTreeView, &FolderTreeView::newFolderSelected, &noteModel,
+                     &NoteListModel::onNewFolderSelected);
+    QObject::connect(ui->noteListView, &NoteListView::noteSelected, this, &NotesDisplayingTab::enterEditingNote);
 }
 
 NotesDisplayingTab::~NotesDisplayingTab()
@@ -44,72 +47,13 @@ NotesDisplayingTab::~NotesDisplayingTab()
     delete ui;
 }
 
-void NotesDisplayingTab::createNewNoteButtonsFromNotes()
-{
-    for (auto const &note : notesManager.getNotes())
-        createNewNoteButton(*note);
-}
-
 void NotesDisplayingTab::onNewNoteButtonPressed()
 {
-    NoteData &note = notesManager.createNewDefaultNote();
-    createNewNoteButton(note);
-    emit enterEditingNote(note);
-}
-
-void NotesDisplayingTab::updateNoteButton(const NoteData &note)
-{
-    auto button = noteToButtonMap.find(&note);
-    if (button != noteToButtonMap.end())
-    {
-        (*button)->setTitle(note.getTitle());
-        (*button)->setCreationTime(note.getCreationTime());
-        (*button)->setModificationTime(note.getModificationTime());
-    }
-    currentNoteButtonsSortingMethod(this, ui->sortInAscendingOrderButton->isChecked());
-}
-
-void NotesDisplayingTab::deleteNoteButton(const NoteData &note)
-{
-    auto foundButton = noteToButtonMap.find(&note);
-    buttonToNoteMap.erase(buttonToNoteMap.find(*foundButton));
-    delete *foundButton;
-    noteToButtonMap.erase(foundButton);
-}
-
-void NotesDisplayingTab::onNoteButtonChangedTitle()
-{
-    NoteButton *button = qobject_cast<NoteButton *>(QObject::sender());
-    auto foundNote = buttonToNoteMap.find(button);
-    if (foundNote != buttonToNoteMap.end())
-    {
-        (*foundNote)->setTitle(button->getTitle());
-        (*foundNote)->setModificationTime(QDateTime::currentDateTime());
-        notesManager.saveNote(**foundNote);
-        updateNoteButton(**foundNote);
-    }
-}
-
-void NotesDisplayingTab::onNoteButtonClicked()
-{
-    NoteButton *button = qobject_cast<NoteButton *>(QObject::sender());
-    auto foundNote = buttonToNoteMap.find(button);
-    if (foundNote != buttonToNoteMap.end())
-    {
-        emit enterEditingNote(**foundNote);
-    }
+    noteModel.createNewNote();
 }
 
 void NotesDisplayingTab::sortNoteButtons(std::function<bool(const QWidget *, const QWidget *)> compare)
 {
-    QList<QWidget *> list = myUtils::getWidgetsFromLayout(*ui->scrollArea->widget()->layout());
-    std::sort(list.begin(), list.end(), compare);
-    auto oldLayout = ui->scrollArea->widget()->layout();
-    delete oldLayout;
-    QVBoxLayout *layout = new QVBoxLayout();
-    ui->scrollArea->widget()->setLayout(layout);
-    for (auto const &i : list)
-        ui->scrollArea->widget()->layout()->addWidget(i);
 }
 
 void NotesDisplayingTab::sortNoteButtonsByTitle(bool ascendingOrder)
@@ -160,23 +104,6 @@ void NotesDisplayingTab::sortNoteButtonsByModificationDate(bool ascendingOrder)
     });
 }
 
-void NotesDisplayingTab::onNoteButtonDeleted()
-{
-    auto reply = QMessageBox::question(this, "Delete note?", "Are you sure you want to delete this note?");
-    if (reply == QMessageBox::No)
-        return;
-
-    NoteButton *button = qobject_cast<NoteButton *>(QObject::sender());
-    auto foundNote = buttonToNoteMap.find(button);
-    if (foundNote != buttonToNoteMap.end())
-    {
-        noteToButtonMap.erase(noteToButtonMap.find(*foundNote));
-        notesManager.deleteNote(**foundNote);
-        buttonToNoteMap.erase(foundNote);
-    }
-    delete button;
-}
-
 void NotesDisplayingTab::onSortByTitleButtonToggled()
 {
     bool ascendingOrder = ui->sortInAscendingOrderButton->isChecked();
@@ -205,26 +132,4 @@ void NotesDisplayingTab::onSortOrderButtonToggled()
 
 void NotesDisplayingTab::filterSortButtonsByTitle(const QString &searched)
 {
-    QList<QWidget *> list = myUtils::getWidgetsFromLayout(*ui->scrollArea->widget()->layout());
-
-    for (auto const &noteButton : list)
-    {
-        if (static_cast<NoteButton *>(noteButton)->getTitle().contains(searched, Qt::CaseInsensitive))
-            noteButton->setVisible(true);
-        else
-            noteButton->setVisible(false);
-    }
-}
-
-void NotesDisplayingTab::createNewNoteButton(NoteData &note)
-{
-    NoteButton *noteButton = new NoteButton(note.getTitle(), note.getCreationTime(), note.getModificationTime());
-    QObject::connect(noteButton, &NoteButton::saveNote, this, &NotesDisplayingTab::onNoteButtonChangedTitle);
-    QObject::connect(noteButton, &NoteButton::enterEditingNote, this, &NotesDisplayingTab::onNoteButtonClicked);
-    QObject::connect(noteButton, &NoteButton::deleteNote, this, &NotesDisplayingTab::onNoteButtonDeleted);
-
-    buttonToNoteMap.insert(noteButton, &note);
-    noteToButtonMap.insert(static_cast<const NoteData *>(&note), noteButton);
-    ui->scrollArea->widget()->layout()->addWidget(noteButton);
-    currentNoteButtonsSortingMethod(this, ui->sortInAscendingOrderButton->isChecked());
 }
