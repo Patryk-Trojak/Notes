@@ -15,8 +15,7 @@ void FolderTreeView::onCustomContextMenuRequested(const QPoint &pos)
 {
     QModelIndex index = QTreeView::indexAt(pos);
     QMenu *menu = new QMenu(this);
-
-    QAction *createSubfolder = new QAction("Create subfolder");
+    QAction *createSubfolder = new QAction(index.isValid() ? "Create subfolder" : "Create new folder");
     QObject::connect(createSubfolder, &QAction::triggered, this,
                      [this, index]() { this->model()->insertRow(0, index); });
     menu->addAction(createSubfolder);
