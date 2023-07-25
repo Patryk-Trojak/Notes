@@ -24,7 +24,7 @@ class NoteEditingTab : public QWidget
   private:
     Ui::NoteEditingTab *ui;
     NoteListModel &noteModel;
-    const QModelIndex *currentEditingNote;
+    QModelIndex currentEditingNote;
     void saveNoteIfChanged();
     QString lastSavedTitle;
     QString lastSavedContent;

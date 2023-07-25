@@ -11,7 +11,7 @@ NoteEditingTab::NoteEditingTab(NoteListModel &noteModel, QWidget *parent)
     ui->setupUi(this);
     QObject::connect(ui->saveAndReturn, &QPushButton::clicked, this, &NoteEditingTab::saveNoteIfChanged);
     QObject::connect(ui->saveAndReturn, &QPushButton::clicked, this,
-                     [this]() { emit exitEditingNote(*currentEditingNote); });
+                     [this]() { emit exitEditingNote(currentEditingNote); });
     QObject::connect(ui->deleteButton, &QPushButton::clicked, this, &NoteEditingTab::onDeleteNoteButtonPressed);
     QObject::connect(ui->returnWithoutSavingButton, &QPushButton::clicked, this,
                      &NoteEditingTab::onReturnWithoutSavingButtonPressed);
@@ -29,7 +29,7 @@ NoteEditingTab::~NoteEditingTab()
 
 void NoteEditingTab::startEditingNewNote(const QModelIndex &index)
 {
-    currentEditingNote = &index;
+    currentEditingNote = index;
     const NoteData *note = static_cast<const NoteData *>(index.constInternalPointer());
 
     ui->titleEdit->setText(note->getTitle());
@@ -43,7 +43,7 @@ void NoteEditingTab::saveNoteIfChanged()
     if (!hasNoteChanged())
         return;
 
-    const NoteData *oldNote = static_cast<const NoteData *>(currentEditingNote->constInternalPointer());
+    const NoteData *oldNote = static_cast<const NoteData *>(currentEditingNote.constInternalPointer());
     NoteData newNote;
     newNote.setContent(ui->contentEdit->toPlainText());
     newNote.setTitle(ui->titleEdit->text());
@@ -51,7 +51,7 @@ void NoteEditingTab::saveNoteIfChanged()
     newNote.setCreationTime(oldNote->getCreationTime());
     newNote.setId(oldNote->getId());
     newNote.setParentFolderId(oldNote->getParentFolderId());
-    noteModel.setNoteData(*currentEditingNote, newNote);
+    noteModel.setNoteData(currentEditingNote, newNote);
     lastSavedTitle = newNote.getTitle();
     lastSavedContent = newNote.getContent();
 }
@@ -69,14 +69,14 @@ void NoteEditingTab::onDeleteNoteButtonPressed()
     auto reply = QMessageBox::question(this, "Delete note?", "Are you sure you want to delete this note?");
     if (reply == QMessageBox::No)
         return;
-    noteModel.removeRows(currentEditingNote->row(), 1, QModelIndex());
+    noteModel.removeRows(currentEditingNote.row(), 1, QModelIndex());
 }
 
 void NoteEditingTab::onReturnWithoutSavingButtonPressed()
 {
     if (!hasNoteChanged())
     {
-        emit exitEditingNote(*currentEditingNote);
+        emit exitEditingNote(currentEditingNote);
         return;
     }
 
@@ -85,11 +85,11 @@ void NoteEditingTab::onReturnWithoutSavingButtonPressed()
                               QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::Save);
 
     if (reply == QMessageBox::Yes)
-        emit exitEditingNote(*currentEditingNote);
+        emit exitEditingNote(currentEditingNote);
 
     if (reply == QMessageBox::Save)
     {
         saveNoteIfChanged();
-        emit exitEditingNote(*currentEditingNote);
+        emit exitEditingNote(currentEditingNote);
     }
 }
