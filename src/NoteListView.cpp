@@ -46,7 +46,10 @@ void NoteListView::onItemEntered(const QModelIndex &index)
     if (index.isValid())
     {
         if (currentIndex().isValid())
+        {
             closePersistentEditor(currentIndex());
+            editor = nullptr;
+        }
 
         if (index.isValid())
             openPersistentEditor(index);
@@ -84,4 +87,5 @@ void NoteListView::leaveEvent(QEvent *event)
 {
     QListView::leaveEvent(event);
     closePersistentEditor(currentIndex());
+    editor = nullptr;
 }
