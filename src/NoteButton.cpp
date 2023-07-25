@@ -1,14 +1,9 @@
 #include "NoteButton.h"
 #include "./ui_NoteButton.h"
 
-NoteButton::NoteButton(const QString &title, const QDateTime &creationTime, const QDateTime &modificationTime,
-                       QWidget *parent)
-    : QPushButton{parent}, ui(new Ui::NoteButton), lastSavedTitle(title)
+NoteButton::NoteButton(QWidget *parent) : QPushButton{parent}, ui(new Ui::NoteButton)
 {
     ui->setupUi(this);
-    setCreationTime(creationTime);
-    setModificationTime(modificationTime);
-    ui->titleEdit->setText(title);
     QObject::connect(ui->titleEdit, &QLineEdit::editingFinished, this, [this]() {
         if (ui->titleEdit->text() != lastSavedTitle)
         {
@@ -19,6 +14,15 @@ NoteButton::NoteButton(const QString &title, const QDateTime &creationTime, cons
     });
     QObject::connect(this, &QPushButton::clicked, this, &NoteButton::enterEditingNote);
     QObject::connect(ui->deleteButton, &QPushButton::clicked, this, &NoteButton::deleteNote);
+}
+
+NoteButton::NoteButton(const QString &title, const QDateTime &creationTime, const QDateTime &modificationTime,
+                       QWidget *parent)
+    : NoteButton(parent)
+{
+    setCreationTime(creationTime);
+    setModificationTime(modificationTime);
+    ui->titleEdit->setText(title);
 }
 
 QString NoteButton::getTitle() const

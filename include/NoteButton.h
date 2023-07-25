@@ -14,6 +14,7 @@ class NoteButton : public QPushButton
 {
     Q_OBJECT
   public:
+    explicit NoteButton(QWidget *parent);
     explicit NoteButton(const QString &title, const QDateTime &creationTime, const QDateTime &modificationTime,
                         QWidget *parent = nullptr);
     QString getTitle() const;
