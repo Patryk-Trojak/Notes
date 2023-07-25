@@ -79,3 +79,9 @@ void NoteListView::onCustomContextMenuRequested(const QPoint &pos)
 
     menu->exec(mapToGlobal(pos));
 }
+
+void NoteListView::leaveEvent(QEvent *event)
+{
+    QListView::leaveEvent(event);
+    closePersistentEditor(currentIndex());
+}

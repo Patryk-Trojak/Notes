@@ -26,6 +26,10 @@ class NoteListView : public QListView
 
   private slots:
     void onCustomContextMenuRequested(const QPoint &pos);
+
+      // QWidget interface
+  protected:
+      void leaveEvent(QEvent *event);
 };
 
 #endif // NOTELISTVIEW_H
