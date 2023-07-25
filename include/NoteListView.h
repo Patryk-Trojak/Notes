@@ -23,6 +23,9 @@ class NoteListView : public QListView
     void onNewEditorCreated(NoteButton *editor, const QModelIndex &index);
     void onItemEntered(const QModelIndex &index);
     void updateEditorOnDataChanged();
+
+  private slots:
+    void onCustomContextMenuRequested(const QPoint &pos);
 };
 
 #endif // NOTELISTVIEW_H

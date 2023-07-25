@@ -36,6 +36,7 @@ NotesDisplayingTab::NotesDisplayingTab(NoteListModel &noteModel, PersistenceMana
     ui->folderTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
 
     ui->noteListView->setModel(&noteModel);
+    ui->noteListView->setContextMenuPolicy(Qt::CustomContextMenu);
 
     QObject::connect(ui->folderTreeView, &FolderTreeView::newFolderSelected, &noteModel,
                      &NoteListModel::onNewFolderSelected);

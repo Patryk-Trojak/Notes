@@ -1,5 +1,6 @@
 #include "NoteListView.h"
 
+#include <QMenu>
 #include <QMouseEvent>
 #include <QScrollBar>
 #include <qmessagebox.h>
@@ -12,6 +13,7 @@ NoteListView::NoteListView(QWidget *parent) : QListView(parent), editor(nullptr)
 
     QObject::connect(&noteListDelegate, &NoteListDelegate::newEditorCreated, this, &NoteListView::onNewEditorCreated);
     QObject::connect(this, &QListView::entered, this, &NoteListView::onItemEntered);
+    QObject::connect(this, &QListView::customContextMenuRequested, this, &NoteListView::onCustomContextMenuRequested);
 }
 
 void NoteListView::setModel(QAbstractItemModel *model)
@@ -57,4 +59,23 @@ void NoteListView::updateEditorOnDataChanged()
 {
     if (editor)
         noteListDelegate.setEditorData(editor, currentIndex());
+}
+
+void NoteListView::onCustomContextMenuRequested(const QPoint &pos)
+{
+    QModelIndex index = indexAt(pos);
+    QMenu *menu = new QMenu(this);
+    QAction *createNote = new QAction("Create new note");
+    QObject::connect(createNote, &QAction::triggered, this, [this, index]() { this->model()->insertRow(0, index); });
+    menu->addAction(createNote);
+
+    if (index.isValid())
+    {
+        QAction *deleteNote = new QAction("Delete note");
+        QObject::connect(deleteNote, &QAction::triggered, this,
+                         [this, index]() { this->model()->removeRow(index.row(), index.parent()); });
+        menu->addAction(deleteNote);
+    }
+
+    menu->exec(mapToGlobal(pos));
 }
