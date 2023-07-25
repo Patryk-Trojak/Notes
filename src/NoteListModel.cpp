@@ -32,9 +32,22 @@ QVariant NoteListModel::data(const QModelIndex &index, int role) const
     int row = index.row();
     switch (role)
     {
-    case Qt::DisplayRole:
-    case Qt::EditRole:
+    case Role::Title:
+    case Role::EditRole:
+    case Role::DisplayRole:
         return notes[row].getTitle();
+    case Role::Content:
+        return notes[row].getContent();
+    case Role::Id:
+        return notes[row].getId();
+    case Role::ParentFolderId:
+        return notes[row].getParentFolderId();
+    case Role::CreationTime:
+        return notes[row].getCreationTime();
+    case Role::ModificationTime:
+        return notes[row].getModificationTime();
+    default:
+        return QVariant();
     }
 
     return QVariant();
@@ -55,9 +68,35 @@ bool NoteListModel::setData(const QModelIndex &index, const QVariant &value, int
     int row = index.row();
     switch (role)
     {
-    case Qt::EditRole:
+    case Role::Title:
+    case Role::EditRole:
         notes[row].setTitle(value.toString());
-        persistenceManager.updateNote(notes[row]);
+        persistenceManager.updateNote(notes[index.row()]);
+        emit dataChanged(index, index);
+        return true;
+    case Role::Content:
+        notes[row].setContent(value.toString());
+        persistenceManager.updateNote(notes[index.row()]);
+        emit dataChanged(index, index);
+        return true;
+    case Role::Id:
+        notes[row].setId(value.toInt());
+        persistenceManager.updateNote(notes[index.row()]);
+        emit dataChanged(index, index);
+        return true;
+    case Role::ParentFolderId:
+        notes[row].setParentFolderId(value.toInt());
+        persistenceManager.updateNote(notes[index.row()]);
+        emit dataChanged(index, index);
+        return true;
+    case Role::CreationTime:
+        notes[row].setCreationTime(value.toDateTime());
+        persistenceManager.updateNote(notes[index.row()]);
+        emit dataChanged(index, index);
+        return true;
+    case Role::ModificationTime:
+        notes[row].setModificationTime(value.toDateTime());
+        persistenceManager.updateNote(notes[index.row()]);
         emit dataChanged(index, index);
         return true;
     }

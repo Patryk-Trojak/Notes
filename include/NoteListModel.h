@@ -11,6 +11,17 @@ class NoteListModel : public QAbstractItemModel
 
   public:
     NoteListModel(QObject *parent, PersistenceManager &persistenceManager);
+    enum Role
+    {
+        DisplayRole = Qt::DisplayRole,
+        EditRole = Qt::EditRole,
+        Id = Qt::UserRole,
+        ParentFolderId,
+        Title,
+        Content,
+        CreationTime,
+        ModificationTime,
+    };
 
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     int rowCount(const QModelIndex &parent) const;
