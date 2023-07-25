@@ -11,12 +11,7 @@ NoteListDelegate::NoteListDelegate(QObject *parent)
 void NoteListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QStyledItemDelegate::paint(painter, option, index);
-
-    const NoteListModel *model = static_cast<const NoteListModel *>(index.model());
-    NoteData note = model->getNoteData(index);
-    noteButton.setTitle(note.getTitle());
-    noteButton.setCreationTime(note.getCreationTime());
-    noteButton.setModificationTime(note.getModificationTime());
+    setupNoteButtonFromIndex(noteButton, index);
     painter->save();
     noteButton.resize(option.rect.size());
     painter->translate(option.rect.topLeft());
@@ -33,8 +28,8 @@ QWidget *NoteListDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
                                         const QModelIndex &index) const
 {
     const NoteListModel *model = static_cast<const NoteListModel *>(index.model());
-    const NoteData &note = model->getNoteData(index);
-    NoteButton *button = new NoteButton(note.getTitle(), note.getCreationTime(), note.getModificationTime(), parent);
+    NoteButton *button = new NoteButton(parent);
+    setupNoteButtonFromIndex(*button, index);
     button->setGeometry(option.rect);
     emit newEditorCreated(button, index);
     return button;
@@ -43,24 +38,16 @@ QWidget *NoteListDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
 void NoteListDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
     NoteButton *button = static_cast<NoteButton *>(editor);
-    const NoteListModel *model = static_cast<const NoteListModel *>(index.model());
-    const NoteData &note = model->getNoteData(index);
-
-    button->setTitle(note.getTitle());
-    button->setCreationTime(note.getCreationTime());
-    button->setModificationTime(note.getModificationTime());
+    setupNoteButtonFromIndex(*button, index);
 }
 
 void NoteListDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    NoteListModel *noteListModel = static_cast<NoteListModel *>(model);
     NoteButton *noteButton = static_cast<NoteButton *>(editor);
-    if (noteButton->getTitle() != noteListModel->getNoteData(index).getTitle())
+    if (noteButton->getTitle() != model->data(index, NoteListModel::Title))
     {
-        NoteData editedNote = noteListModel->getNoteData(index);
-        editedNote.setTitle(noteButton->getTitle());
-        editedNote.setModificationTime(QDateTime::currentDateTime());
-        noteListModel->setNoteData(index, editedNote);
+        model->setData(index, noteButton->getTitle(), NoteListModel::Title);
+        model->setData(index, QDateTime::currentDateTime(), NoteListModel::ModificationTime);
     }
 }
 
@@ -68,4 +55,12 @@ void NoteListDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionV
                                             const QModelIndex &index) const
 {
     editor->setGeometry(option.rect);
+}
+
+void NoteListDelegate::setupNoteButtonFromIndex(NoteButton &noteButton, const QModelIndex &index) const
+{
+    const auto *model = index.model();
+    noteButton.setTitle(model->data(index, NoteListModel::Title).toString());
+    noteButton.setCreationTime(model->data(index, NoteListModel::CreationTime).toDateTime());
+    noteButton.setModificationTime(model->data(index, NoteListModel::ModificationTime).toDateTime());
 }

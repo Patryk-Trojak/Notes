@@ -24,6 +24,7 @@ class NoteListDelegate : public QStyledItemDelegate
 
   private:
     mutable NoteButton noteButton; // Used to drawing item
+    void setupNoteButtonFromIndex(NoteButton &noteButton, const QModelIndex &index) const;
 };
 
 #endif // NOTELISTDELEGATE_H

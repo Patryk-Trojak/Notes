@@ -43,17 +43,11 @@ void NoteEditingTab::saveNoteIfChanged()
     if (!hasNoteChanged())
         return;
 
-    const NoteData *oldNote = static_cast<const NoteData *>(currentEditingNote.constInternalPointer());
-    NoteData newNote;
-    newNote.setContent(ui->contentEdit->toPlainText());
-    newNote.setTitle(ui->titleEdit->text());
-    newNote.setModificationTime(QDateTime::currentDateTime());
-    newNote.setCreationTime(oldNote->getCreationTime());
-    newNote.setId(oldNote->getId());
-    newNote.setParentFolderId(oldNote->getParentFolderId());
-    noteModel.setNoteData(currentEditingNote, newNote);
-    lastSavedTitle = newNote.getTitle();
-    lastSavedContent = newNote.getContent();
+    noteModel.setData(currentEditingNote, ui->contentEdit->toPlainText(), NoteListModel::Content);
+    noteModel.setData(currentEditingNote, ui->titleEdit->text(), NoteListModel::Title);
+    noteModel.setData(currentEditingNote, QDateTime::currentDateTime(), NoteListModel::ModificationTime);
+    lastSavedTitle = ui->contentEdit->toPlainText();
+    lastSavedContent = ui->titleEdit->text();
 }
 
 bool NoteEditingTab::hasNoteChanged()
