@@ -3,7 +3,6 @@
 
 #include "NoteEditingTab.h"
 #include "NotesDisplayingTab.h"
-#include <NotesManager.h>
 #include <QMainWindow>
 
 QT_BEGIN_NAMESPACE

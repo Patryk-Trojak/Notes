@@ -2,27 +2,8 @@
 #define NOTESDISPLAYINGTAB_H
 
 #include "FolderTreeModel.h"
-#include "NoteButton.h"
-#include "NoteData.h"
 #include "NoteListModel.h"
-#include "NotesManager.h"
-#include "Utils.h"
-#include <QDebug>
-#include <QFile>
-#include <QFileDialog>
-#include <QHBoxLayout>
-#include <QHash>
-#include <QMessageBox>
-#include <QPushButton>
-#include <QRandomGenerator>
-#include <QScrollArea>
-#include <QString>
-#include <QVBoxLayout>
 #include <QWidget>
-#include <algorithm>
-#include <functional>
-#include <memory>
-#include <vector>
 
 namespace Ui
 {
