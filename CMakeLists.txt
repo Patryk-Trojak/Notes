@@ -30,7 +30,6 @@ set(PROJECT_SOURCES
         ${INCLUDE_DIR}/NotesDisplayingTab.h ${SOURCE_DIR}/NotesDisplayingTab.cpp ${FORMS_DIR}/NotesDisplayingTab.ui
         ${INCLUDE_DIR}/PersistenceManager.h ${SOURCE_DIR}/PersistenceManager.cpp
         ${INCLUDE_DIR}/Utils.h ${SOURCE_DIR}/Utils.cpp
-        ${INCLUDE_DIR}/NotesManager.h ${SOURCE_DIR}/NotesManager.cpp
         ${INCLUDE_DIR}/AboutWindow.h ${SOURCE_DIR}/AboutWindow.cpp ${FORMS_DIR}/AboutWindow.ui
         ${RESOURCES_DIR}/images.qrc
         ${INCLUDE_DIR}/SearchBar.h ${SOURCE_DIR}/SearchBar.cpp
