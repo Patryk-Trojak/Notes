@@ -119,6 +119,16 @@ QVector<NoteData> PersistenceManager::loadAllNotesFromFolder(int folderId) const
     return notes;
 }
 
+void PersistenceManager::deleteAllNotesFromFolder(int folderId) const
+{
+    QSqlQuery query(db);
+    query.prepare("DELETE FROM note WHERE parent_folder_id = :parent_folder_id");
+    query.bindValue(":parent_folder_id", folderId);
+
+    if (!query.exec())
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+}
+
 std::vector<int> PersistenceManager::getAllIdsOfSavedNotes() const
 {
     std::vector<int> ids;
