@@ -40,6 +40,7 @@ set(PROJECT_SOURCES
         ${INCLUDE_DIR}/NoteListModel.h ${SOURCE_DIR}/NoteListModel.cpp
         ${INCLUDE_DIR}/NoteListDelegate.h ${SOURCE_DIR}/NoteListDelegate.cpp
         ${INCLUDE_DIR}/NoteListView.h ${SOURCE_DIR}/NoteListView.cpp
+        ${INCLUDE_DIR}/NoteSortFilterProxyModel.h ${SOURCE_DIR}/NoteSortFilterProxyModel.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
