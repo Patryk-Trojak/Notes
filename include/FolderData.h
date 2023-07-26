@@ -2,11 +2,11 @@
 #define FOLDERDATA_H
 
 #include <QString>
-
 class FolderData
 {
   public:
     FolderData();
+    FolderData(int id, int parentId, const QString &name);
     void setId(int newId);
     void setParentId(int newParentId);
     void setName(const QString &newName);

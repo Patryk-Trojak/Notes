@@ -4,6 +4,10 @@ FolderData::FolderData()
 {
 }
 
+FolderData::FolderData(int id, int parentId, const QString &name) : id(id), parentId(parentId), name(name)
+{
+}
+
 int FolderData::getId() const
 {
     return id;
