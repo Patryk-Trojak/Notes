@@ -115,7 +115,7 @@ bool FolderTreeModel::removeRows(int row, int count, const QModelIndex &parent)
 
     for (int i = 0; i < count; i++)
     {
-        persistenceManager.deleteFolder(parentItem->getChild(row + i)->data.getId());
+        deleteFolderRecursivelyFromDb(*parentItem->getChild(row + i));
     }
 
     beginRemoveRows(parent, row, row + count - 1);
@@ -152,4 +152,12 @@ void FolderTreeModel::setupChildrenRecursively(FolderTreeItem &folderTreeItem, c
         setupChildrenRecursively(addedItem, listOfFolders);
         first++;
     }
+}
+
+void FolderTreeModel::deleteFolderRecursivelyFromDb(const FolderTreeItem &folderTreeItem)
+{
+    persistenceManager.deleteFolder(folderTreeItem.data.getId());
+
+    for (auto const &i : folderTreeItem.getChildren())
+        deleteFolderRecursivelyFromDb(*i);
 }

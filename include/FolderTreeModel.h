@@ -27,6 +27,7 @@ class FolderTreeModel : public QAbstractItemModel
     PersistenceManager &persistenceManager;
     void setupModelData();
     void setupChildrenRecursively(FolderTreeItem &folderTreeItem, const QVector<FolderData> &listOfFolders);
+    void deleteFolderRecursivelyFromDb(const FolderTreeItem &folderTreeItem);
 };
 
 #endif // FOLDERTREEMODEL_H
