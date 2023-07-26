@@ -270,14 +270,9 @@ void PersistenceManager::createNewDefaultTables() const
     if (!query.exec(createFolderTable))
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
 
-    FolderData rootFolder;
-    rootFolder.setName("/");
-    rootFolder.setParentId(SpecialFolderId::InvalidId);
-    int rootId = addFolder(rootFolder);
-
     FolderData notesFolder;
     notesFolder.setName("Folder");
-    notesFolder.setParentId(rootId);
+    notesFolder.setParentId(SpecialFolderId::RootFolder);
     addFolder(notesFolder);
 }
 
