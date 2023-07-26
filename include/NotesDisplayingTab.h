@@ -3,6 +3,7 @@
 
 #include "FolderTreeModel.h"
 #include "NoteListModel.h"
+#include <QSortFilterProxyModel>
 #include <QWidget>
 
 namespace Ui
@@ -26,17 +27,12 @@ class NotesDisplayingTab : public QWidget
     void onSortByCreationDateButtonToggled();
     void onSortByModificationDateButtonToggled();
     void onSortOrderButtonToggled();
-    void filterSortButtonsByTitle(const QString &searched);
 
   private:
     Ui::NotesDisplayingTab *ui;
     NoteListModel &noteModel;
+    QSortFilterProxyModel noteProxyModel;
     FolderTreeModel folderModel;
-    std::function<void(NotesDisplayingTab *, bool)> currentNoteButtonsSortingMethod;
-    void sortNoteButtons(std::function<bool(const QWidget *a, const QWidget *b)> compare);
-    void sortNoteButtonsByTitle(bool ascendingOrder);
-    void sortNoteButtonsByCreationDate(bool ascendingOrder);
-    void sortNoteButtonsByModificationDate(bool ascendingOrder);
 };
 
 #endif // NOTESDISPLAYINGTAB_H
