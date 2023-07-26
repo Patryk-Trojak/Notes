@@ -2,6 +2,7 @@
 
 #include "FolderData.h"
 #include <QMenu>
+#include <QMessageBox>
 #include <QModelIndex>
 
 FolderTreeView::FolderTreeView(QWidget *parent) : QTreeView(parent)
@@ -30,8 +31,7 @@ void FolderTreeView::onCustomContextMenuRequested(const QPoint &pos)
     if (index.isValid())
     {
         QAction *deleteFolder = new QAction("Delete folder");
-        QObject::connect(deleteFolder, &QAction::triggered, this,
-                         [this, index]() { this->model()->removeRow(index.row(), index.parent()); });
+        QObject::connect(deleteFolder, &QAction::triggered, this, [this, index]() { this->deleteFolder(index); });
         menu->addAction(deleteFolder);
 
         QAction *renameFolder = new QAction("Rename folder");
@@ -40,6 +40,17 @@ void FolderTreeView::onCustomContextMenuRequested(const QPoint &pos)
     }
 
     menu->exec(mapToGlobal(pos));
+}
+
+void FolderTreeView::deleteFolder(const QModelIndex &index)
+{
+    auto reply =
+        QMessageBox::question(this, "Delete folder?",
+                              "Are you sure you want to delete this folder? All notes and subfolders will be removed.");
+    if (reply == QMessageBox::No)
+        return;
+
+    model()->removeRow(index.row());
 }
 
 void FolderTreeView::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)

@@ -12,9 +12,11 @@ class FolderTreeView : public QTreeView
 
   signals:
     void newFolderSelected(int selectedFolderId);
+    void folderDeleted(int deletedFolderId);
 
   private slots:
     void onCustomContextMenuRequested(const QPoint &pos);
+    void deleteFolder(const QModelIndex &index);
 
   protected slots:
     void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
