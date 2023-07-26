@@ -9,7 +9,8 @@ class FolderTreeItem
     enum class Type
     {
         UserFolder,
-        AllNotesItem
+        AllNotesItem,
+        RootFolder
     };
     FolderTreeItem();
     FolderTreeItem(FolderTreeItem *parent, const FolderData &data, Type type = Type::UserFolder);

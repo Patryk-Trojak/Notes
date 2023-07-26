@@ -130,7 +130,7 @@ void FolderTreeModel::setupModelData()
     std::sort(folders.begin(), folders.end(), [](const FolderData &folder1, const FolderData &folder2) {
         return folder1.getParentId() < folder2.getParentId();
     });
-    rootItem = std::make_unique<FolderTreeItem>(nullptr, folders[0]);
+    rootItem = std::make_unique<FolderTreeItem>(nullptr, folders[0], FolderTreeItem::Type::RootFolder);
 
     setupChildrenRecursively(*rootItem, folders);
 
