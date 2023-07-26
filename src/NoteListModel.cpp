@@ -153,6 +153,11 @@ void NoteListModel::onNewFolderSelected(int selectedFolderId)
     endResetModel();
 }
 
+void NoteListModel::onFolderDeleted(int deletedFolderId)
+{
+    persistenceManager.deleteAllNotesFromFolder(deletedFolderId);
+}
+
 QModelIndex NoteListModel::parent(const QModelIndex &child) const
 {
     return QModelIndex();

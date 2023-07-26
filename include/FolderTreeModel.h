@@ -22,6 +22,9 @@ class FolderTreeModel : public QAbstractItemModel
     bool insertRows(int row, int count, const QModelIndex &parent);
     bool removeRows(int row, int count, const QModelIndex &parent);
 
+  signals:
+    void folderDeletedFromDatabase(int deletedFolderId);
+
   private:
     std::unique_ptr<FolderTreeItem> rootItem;
     PersistenceManager &persistenceManager;

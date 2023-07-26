@@ -38,6 +38,7 @@ class NoteListModel : public QAbstractItemModel
 
   public slots:
     void onNewFolderSelected(int selectedFolderId = 5);
+    void onFolderDeleted(int deletedFolderId);
 
   private:
     PersistenceManager &persistenceManager;

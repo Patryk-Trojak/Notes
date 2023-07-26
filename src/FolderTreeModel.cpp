@@ -157,6 +157,7 @@ void FolderTreeModel::setupChildrenRecursively(FolderTreeItem &folderTreeItem, c
 void FolderTreeModel::deleteFolderRecursivelyFromDb(const FolderTreeItem &folderTreeItem)
 {
     persistenceManager.deleteFolder(folderTreeItem.data.getId());
+    emit folderDeletedFromDatabase(folderTreeItem.data.getId());
 
     for (auto const &i : folderTreeItem.getChildren())
         deleteFolderRecursivelyFromDb(*i);

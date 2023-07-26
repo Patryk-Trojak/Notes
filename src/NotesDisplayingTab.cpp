@@ -47,6 +47,9 @@ NotesDisplayingTab::NotesDisplayingTab(NoteListModel &noteModel, PersistenceMana
         emit this->enterEditingNote(sourceIndex);
     });
     onNewFolderSelected(-1);
+
+    QObject::connect(&folderModel, &FolderTreeModel::folderDeletedFromDatabase, &noteModel,
+                     &NoteListModel::onFolderDeleted);
 }
 
 NotesDisplayingTab::~NotesDisplayingTab()
