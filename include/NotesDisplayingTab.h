@@ -27,6 +27,7 @@ class NotesDisplayingTab : public QWidget
     void onSortByCreationDateButtonToggled();
     void onSortByModificationDateButtonToggled();
     void onSortOrderButtonToggled();
+    void onNewFolderSelected(int selectedFolderId);
 
   private:
     Ui::NotesDisplayingTab *ui;

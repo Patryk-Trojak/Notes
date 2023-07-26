@@ -30,9 +30,8 @@ NotesDisplayingTab::NotesDisplayingTab(NoteListModel &noteModel, PersistenceMana
 
     ui->folderTreeView->setModel(&folderModel);
     ui->folderTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
-    QObject::connect(ui->folderTreeView, &FolderTreeView::newFolderSelected, &noteModel,
-                     &NoteListModel::onNewFolderSelected);
-
+    QObject::connect(ui->folderTreeView, &FolderTreeView::newFolderSelected, this,
+                     &NotesDisplayingTab::onNewFolderSelected);
     noteProxyModel.setSourceModel(&noteModel);
     noteProxyModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
     noteProxyModel.setSortCaseSensitivity(Qt::CaseInsensitive);
@@ -81,4 +80,10 @@ void NotesDisplayingTab::onSortOrderButtonToggled()
         sortOrder = Qt::AscendingOrder;
 
     noteProxyModel.sort(0, sortOrder);
+}
+
+void NotesDisplayingTab::onNewFolderSelected(int selectedFolderId)
+{
+    noteModel.onNewFolderSelected(selectedFolderId);
+    ui->searchBar->setText("");
 }
