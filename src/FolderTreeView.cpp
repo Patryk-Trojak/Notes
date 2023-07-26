@@ -22,6 +22,9 @@ void FolderTreeView::setModel(QAbstractItemModel *model)
 void FolderTreeView::onCustomContextMenuRequested(const QPoint &pos)
 {
     QModelIndex index = QTreeView::indexAt(pos);
+    if (!(index.flags() & Qt::ItemIsEditable))
+        index = QModelIndex(); // Treat uneditable item as when the mouse isn't over any item
+
     QMenu *menu = new QMenu(this);
     QAction *createSubfolder = new QAction(index.isValid() ? "Create subfolder" : "Create new folder");
     QObject::connect(createSubfolder, &QAction::triggered, this,
