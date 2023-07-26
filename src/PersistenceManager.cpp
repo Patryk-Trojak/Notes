@@ -272,7 +272,7 @@ void PersistenceManager::createNewDefaultTables() const
 
     FolderData rootFolder;
     rootFolder.setName("/");
-    rootFolder.setParentId(-10);
+    rootFolder.setParentId(SpecialFolderId::InvalidId);
     int rootId = addFolder(rootFolder);
 
     FolderData notesFolder;

@@ -147,7 +147,7 @@ void NoteListModel::onNewFolderSelected(int selectedFolderId)
     notes.clear();
     if (selectedFolderId >= 0)
         notes = persistenceManager.loadAllNotesFromFolder(selectedFolderId);
-    else
+    else if (selectedFolderId == SpecialFolderId::AllNotesFolder)
         notes = persistenceManager.loadAllNotes();
 
     endResetModel();

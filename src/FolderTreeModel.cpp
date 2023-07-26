@@ -136,7 +136,7 @@ void FolderTreeModel::setupModelData()
 
     FolderData allNotesFolder;
     allNotesFolder.setName("All notes");
-    allNotesFolder.setId(-1);
+    allNotesFolder.setId(SpecialFolderId::AllNotesFolder);
     allNotesFolder.setParentId(rootItem->data.getId());
     rootItem->insertChild(0, allNotesFolder, FolderTreeItem::Type::AllNotesItem);
 }
