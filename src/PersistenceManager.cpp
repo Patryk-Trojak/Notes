@@ -170,6 +170,27 @@ QVector<FolderData> PersistenceManager::loadAllFolders() const
     return folders;
 }
 
+QVector<int> PersistenceManager::loadIdsOfSubfolders(int idOfFolder)
+{
+    QVector<int> ids;
+    QSqlQuery query(db);
+    query.prepare("SELECT id FROM folder WHERE parent_id = :parent_id");
+    query.bindValue(":parent_id", idOfFolder);
+
+    if (!query.exec())
+    {
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+        return ids;
+    }
+
+    while (query.next())
+    {
+        ids.emplace_back(query.value(0).toInt());
+    }
+
+    return ids;
+}
+
 int PersistenceManager::addFolder(const FolderData &folder) const
 {
     QSqlQuery query(db);
