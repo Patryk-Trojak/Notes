@@ -130,14 +130,12 @@ void FolderTreeModel::setupModelData()
     std::sort(folders.begin(), folders.end(), [](const FolderData &folder1, const FolderData &folder2) {
         return folder1.getParentId() < folder2.getParentId();
     });
+
     rootItem = std::make_unique<FolderTreeItem>(nullptr, folders[0], FolderTreeItem::Type::RootFolder);
 
     setupChildrenRecursively(*rootItem, folders);
 
-    FolderData allNotesFolder;
-    allNotesFolder.setName("All notes");
-    allNotesFolder.setId(SpecialFolderId::AllNotesFolder);
-    allNotesFolder.setParentId(rootItem->data.getId());
+    FolderData allNotesFolder(SpecialFolderId::AllNotesFolder, rootItem->data.getId(), "All notes");
     rootItem->insertChild(0, allNotesFolder, FolderTreeItem::Type::AllNotesItem);
 }
 
