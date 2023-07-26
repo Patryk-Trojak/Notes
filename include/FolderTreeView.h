@@ -8,6 +8,7 @@ class FolderTreeView : public QTreeView
 
   public:
     FolderTreeView(QWidget *parent = nullptr);
+    void setModel(QAbstractItemModel *model);
 
   signals:
     void newFolderSelected(int selectedFolderId);

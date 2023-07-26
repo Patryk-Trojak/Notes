@@ -79,12 +79,19 @@ bool FolderTreeModel::setData(const QModelIndex &index, const QVariant &value, i
 
 Qt::ItemFlags FolderTreeModel::flags(const QModelIndex &index) const
 {
-    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+    FolderTreeItem *item = getItemFromIndex(index);
+    if (item->getType() == FolderTreeItem::Type::UserFolder)
+    {
+        return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+    }
+    return QAbstractItemModel::flags(index);
 }
 
 bool FolderTreeModel::insertRows(int row, int count, const QModelIndex &parent)
 {
     FolderTreeItem *parentItem = getItemFromIndex(parent);
+    if (parentItem == rootItem.get() and row == 0) // Prevent adding row before special folders
+        row = 1;
 
     for (int i = 0; i < count; i++)
     {
@@ -103,6 +110,8 @@ bool FolderTreeModel::insertRows(int row, int count, const QModelIndex &parent)
 bool FolderTreeModel::removeRows(int row, int count, const QModelIndex &parent)
 {
     FolderTreeItem *parentItem = getItemFromIndex(parent);
+    if (parentItem == rootItem.get() and row == 0) // Prevent removing special folders
+        return false;
 
     for (int i = 0; i < count; i++)
     {
@@ -124,6 +133,12 @@ void FolderTreeModel::setupModelData()
     rootItem = std::make_unique<FolderTreeItem>(nullptr, folders[0]);
 
     setupChildrenRecursively(*rootItem, folders);
+
+    FolderData allNotesFolder;
+    allNotesFolder.setName("All notes");
+    allNotesFolder.setId(-1);
+    allNotesFolder.setParentId(rootItem->data.getId());
+    rootItem->insertChild(0, allNotesFolder, FolderTreeItem::Type::AllNotesItem);
 }
 
 void FolderTreeModel::setupChildrenRecursively(FolderTreeItem &folderTreeItem, const QVector<FolderData> &listOfFolders)

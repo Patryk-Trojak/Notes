@@ -11,6 +11,13 @@ FolderTreeView::FolderTreeView(QWidget *parent) : QTreeView(parent)
                      &FolderTreeView::onCustomContextMenuRequested);
 }
 
+void FolderTreeView::setModel(QAbstractItemModel *model)
+{
+    QTreeView::setModel(model);
+    if (this->model()->rowCount() > 0)
+        setCurrentIndex(this->model()->index(0, 0));
+}
+
 void FolderTreeView::onCustomContextMenuRequested(const QPoint &pos)
 {
     QModelIndex index = QTreeView::indexAt(pos);

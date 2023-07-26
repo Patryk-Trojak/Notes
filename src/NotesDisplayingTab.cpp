@@ -46,6 +46,7 @@ NotesDisplayingTab::NotesDisplayingTab(NoteListModel &noteModel, PersistenceMana
         auto sourceIndex = this->noteProxyModel.mapToSource(index);
         emit this->enterEditingNote(sourceIndex);
     });
+    onNewFolderSelected(-1);
 }
 
 NotesDisplayingTab::~NotesDisplayingTab()
