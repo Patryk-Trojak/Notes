@@ -83,7 +83,9 @@ QVector<NoteData> PersistenceManager::loadAllNotes() const
 {
     QVector<NoteData> notes;
     QSqlQuery query(db);
-    query.prepare("SELECT * FROM note");
+    query.prepare("SELECT * FROM note WHERE parent_folder_id != :thrash_folder_id");
+    query.bindValue(":thrash_folder_id", SpecialFolderId::TrashFolder);
+
     if (!query.exec())
     {
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
@@ -117,6 +119,56 @@ QVector<NoteData> PersistenceManager::loadAllNotesFromFolder(int folderId) const
     }
 
     return notes;
+}
+
+void PersistenceManager::moveNoteToTrash(int noteId) const
+{
+    QSqlQuery query(db);
+
+    query.prepare("UPDATE note "
+                  "SET parent_folder_id = :thrash_folder_id "
+                  "WHERE id = :id");
+
+    query.bindValue(":thrash_folder_id", SpecialFolderId::TrashFolder);
+    query.bindValue(":id", noteId);
+
+    if (!query.exec())
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+}
+
+void PersistenceManager::moveAllNotesFromFolderToTrash(int folderId) const
+{
+    QSqlQuery query(db);
+
+    query.prepare("UPDATE note "
+                  "SET parent_folder_id = :thrash_folder_id "
+                  "WHERE parent_folder_id = :old_parent_folder_id");
+
+    query.bindValue(":thrash_folder_id", SpecialFolderId::TrashFolder);
+    query.bindValue(":old_parent_folder_id", folderId);
+
+    if (!query.exec())
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+}
+
+void PersistenceManager::restoreNoteFromTrash(int noteId) const
+{
+    QSqlQuery query(db);
+
+    query.prepare("UPDATE note "
+                  "SET parent_folder_id = :all_notes_folder_id "
+                  "WHERE id = :id");
+
+    query.bindValue(":all_notes_folder_id", SpecialFolderId::AllNotesFolder);
+    query.bindValue(":id", noteId);
+
+    if (!query.exec())
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+}
+
+QVector<NoteData> PersistenceManager::loadAllNotesFromTrash() const
+{
+    return loadAllNotesFromFolder(SpecialFolderId::TrashFolder);
 }
 
 void PersistenceManager::deleteAllNotesFromFolder(int folderId) const
@@ -301,6 +353,10 @@ NoteData PersistenceManager::createNoteDataFromQueryRecord(const QSqlQuery &quer
     noteData.setContent(query.value(3).toString());
     noteData.setCreationTime(QDateTime::fromMSecsSinceEpoch(query.value(4).toLongLong()));
     noteData.setModificationTime(QDateTime::fromMSecsSinceEpoch(query.value(5).toLongLong()));
+    if (noteData.getParentFolderId() == SpecialFolderId::TrashFolder)
+        noteData.setIsInTrash(true);
+    else
+        noteData.setIsInTrash(false);
 
     return noteData;
 }

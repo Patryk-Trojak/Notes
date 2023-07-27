@@ -30,6 +30,12 @@ class PersistenceManager
     void deleteAllNotesFromFolder(int folderId) const;
     std::vector<int> getAllIdsOfSavedNotes() const;
     void deleteNoteFile(int id) const;
+
+    void moveNoteToTrash(int noteId) const;
+    void moveAllNotesFromFolderToTrash(int folderId) const;
+    void restoreNoteFromTrash(int noteId) const;
+    QVector<NoteData> loadAllNotesFromTrash() const;
+
     QVector<FolderData> loadAllFolders() const;
     QVector<int> loadIdsOfSubfolders(int idOfFolder);
     int addFolder(const FolderData &folder) const;
