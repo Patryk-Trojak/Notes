@@ -1,6 +1,6 @@
 #include "NoteData.h"
 
-NoteData::NoteData() : id(-1), parentFolderId(-1)
+NoteData::NoteData() : id(-1), parentFolderId(-1), isInTrash(false), isPinned(false)
 {
 }
 
@@ -39,6 +39,11 @@ bool NoteData::getIsInTrash() const
     return isInTrash;
 }
 
+bool NoteData::getIsPinned() const
+{
+    return isPinned;
+}
+
 void NoteData::setId(int id)
 {
     this->id = id;
@@ -72,4 +77,9 @@ void NoteData::setModificationTime(const QDateTime &newModificationTime)
 void NoteData::setIsInTrash(bool newIsInTrash)
 {
     isInTrash = newIsInTrash;
+}
+
+void NoteData::setIsPinned(bool newIsPinned)
+{
+    isPinned = newIsPinned;
 }

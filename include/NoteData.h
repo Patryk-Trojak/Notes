@@ -19,17 +19,19 @@ class NoteData
     const QString &getTitle() const;
     const QDateTime &getCreationTime() const;
     const QDateTime &getModificationTime() const;
+    bool getIsInTrash() const;
+    bool getIsPinned() const;
+
     void setId(int id);
     void setParentFolderId(int newParentFolderId);
     void setTitle(const QString &title);
     void setContent(const QString &content);
     void setCreationTime(const QDateTime &newCreationTime);
     void setModificationTime(const QDateTime &newModificationTime);
-
-    bool getIsInTrash() const;
     void setIsInTrash(bool newIsInTrash);
+    void setIsPinned(bool newIsPinned);
 
-private:
+  private:
     int id;
     int parentFolderId;
     QString title;
@@ -37,6 +39,7 @@ private:
     QDateTime creationTime;
     QDateTime modificationTime;
     bool isInTrash;
+    bool isPinned;
 };
 
 #endif // NOTE_H
