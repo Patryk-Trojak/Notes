@@ -25,13 +25,14 @@ int PersistenceManager::addNote(const NoteData &note) const
 {
     QSqlQuery query(db);
     query.prepare("INSERT INTO note "
-                  "(parent_folder_id, title, content, creation_time, modification_time)"
-                  "VALUES(:parent_folder_id, :title, :content, :creation_time, :modification_time)");
+                  "(parent_folder_id, title, content, creation_time, modification_time, is_pinned)"
+                  "VALUES(:parent_folder_id, :title, :content, :creation_time, :modification_time, :is_pinned)");
     query.bindValue(":parent_folder_id", note.getParentFolderId());
     query.bindValue(":title", note.getTitle());
     query.bindValue(":content", note.getContent());
     query.bindValue(":creation_time", note.getCreationTime().toMSecsSinceEpoch());
     query.bindValue(":modification_time", note.getModificationTime().toMSecsSinceEpoch());
+    query.bindValue(":is_pinned", note.getIsPinned());
 
     if (!query.exec())
     {
@@ -47,8 +48,7 @@ void PersistenceManager::updateNote(const NoteData &note) const
 
     query.prepare("UPDATE note "
                   "SET parent_folder_id = :parent_folder_id, title = :title, content = :content, creation_time = "
-                  ":creation_time, modification_time = "
-                  ":modification_time "
+                  ":creation_time, modification_time = :modification_time , is_pinned = :is_pinned "
                   "WHERE id = :id");
 
     query.bindValue(":parent_folder_id", note.getParentFolderId());
@@ -56,6 +56,7 @@ void PersistenceManager::updateNote(const NoteData &note) const
     query.bindValue(":content", note.getContent());
     query.bindValue(":creation_time", note.getCreationTime().toMSecsSinceEpoch());
     query.bindValue(":modification_time", note.getModificationTime().toMSecsSinceEpoch());
+    query.bindValue(":is_pinned", note.getIsPinned());
     query.bindValue(":id", note.getId());
 
     if (!query.exec())
@@ -306,7 +307,8 @@ void PersistenceManager::createNewDefaultTables() const
                               "title TEXT, "
                               "content TEXT, "
                               "creation_time INTEGER NOT NULL DEFAULT 0, "
-                              "modification_time INTEGER NOT NULL DEFAULT 0"
+                              "modification_time INTEGER NOT NULL DEFAULT 0, "
+                              "is_pinned INTEGER NOT NULL DEFAULT 0"
                               ")";
 
     if (!query.exec(createNoteTable))
@@ -353,6 +355,8 @@ NoteData PersistenceManager::createNoteDataFromQueryRecord(const QSqlQuery &quer
     noteData.setContent(query.value(3).toString());
     noteData.setCreationTime(QDateTime::fromMSecsSinceEpoch(query.value(4).toLongLong()));
     noteData.setModificationTime(QDateTime::fromMSecsSinceEpoch(query.value(5).toLongLong()));
+    noteData.setIsPinned(query.value(6).toBool());
+
     if (noteData.getParentFolderId() == SpecialFolderId::TrashFolder)
         noteData.setIsInTrash(true);
     else
