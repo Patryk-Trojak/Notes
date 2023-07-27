@@ -46,6 +46,8 @@ QVariant NoteListModel::data(const QModelIndex &index, int role) const
         return notes[row].getCreationTime();
     case Role::ModificationTime:
         return notes[row].getModificationTime();
+    case Role::isInTrash:
+        return notes[row].getIsInTrash();
     default:
         return QVariant();
     }
@@ -99,6 +101,11 @@ bool NoteListModel::setData(const QModelIndex &index, const QVariant &value, int
         persistenceManager.updateNote(notes[index.row()]);
         emit dataChanged(index, index);
         return true;
+    case Role::isInTrash:
+        notes[row].setIsInTrash(value.toBool());
+        persistenceManager.updateNote(notes[index.row()]);
+        emit dataChanged(index, index);
+        return true;
     }
 
     return false;
@@ -106,6 +113,9 @@ bool NoteListModel::setData(const QModelIndex &index, const QVariant &value, int
 
 bool NoteListModel::insertRows(int row, int count, const QModelIndex &parent)
 {
+    if (currentSelectedFolderId == SpecialFolderId::TrashFolder)
+        return false;
+
     beginInsertRows(parent, row, row + count - 1);
     auto inserted = notes.insert(row, count, NoteData{});
 
@@ -127,7 +137,10 @@ bool NoteListModel::removeRows(int row, int count, const QModelIndex &parent)
 {
     for (int i = row; i < row + count; i++)
     {
-        persistenceManager.deleteNoteFile(notes[i].getId());
+        if (currentSelectedFolderId == SpecialFolderId::TrashFolder)
+            persistenceManager.deleteNoteFile(notes[i].getId());
+        else
+            persistenceManager.moveNoteToTrash(notes[i].getId());
     }
     beginRemoveRows(parent, row, row + count - 1);
     notes.remove(row, count);
@@ -140,22 +153,41 @@ void NoteListModel::createNewNote()
     insertRows(0, 1, QModelIndex());
 }
 
+void NoteListModel::restoreNoteFromTrash(const QModelIndex &index)
+{
+    persistenceManager.restoreNoteFromTrash(notes[index.row()].getId());
+    beginRemoveRows(QModelIndex(), index.row(), index.row());
+    notes.remove(index.row(), 1);
+    endRemoveRows();
+}
+
 void NoteListModel::onNewFolderSelected(int selectedFolderId)
 {
     beginResetModel();
     currentSelectedFolderId = selectedFolderId;
     notes.clear();
-    if (selectedFolderId >= 0)
-        notes = persistenceManager.loadAllNotesFromFolder(selectedFolderId);
-    else if (selectedFolderId == SpecialFolderId::AllNotesFolder)
+
+    if (selectedFolderId == SpecialFolderId::AllNotesFolder)
         notes = persistenceManager.loadAllNotes();
+    else if (selectedFolderId == SpecialFolderId::TrashFolder)
+        notes = persistenceManager.loadAllNotesFromTrash();
+    else
+        notes = persistenceManager.loadAllNotesFromFolder(currentSelectedFolderId);
 
     endResetModel();
 }
 
 void NoteListModel::onFolderDeleted(int deletedFolderId)
 {
-    persistenceManager.deleteAllNotesFromFolder(deletedFolderId);
+    if (currentSelectedFolderId == SpecialFolderId::TrashFolder)
+        persistenceManager.deleteAllNotesFromFolder(deletedFolderId);
+    else
+        persistenceManager.moveAllNotesFromFolderToTrash(deletedFolderId);
+}
+
+int NoteListModel::getCurrentSelectedFolderId() const
+{
+    return currentSelectedFolderId;
 }
 
 QModelIndex NoteListModel::parent(const QModelIndex &child) const

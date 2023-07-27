@@ -10,7 +10,8 @@ class FolderTreeItem
     {
         UserFolder,
         AllNotesItem,
-        RootFolder
+        RootFolder,
+        TrashFolder
     };
     FolderTreeItem();
     FolderTreeItem(FolderTreeItem *parent, const FolderData &data, Type type = Type::UserFolder);

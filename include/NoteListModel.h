@@ -21,6 +21,7 @@ class NoteListModel : public QAbstractItemModel
         Content,
         CreationTime,
         ModificationTime,
+        isInTrash
     };
 
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
@@ -35,6 +36,8 @@ class NoteListModel : public QAbstractItemModel
     QModelIndex parent(const QModelIndex &child) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
     void createNewNote();
+    void restoreNoteFromTrash(const QModelIndex &index);
+    int getCurrentSelectedFolderId() const;
 
   public slots:
     void onNewFolderSelected(int selectedFolderId = 5);
