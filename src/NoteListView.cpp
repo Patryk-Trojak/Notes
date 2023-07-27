@@ -24,10 +24,10 @@ void NoteListView::setModel(QAbstractItemModel *model)
     QListView::setModel(model);
 }
 
-void NoteListView::removeNote()
+void NoteListView::removeNote(const QModelIndex &index)
 {
-    const QString message = [this]() {
-        if (this->currentIndex().data(NoteListModel::isInTrash).toBool())
+    const QString message = [index]() {
+        if (index.data(NoteListModel::isInTrash).toBool())
             return "Are you sure you want to delete this note? You won't be able to recover deleted note";
         else
             return "Are you sure you want to remove this note? You will be able to restore it from trash folder";
@@ -37,13 +37,14 @@ void NoteListView::removeNote()
     if (reply == QMessageBox::No)
         return;
 
-    model()->removeRow(currentIndex().row());
+    model()->removeRow(index.row());
 }
 
 void NoteListView::onNewEditorCreated(NoteButton *editor, const QModelIndex &index)
 {
     this->editor = editor;
-    QObject::connect(editor, &NoteButton::deleteNote, this, &NoteListView::removeNote);
+    QObject::connect(editor, &NoteButton::deleteNote, this,
+                     [this, index]() { this->removeNote(this->currentIndex()); });
     QObject::connect(editor, &NoteButton::saveNote, this,
                      [this, editor, index]() { noteListDelegate.setModelData(editor, this->model(), index); });
     QObject::connect(editor, &NoteButton::clicked, this, [this, index]() { emit this->noteSelected(index); });
@@ -138,8 +139,7 @@ void NoteListView::onCustomContextMenuRequested(const QPoint &pos)
     if (index.isValid())
     {
         QAction *deleteNote = new QAction("Delete note");
-        QObject::connect(deleteNote, &QAction::triggered, this,
-                         [this, index]() { this->model()->removeRow(index.row(), index.parent()); });
+        QObject::connect(deleteNote, &QAction::triggered, this, [this, index]() { removeNote(index); });
         menu->addAction(deleteNote);
     }
 

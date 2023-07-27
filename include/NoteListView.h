@@ -20,7 +20,7 @@ class NoteListView : public QListView
   private:
     NoteListDelegate noteListDelegate;
     NoteButton *editor;
-    void removeNote();
+    void removeNote(const QModelIndex &index);
     void onNewEditorCreated(NoteButton *editor, const QModelIndex &index);
     void onItemEntered(const QModelIndex &index);
     void updateEditorOnDataChanged();
