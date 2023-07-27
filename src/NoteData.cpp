@@ -34,6 +34,11 @@ const QDateTime &NoteData::getModificationTime() const
     return modificationTime;
 }
 
+bool NoteData::getIsInTrash() const
+{
+    return isInTrash;
+}
+
 void NoteData::setId(int id)
 {
     this->id = id;
@@ -62,4 +67,9 @@ void NoteData::setCreationTime(const QDateTime &newCreationTime)
 void NoteData::setModificationTime(const QDateTime &newModificationTime)
 {
     modificationTime = newModificationTime;
+}
+
+void NoteData::setIsInTrash(bool newIsInTrash)
+{
+    isInTrash = newIsInTrash;
 }

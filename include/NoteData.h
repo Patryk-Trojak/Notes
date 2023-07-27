@@ -26,13 +26,17 @@ class NoteData
     void setCreationTime(const QDateTime &newCreationTime);
     void setModificationTime(const QDateTime &newModificationTime);
 
-  private:
+    bool getIsInTrash() const;
+    void setIsInTrash(bool newIsInTrash);
+
+private:
     int id;
     int parentFolderId;
     QString title;
     QString content;
     QDateTime creationTime;
     QDateTime modificationTime;
+    bool isInTrash;
 };
 
 #endif // NOTE_H
