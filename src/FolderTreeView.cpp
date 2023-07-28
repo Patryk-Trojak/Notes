@@ -1,6 +1,7 @@
 #include "FolderTreeView.h"
 
 #include "FolderData.h"
+#include "PersistenceManager.h"
 #include <QMenu>
 #include <QMessageBox>
 #include <QModelIndex>
@@ -17,6 +18,15 @@ void FolderTreeView::setModel(QAbstractItemModel *model)
     QTreeView::setModel(model);
     if (this->model()->rowCount() > 0)
         setCurrentIndex(this->model()->index(0, 0));
+}
+
+int FolderTreeView::getCurrentFolderSelectedId() const
+{
+    FolderData *selectedFolder = static_cast<FolderData *>(currentIndex().internalPointer());
+    if (selectedFolder)
+        return selectedFolder->getId();
+    else
+        return SpecialFolderId::AllNotesFolder;
 }
 
 void FolderTreeView::onCustomContextMenuRequested(const QPoint &pos)
