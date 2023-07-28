@@ -50,6 +50,8 @@ void NoteListView::onNewEditorCreated(NoteButton *editor, const QModelIndex &ind
     QObject::connect(editor, &NoteButton::saveNote, this,
                      [this, editor, index]() { noteListDelegate.setModelData(editor, this->model(), index); });
     QObject::connect(editor, &NoteButton::clicked, this, [this, index]() { emit this->noteSelected(index); });
+    QObject::connect(editor, &NoteButton::pinCheckboxToogled, this,
+                     [this, editor, index]() { noteListDelegate.setModelData(editor, this->model(), index); });
 }
 
 void NoteListView::onItemEntered(const QModelIndex &index)
@@ -129,6 +131,23 @@ void NoteListView::onCustomContextMenuRequested(const QPoint &pos)
         QObject::connect(createNote, &QAction::triggered, this,
                          [this, index]() { this->model()->insertRow(0, index); });
         menu->addAction(createNote);
+        if (index.isValid())
+        {
+            if (!index.data(NoteListModel::isPinned).toBool())
+            {
+                QAction *pinNote = new QAction("Pin note");
+                QObject::connect(pinNote, &QAction::triggered, this,
+                                 [this, index]() { this->model()->setData(index, true, NoteListModel::isPinned); });
+                menu->addAction(pinNote);
+            }
+            else
+            {
+                QAction *unpinNote = new QAction("Unpin note");
+                QObject::connect(unpinNote, &QAction::triggered, this,
+                                 [this, index]() { this->model()->setData(index, false, NoteListModel::isPinned); });
+                menu->addAction(unpinNote);
+            }
+        }
     }
     else if (index.isValid())
     {

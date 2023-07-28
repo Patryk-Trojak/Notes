@@ -3,6 +3,7 @@
 
 #include "FolderTreeModel.h"
 #include "NoteListModel.h"
+#include "NoteSortFilterProxyModel.h"
 #include <QSortFilterProxyModel>
 #include <QWidget>
 
@@ -32,7 +33,7 @@ class NotesDisplayingTab : public QWidget
   private:
     Ui::NotesDisplayingTab *ui;
     NoteListModel &noteModel;
-    QSortFilterProxyModel noteProxyModel;
+    NoteSortFilterProxyModel noteProxyModel;
     FolderTreeModel folderModel;
 };
 

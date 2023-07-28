@@ -11,7 +11,7 @@ class NoteSortFilterProxyModel : public QSortFilterProxyModel
     NoteSortFilterProxyModel(QObject *parent);
 
   protected:
-    bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const;
+    bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const override;
 };
 
 #endif // NOTESORTFILTERPROXYMODEL_H

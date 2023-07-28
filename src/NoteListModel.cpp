@@ -48,6 +48,8 @@ QVariant NoteListModel::data(const QModelIndex &index, int role) const
         return notes[row].getModificationTime();
     case Role::isInTrash:
         return notes[row].getIsInTrash();
+    case Role::isPinned:
+        return notes[row].getIsPinned();
     default:
         return QVariant();
     }
@@ -103,6 +105,11 @@ bool NoteListModel::setData(const QModelIndex &index, const QVariant &value, int
         return true;
     case Role::isInTrash:
         notes[row].setIsInTrash(value.toBool());
+        persistenceManager.updateNote(notes[index.row()]);
+        emit dataChanged(index, index);
+        return true;
+    case Role::isPinned:
+        notes[row].setIsPinned(value.toBool());
         persistenceManager.updateNote(notes[index.row()]);
         emit dataChanged(index, index);
         return true;
