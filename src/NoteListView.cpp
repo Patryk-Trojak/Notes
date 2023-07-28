@@ -43,6 +43,8 @@ void NoteListView::removeNote(const QModelIndex &index)
 void NoteListView::onNewEditorCreated(NoteButton *editor, const QModelIndex &index)
 {
     this->editor = editor;
+    editor->setMouseTracking(true);
+    editor->installEventFilter(this);
     QObject::connect(editor, &NoteButton::deleteNote, this,
                      [this, index]() { this->removeNote(this->currentIndex()); });
     QObject::connect(editor, &NoteButton::saveNote, this,
@@ -154,9 +156,16 @@ void NoteListView::onRestoreNoteFromTrashRequested(const QModelIndex &index)
         noteModel->restoreNoteFromTrash(noteModelIndex);
 }
 
-void NoteListView::leaveEvent(QEvent *event)
+bool NoteListView::eventFilter(QObject *watched, QEvent *event)
 {
-    QListView::leaveEvent(event);
-    closePersistentEditor(currentIndex());
-    editor = nullptr;
+    if (watched == editor)
+    {
+        if (event->type() == QEvent::Leave)
+        {
+            // Destroy editor when mouse leaves it
+            closePersistentEditor(currentIndex());
+            editor = nullptr;
+        }
+    }
+    return QListView::eventFilter(watched, event);
 }

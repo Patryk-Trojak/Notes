@@ -13,6 +13,7 @@ class NoteListView : public QListView
   public:
     NoteListView(QWidget *parent);
     void setModel(QAbstractItemModel *model);
+    bool eventFilter(QObject *watched, QEvent *event);
 
   signals:
     void noteSelected(const QModelIndex &index);
@@ -30,9 +31,6 @@ class NoteListView : public QListView
   private slots:
     void onCustomContextMenuRequested(const QPoint &pos);
     void onRestoreNoteFromTrashRequested(const QModelIndex &index);
-
-  protected:
-    void leaveEvent(QEvent *event);
 };
 
 #endif // NOTELISTVIEW_H
