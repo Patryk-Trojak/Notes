@@ -1,9 +1,17 @@
 #include "NoteButton.h"
 #include "./ui_NoteButton.h"
 
+#include <QResizeEvent>
+
 NoteButton::NoteButton(QWidget *parent) : QPushButton{parent}, ui(new Ui::NoteButton)
 {
     ui->setupUi(this);
+    pinCheckbox = new QCheckBox(this);
+    pinCheckbox->setGeometry(0, 0, 32, 32);
+    pinCheckbox->setStyleSheet("QCheckBox::indicator:checked {image: url(:/images/pinChecked.png);} "
+                               "QCheckBox::indicator:unchecked {image: url(:/images/pinUnchecked.png);}");
+    pinCheckbox->setChecked(false);
+    QObject::connect(pinCheckbox, &QCheckBox::toggled, this, &NoteButton::pinCheckboxToogled);
     QObject::connect(ui->titleEdit, &QLineEdit::editingFinished, this, [this]() {
         if (ui->titleEdit->text() != lastSavedTitle)
         {
@@ -17,9 +25,10 @@ NoteButton::NoteButton(QWidget *parent) : QPushButton{parent}, ui(new Ui::NoteBu
 }
 
 NoteButton::NoteButton(const QString &title, const QDateTime &creationTime, const QDateTime &modificationTime,
-                       QWidget *parent)
+                       bool isPinned, QWidget *parent)
     : NoteButton(parent)
 {
+    setIsPinned(isPinned);
     setCreationTime(creationTime);
     setModificationTime(modificationTime);
     ui->titleEdit->setText(title);
@@ -60,4 +69,25 @@ const QDateTime &NoteButton::getModificationTime() const
 QString NoteButton::convertDateTimeToString(const QDateTime &dateTime)
 {
     return dateTime.toString("dd.MM.yy hh:mm:ss");
+}
+
+void NoteButton::resizeEvent(QResizeEvent *event)
+{
+    QPushButton::resizeEvent(event);
+    pinCheckbox->move(event->size().width() - pinCheckbox->width() - 5, 5);
+}
+
+bool NoteButton::getIsPinned() const
+{
+    return pinCheckbox->isChecked();
+}
+
+void NoteButton::setPinCheckboxVisible(bool visible)
+{
+    pinCheckbox->setVisible(visible);
+}
+
+void NoteButton::setIsPinned(bool newIsPinned)
+{
+    pinCheckbox->setChecked(newIsPinned);
 }
