@@ -63,7 +63,7 @@ void PersistenceManager::updateNote(const NoteData &note) const
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
 }
 
-NoteData PersistenceManager::loadNoteFromFile(int id) const
+NoteData PersistenceManager::loadNote(int id) const
 {
     QSqlQuery query(db);
     query.prepare("SELECT * FROM note WHERE id = :id LIMIT 1");
@@ -182,7 +182,7 @@ void PersistenceManager::deleteAllNotesFromFolder(int folderId) const
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
 }
 
-std::vector<int> PersistenceManager::getAllIdsOfSavedNotes() const
+std::vector<int> PersistenceManager::getIdsNotes() const
 {
     std::vector<int> ids;
     QSqlQuery query(db);
@@ -201,7 +201,7 @@ std::vector<int> PersistenceManager::getAllIdsOfSavedNotes() const
     return ids;
 }
 
-void PersistenceManager::deleteNoteFile(int id) const
+void PersistenceManager::deleteNote(int id) const
 {
     QSqlQuery query(db);
     query.prepare("DELETE FROM note WHERE id = :id");

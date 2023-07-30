@@ -145,7 +145,7 @@ bool NoteListModel::removeRows(int row, int count, const QModelIndex &parent)
     for (int i = row; i < row + count; i++)
     {
         if (currentSelectedFolderId == SpecialFolderId::TrashFolder)
-            persistenceManager.deleteNoteFile(notes[i].getId());
+            persistenceManager.deleteNote(notes[i].getId());
         else
             persistenceManager.moveNoteToTrash(notes[i].getId());
     }

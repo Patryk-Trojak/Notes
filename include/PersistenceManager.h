@@ -24,12 +24,12 @@ class PersistenceManager
     PersistenceManager();
     int addNote(const NoteData &note) const;
     void updateNote(const NoteData &note) const;
-    NoteData loadNoteFromFile(int id) const;
+    NoteData loadNote(int id) const;
     QVector<NoteData> loadAllNotes() const;
     QVector<NoteData> loadAllNotesFromFolder(int folderId) const;
     void deleteAllNotesFromFolder(int folderId) const;
-    std::vector<int> getAllIdsOfSavedNotes() const;
-    void deleteNoteFile(int id) const;
+    std::vector<int> getIdsNotes() const;
+    void deleteNote(int id) const;
 
     void moveNoteToTrash(int noteId) const;
     void moveAllNotesFromFolderToTrash(int folderId) const;
