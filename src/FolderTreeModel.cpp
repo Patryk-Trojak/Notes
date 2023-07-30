@@ -1,6 +1,7 @@
 #include "FolderTreeModel.h"
 
-FolderTreeModel::FolderTreeModel(PersistenceManager &persistenceManager) : persistenceManager(persistenceManager)
+FolderTreeModel::FolderTreeModel(PersistenceManager &persistenceManager, QObject *parent)
+    : persistenceManager(persistenceManager), QAbstractItemModel(parent)
 {
     setupModelData();
 }

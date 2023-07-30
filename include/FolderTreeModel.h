@@ -10,7 +10,7 @@ class FolderTreeModel : public QAbstractItemModel
     Q_OBJECT
 
   public:
-    FolderTreeModel(PersistenceManager &persistenceManager);
+    FolderTreeModel(PersistenceManager &persistenceManager, QObject *parent);
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     FolderTreeItem *getItemFromIndex(const QModelIndex &index) const;
     QModelIndex parent(const QModelIndex &child) const;

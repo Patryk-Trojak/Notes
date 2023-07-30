@@ -5,7 +5,7 @@
 #include <QStringListModel>
 NotesDisplayingTab::NotesDisplayingTab(NoteListModel &noteModel, PersistenceManager &persistenceManager,
                                        QWidget *parent)
-    : QWidget(parent), ui(new Ui::NotesDisplayingTab), folderModel(persistenceManager), noteModel(noteModel),
+    : QWidget(parent), ui(new Ui::NotesDisplayingTab), folderModel(persistenceManager, this), noteModel(noteModel),
       noteProxyModel(this)
 {
     ui->setupUi(this);
