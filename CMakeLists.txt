@@ -41,6 +41,7 @@ set(PROJECT_SOURCES
         ${INCLUDE_DIR}/NoteListDelegate.h ${SOURCE_DIR}/NoteListDelegate.cpp
         ${INCLUDE_DIR}/NoteListView.h ${SOURCE_DIR}/NoteListView.cpp
         ${INCLUDE_DIR}/NoteSortFilterProxyModel.h ${SOURCE_DIR}/NoteSortFilterProxyModel.cpp
+        ${INCLUDE_DIR}/ElidedLabel.h ${SOURCE_DIR}/ElidedLabel.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
