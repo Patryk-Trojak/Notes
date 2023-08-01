@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2,1">
+  <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,7,1">
    <item>
     <widget class="FolderTreeView" name="folderTreeView">
      <property name="contextMenuPolicy">
@@ -42,7 +42,11 @@
       <widget class="SearchBar" name="searchBar"/>
      </item>
      <item>
-      <widget class="NoteListView" name="noteListView"/>
+      <widget class="NoteListView" name="noteListView">
+       <property name="sizeAdjustPolicy">
+        <enum>QAbstractScrollArea::AdjustIgnored</enum>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

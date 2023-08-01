@@ -6,88 +6,88 @@
 NoteButton::NoteButton(QWidget *parent) : QPushButton{parent}, ui(new Ui::NoteButton)
 {
     ui->setupUi(this);
-    pinCheckbox = new QCheckBox(this);
-    pinCheckbox->setGeometry(0, 0, 32, 32);
-    pinCheckbox->setStyleSheet("QCheckBox::indicator:checked {image: url(:/images/pinChecked.png);} "
-                               "QCheckBox::indicator:unchecked {image: url(:/images/pinUnchecked.png);}");
-    pinCheckbox->setChecked(false);
-    QObject::connect(pinCheckbox, &QCheckBox::toggled, this, &NoteButton::pinCheckboxToogled);
-    QObject::connect(ui->titleEdit, &QLineEdit::editingFinished, this, [this]() {
-        if (ui->titleEdit->text() != lastSavedTitle)
-        {
-            emit saveNote();
-            setModificationTime(QDateTime::currentDateTime());
-            lastSavedTitle = ui->titleEdit->text();
-        }
-    });
-    QObject::connect(this, &QPushButton::clicked, this, &NoteButton::enterEditingNote);
-    QObject::connect(ui->deleteButton, &QPushButton::clicked, this, &NoteButton::deleteNote);
+    pinCheckBox = new QCheckBox(this);
+    pinCheckBox->setStyleSheet("QCheckBox::indicator:checked {image: url(:/images/pinChecked.png);}"
+                               "QCheckBox::indicator:unchecked {image: url(:/images/pinUnchecked.png);}"
+                               "QCheckBox::indicator {width: 28px; height: 28px;};");
+    pinCheckBox->resize(28, 28);
+
+    deleteButton = new QPushButton(this);
+    deleteButton->setIcon(QIcon(":/images/delete.png"));
+    deleteButton->setStyleSheet("Margin: 0px; Padding: 0px; Border:none;");
+    deleteButton->setIconSize(QSize(28, 28));
+    deleteButton->resize(28, 28);
+
+    QObject::connect(pinCheckBox, &QCheckBox::toggled, this, &NoteButton::pinCheckboxToogled);
+    QObject::connect(deleteButton, &QPushButton::clicked, this, &NoteButton::deleteNote);
+
+    setStyleSheet("QPushButton{border-style: solid; border-color: black; border-width: 1px;border-radius: 8px;}");
 }
 
-NoteButton::NoteButton(const QString &title, const QDateTime &creationTime, const QDateTime &modificationTime,
-                       bool isPinned, QWidget *parent)
+NoteButton::NoteButton(const QString &title, const QDateTime &modificationTime, bool isPinned, QWidget *parent)
     : NoteButton(parent)
 {
     setIsPinned(isPinned);
-    setCreationTime(creationTime);
     setModificationTime(modificationTime);
-    ui->titleEdit->setText(title);
+    setTitle(title);
 }
 
 QString NoteButton::getTitle() const
 {
-    return ui->titleEdit->text();
+    return ui->title->text();
+}
+
+QString NoteButton::getContent() const
+{
+    return ui->content->text();
 }
 
 void NoteButton::setTitle(const QString &title)
 {
-    ui->titleEdit->setText(title);
+    ui->title->setText(title);
 }
 
-void NoteButton::setCreationTime(const QDateTime &newCreationTime)
+void NoteButton::setContent(const QString &content)
 {
-    this->creationTime = newCreationTime;
-    ui->creationTime->setText("Creation time: " + convertDateTimeToString(newCreationTime));
+    ui->content->setText(content);
 }
 
 void NoteButton::setModificationTime(const QDateTime &newModificationTime)
 {
     this->modificationTime = newModificationTime;
-    ui->modificationTime->setText("Last modified: " + convertDateTimeToString(newModificationTime));
-}
-
-const QDateTime &NoteButton::getCreationTime() const
-{
-    return creationTime;
-}
-
-const QDateTime &NoteButton::getModificationTime() const
-{
-    return modificationTime;
+    ui->modificationTime->setText("Modified: " + convertDateTimeToString(modificationTime));
 }
 
 QString NoteButton::convertDateTimeToString(const QDateTime &dateTime)
 {
-    return dateTime.toString("dd.MM.yy hh:mm:ss");
+    if (dateTime.date() == QDate::currentDate())
+        return dateTime.toString("hh:mm");
+    else
+        return dateTime.toString("dd.MM.yy");
 }
 
 void NoteButton::resizeEvent(QResizeEvent *event)
 {
     QPushButton::resizeEvent(event);
-    pinCheckbox->move(event->size().width() - pinCheckbox->width() - 5, 5);
+
+    QPoint rightTop = QPoint(event->size().width(), 0);
+    pinCheckBox->move(rightTop + QPoint(-pinCheckBox->width() - 10, 10));
+
+    QPoint rightBottom = QPoint(rightTop.x(), event->size().height());
+    deleteButton->move(rightBottom + QPoint(-deleteButton->width() - 10, -deleteButton->height() - 10));
 }
 
 bool NoteButton::getIsPinned() const
 {
-    return pinCheckbox->isChecked();
+    return pinCheckBox->isChecked();
 }
 
 void NoteButton::setPinCheckboxVisible(bool visible)
 {
-    pinCheckbox->setVisible(visible);
+    pinCheckBox->setVisible(visible);
 }
 
 void NoteButton::setIsPinned(bool newIsPinned)
 {
-    pinCheckbox->setChecked(newIsPinned);
+    pinCheckBox->setChecked(newIsPinned);
 }

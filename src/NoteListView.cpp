@@ -16,6 +16,11 @@ NoteListView::NoteListView(QWidget *parent) : QListView(parent), editor(nullptr)
     QObject::connect(&noteListDelegate, &NoteListDelegate::newEditorCreated, this, &NoteListView::onNewEditorCreated);
     QObject::connect(this, &QListView::entered, this, &NoteListView::onItemEntered);
     QObject::connect(this, &QListView::customContextMenuRequested, this, &NoteListView::onCustomContextMenuRequested);
+
+    setWrapping(true);
+    setUniformItemSizes(true);
+    setSpacing(5);
+    setFlow(Flow::LeftToRight);
 }
 
 void NoteListView::setModel(QAbstractItemModel *model)
@@ -47,8 +52,6 @@ void NoteListView::onNewEditorCreated(NoteButton *editor, const QModelIndex &ind
     editor->installEventFilter(this);
     QObject::connect(editor, &NoteButton::deleteNote, this,
                      [this, index]() { this->removeNote(this->currentIndex()); });
-    QObject::connect(editor, &NoteButton::saveNote, this,
-                     [this, editor, index]() { noteListDelegate.setModelData(editor, this->model(), index); });
     QObject::connect(editor, &NoteButton::clicked, this, [this, index]() { emit this->noteSelected(index); });
     QObject::connect(editor, &NoteButton::pinCheckboxToogled, this,
                      [this, editor, index]() { noteListDelegate.setModelData(editor, this->model(), index); });
@@ -173,6 +176,12 @@ void NoteListView::onRestoreNoteFromTrashRequested(const QModelIndex &index)
     QModelIndex noteModelIndex = mapIndexToSourceModelAtTheBott(index);
     if (noteModel)
         noteModel->restoreNoteFromTrash(noteModelIndex);
+}
+
+void NoteListView::resizeEvent(QResizeEvent *event)
+{
+    QListView::resizeEvent(event);
+    setWrapping(true);
 }
 
 bool NoteListView::eventFilter(QObject *watched, QEvent *event)

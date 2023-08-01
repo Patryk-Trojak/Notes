@@ -4,13 +4,12 @@
 #include <QPainter>
 
 NoteListDelegate::NoteListDelegate(QObject *parent)
-    : QStyledItemDelegate(parent), noteButton("", QDateTime(), QDateTime(), false, nullptr)
+    : QStyledItemDelegate(parent), noteButton("", QDateTime(), false, nullptr)
 {
 }
 
 void NoteListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    QStyledItemDelegate::paint(painter, option, index);
     setupNoteButtonFromIndex(noteButton, index);
     noteButton.setPinCheckboxVisible(noteButton.getIsPinned());
     painter->save();
@@ -22,7 +21,7 @@ void NoteListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
 
 QSize NoteListDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    return QSize(300, 120);
+    return QSize(200, 200);
 }
 
 QWidget *NoteListDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option,
@@ -45,11 +44,6 @@ void NoteListDelegate::setEditorData(QWidget *editor, const QModelIndex &index) 
 void NoteListDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
     NoteButton *noteButton = static_cast<NoteButton *>(editor);
-    if (noteButton->getTitle() != model->data(index, NoteListModel::Title))
-    {
-        model->setData(index, noteButton->getTitle(), NoteListModel::Title);
-        model->setData(index, QDateTime::currentDateTime(), NoteListModel::ModificationTime);
-    }
     model->setData(index, noteButton->getIsPinned(), NoteListModel::isPinned);
 }
 
@@ -61,9 +55,8 @@ void NoteListDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionV
 
 void NoteListDelegate::setupNoteButtonFromIndex(NoteButton &noteButton, const QModelIndex &index) const
 {
-    const auto *model = index.model();
-    noteButton.setTitle(model->data(index, NoteListModel::Title).toString());
-    noteButton.setCreationTime(model->data(index, NoteListModel::CreationTime).toDateTime());
-    noteButton.setModificationTime(model->data(index, NoteListModel::ModificationTime).toDateTime());
-    noteButton.setIsPinned(model->data(index, NoteListModel::isPinned).toBool());
+    noteButton.setTitle(index.data(NoteListModel::Title).toString());
+    noteButton.setContent(index.data(NoteListModel::Content).toString());
+    noteButton.setModificationTime(index.data(NoteListModel::ModificationTime).toDateTime());
+    noteButton.setIsPinned(index.data(NoteListModel::isPinned).toBool());
 }

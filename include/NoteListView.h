@@ -31,6 +31,9 @@ class NoteListView : public QListView
   private slots:
     void onCustomContextMenuRequested(const QPoint &pos);
     void onRestoreNoteFromTrashRequested(const QModelIndex &index);
+
+  protected:
+    void resizeEvent(QResizeEvent *event);
 };
 
 #endif // NOTELISTVIEW_H
