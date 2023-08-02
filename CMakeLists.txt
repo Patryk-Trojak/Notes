@@ -43,6 +43,7 @@ set(PROJECT_SOURCES
         ${INCLUDE_DIR}/NoteSortFilterProxyModel.h ${SOURCE_DIR}/NoteSortFilterProxyModel.cpp
         ${INCLUDE_DIR}/ElidedLabel.h ${SOURCE_DIR}/ElidedLabel.cpp
         ${INCLUDE_DIR}/ColorButton.h ${SOURCE_DIR}/ColorButton.cpp
+        ${INCLUDE_DIR}/ColorPicker.h ${SOURCE_DIR}/ColorPicker.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
