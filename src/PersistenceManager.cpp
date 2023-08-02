@@ -24,15 +24,17 @@ PersistenceManager::PersistenceManager() : dbFullFilepath(QCoreApplication::appl
 int PersistenceManager::addNote(const NoteData &note) const
 {
     QSqlQuery query(db);
-    query.prepare("INSERT INTO note "
-                  "(parent_folder_id, title, content, creation_time, modification_time, is_pinned)"
-                  "VALUES(:parent_folder_id, :title, :content, :creation_time, :modification_time, :is_pinned)");
+    query.prepare(
+        "INSERT INTO note "
+        "(parent_folder_id, title, content, creation_time, modification_time, is_pinned, color)"
+        "VALUES(:parent_folder_id, :title, :content, :creation_time, :modification_time, :is_pinned, :color)");
     query.bindValue(":parent_folder_id", note.getParentFolderId());
     query.bindValue(":title", note.getTitle());
     query.bindValue(":content", note.getContent());
     query.bindValue(":creation_time", note.getCreationTime().toMSecsSinceEpoch());
     query.bindValue(":modification_time", note.getModificationTime().toMSecsSinceEpoch());
     query.bindValue(":is_pinned", note.getIsPinned());
+    query.bindValue(":color", note.getColor().name());
 
     if (!query.exec())
     {
@@ -48,7 +50,7 @@ void PersistenceManager::updateNote(const NoteData &note) const
 
     query.prepare("UPDATE note "
                   "SET parent_folder_id = :parent_folder_id, title = :title, content = :content, creation_time = "
-                  ":creation_time, modification_time = :modification_time , is_pinned = :is_pinned "
+                  ":creation_time, modification_time = :modification_time , is_pinned = :is_pinned, color = :color "
                   "WHERE id = :id");
 
     query.bindValue(":parent_folder_id", note.getParentFolderId());
@@ -58,6 +60,7 @@ void PersistenceManager::updateNote(const NoteData &note) const
     query.bindValue(":modification_time", note.getModificationTime().toMSecsSinceEpoch());
     query.bindValue(":is_pinned", note.getIsPinned());
     query.bindValue(":id", note.getId());
+    query.bindValue(":color", note.getColor().name());
 
     if (!query.exec())
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
@@ -308,7 +311,8 @@ void PersistenceManager::createNewDefaultTables() const
                               "content TEXT, "
                               "creation_time INTEGER NOT NULL DEFAULT 0, "
                               "modification_time INTEGER NOT NULL DEFAULT 0, "
-                              "is_pinned INTEGER NOT NULL DEFAULT 0"
+                              "is_pinned INTEGER NOT NULL DEFAULT 0, "
+                              "color TEXT NOT NULL "
                               ")";
 
     if (!query.exec(createNoteTable))
@@ -356,6 +360,7 @@ NoteData PersistenceManager::createNoteDataFromQueryRecord(const QSqlQuery &quer
     noteData.setCreationTime(QDateTime::fromMSecsSinceEpoch(query.value(4).toLongLong()));
     noteData.setModificationTime(QDateTime::fromMSecsSinceEpoch(query.value(5).toLongLong()));
     noteData.setIsPinned(query.value(6).toBool());
+    noteData.setColor(QColor(query.value(7).toString()));
 
     if (noteData.getParentFolderId() == SpecialFolderId::TrashFolder)
         noteData.setIsInTrash(true);
