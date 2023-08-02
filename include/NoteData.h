@@ -3,12 +3,6 @@
 
 #include <QColor>
 #include <QDateTime>
-#include <QDebug>
-#include <QFile>
-#include <QFlags>
-#include <QObject>
-#include <QTextStream>
-#include <random>
 
 class NoteData
 {
