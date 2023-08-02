@@ -1,6 +1,7 @@
 #ifndef NOTE_H
 #define NOTE_H
 
+#include <QColor>
 #include <QDateTime>
 #include <QDebug>
 #include <QFile>
@@ -21,6 +22,7 @@ class NoteData
     const QDateTime &getModificationTime() const;
     bool getIsInTrash() const;
     bool getIsPinned() const;
+    const QColor &getColor() const;
 
     void setId(int id);
     void setParentFolderId(int newParentFolderId);
@@ -30,6 +32,7 @@ class NoteData
     void setModificationTime(const QDateTime &newModificationTime);
     void setIsInTrash(bool newIsInTrash);
     void setIsPinned(bool newIsPinned);
+    void setColor(const QColor &newColor);
 
   private:
     int id;
@@ -40,6 +43,7 @@ class NoteData
     QDateTime modificationTime;
     bool isInTrash;
     bool isPinned;
+    QColor color;
 };
 
 #endif // NOTE_H

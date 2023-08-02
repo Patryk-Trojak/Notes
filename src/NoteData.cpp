@@ -44,6 +44,11 @@ bool NoteData::getIsPinned() const
     return isPinned;
 }
 
+const QColor &NoteData::getColor() const
+{
+    return color;
+}
+
 void NoteData::setId(int id)
 {
     this->id = id;
@@ -82,4 +87,9 @@ void NoteData::setIsInTrash(bool newIsInTrash)
 void NoteData::setIsPinned(bool newIsPinned)
 {
     isPinned = newIsPinned;
+}
+
+void NoteData::setColor(const QColor &newColor)
+{
+    color = newColor;
 }
