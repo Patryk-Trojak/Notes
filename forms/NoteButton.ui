@@ -36,7 +36,7 @@
     <number>15</number>
    </property>
    <property name="rightMargin">
-    <number>0</number>
+    <number>10</number>
    </property>
    <property name="bottomMargin">
     <number>10</number>
@@ -102,7 +102,7 @@
      </property>
     </spacer>
    </item>
-   <item>
+   <item alignment="Qt::AlignHCenter">
     <widget class="QLabel" name="modificationTime">
      <property name="maximumSize">
       <size>

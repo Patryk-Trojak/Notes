@@ -1,5 +1,7 @@
 #ifndef NOTEBUTTON_H
 #define NOTEBUTTON_H
+#include "ColorPicker.h"
+
 #include <QCheckBox>
 #include <QDateTime>
 #include <QTextEdit>
@@ -23,22 +25,34 @@ class NoteButton : public QPushButton
     void setContent(const QString &content);
     void setModificationTime(const QDateTime &newModificationTime);
     void setIsPinned(bool newIsPinned);
+    void setPinCheckboxVisible(bool visible);
+    void setColor(const QColor &newColor);
+
     QString getTitle() const;
     QString getContent() const;
     const QDateTime &getModificationTime() const;
     bool getIsPinned() const;
-    void setPinCheckboxVisible(bool visible);
+    const QColor &getColor() const;
 
   signals:
     void deleteNote();
     void pinCheckboxToogled(bool checked);
+    void colorChanged(const QColor &newColor);
 
   private:
     Ui::NoteButton *ui;
     QPushButton *deleteButton;
+    QPushButton *changeColorButton;
+    ColorPicker *colorPicker;
     QCheckBox *pinCheckBox;
     QDateTime modificationTime;
+    QColor color;
     QString convertDateTimeToString(const QDateTime &dateTime);
+
+    void createColorPicker();
+    void deleteColorPicker();
+    void onColorSelected(const QColor &color);
+    void onChangeColorButtonClicked();
 
   protected:
     void resizeEvent(QResizeEvent *event);

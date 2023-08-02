@@ -7,5 +7,6 @@
         <file>images/search.png</file>
         <file>images/pinChecked.png</file>
         <file>images/pinUnchecked.png</file>
+        <file>images/palette.png</file>
     </qresource>
 </RCC>

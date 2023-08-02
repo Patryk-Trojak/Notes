@@ -3,7 +3,7 @@
 
 #include <QResizeEvent>
 
-NoteButton::NoteButton(QWidget *parent) : QPushButton{parent}, ui(new Ui::NoteButton)
+NoteButton::NoteButton(QWidget *parent) : QPushButton{parent}, ui(new Ui::NoteButton), colorPicker(nullptr)
 {
     ui->setupUi(this);
     pinCheckBox = new QCheckBox(this);
@@ -18,10 +18,19 @@ NoteButton::NoteButton(QWidget *parent) : QPushButton{parent}, ui(new Ui::NoteBu
     deleteButton->setIconSize(QSize(28, 28));
     deleteButton->resize(28, 28);
 
+    changeColorButton = new QPushButton(this);
+    changeColorButton->setIcon(QIcon(":/images/palette.png"));
+    changeColorButton->setStyleSheet("Margin: 0px; Padding: 0px; Border:none;");
+    changeColorButton->setIconSize(QSize(28, 28));
+    changeColorButton->resize(28, 28);
+
     QObject::connect(pinCheckBox, &QCheckBox::toggled, this, &NoteButton::pinCheckboxToogled);
     QObject::connect(deleteButton, &QPushButton::clicked, this, &NoteButton::deleteNote);
 
-    setStyleSheet("QPushButton{border-style: solid; border-color: black; border-width: 1px;border-radius: 8px;}");
+    setStyleSheet("QPushButton#NoteButton{border-style: solid; border-color: transparent; border-width: "
+                  "1px;border-radius:8px;}");
+
+    QObject::connect(changeColorButton, &QPushButton::clicked, this, &NoteButton::onChangeColorButtonClicked);
 }
 
 NoteButton::NoteButton(const QString &title, const QDateTime &modificationTime, bool isPinned, QWidget *parent)
@@ -40,6 +49,11 @@ QString NoteButton::getTitle() const
 QString NoteButton::getContent() const
 {
     return ui->content->text();
+}
+
+const QColor &NoteButton::getColor() const
+{
+    return color;
 }
 
 void NoteButton::setTitle(const QString &title)
@@ -66,6 +80,44 @@ QString NoteButton::convertDateTimeToString(const QDateTime &dateTime)
         return dateTime.toString("dd.MM.yy");
 }
 
+void NoteButton::createColorPicker()
+{
+    if (colorPicker == nullptr)
+    {
+        colorPicker = new ColorPicker(this);
+        colorPicker->setGeometry(10, 155, 180, 40);
+        colorPicker->show();
+
+        QObject::connect(colorPicker, &ColorPicker::colorSelected, this, &NoteButton::onColorSelected);
+    }
+}
+
+void NoteButton::deleteColorPicker()
+{
+    if (colorPicker != nullptr)
+    {
+        delete colorPicker;
+        colorPicker = nullptr;
+    }
+}
+
+void NoteButton::onColorSelected(const QColor &color)
+{
+    if (colorPicker)
+    {
+        setColor(color);
+        deleteColorPicker();
+    }
+}
+
+void NoteButton::onChangeColorButtonClicked()
+{
+    if (colorPicker)
+        deleteColorPicker();
+    else
+        this->createColorPicker();
+}
+
 void NoteButton::resizeEvent(QResizeEvent *event)
 {
     QPushButton::resizeEvent(event);
@@ -75,6 +127,9 @@ void NoteButton::resizeEvent(QResizeEvent *event)
 
     QPoint rightBottom = QPoint(rightTop.x(), event->size().height());
     deleteButton->move(rightBottom + QPoint(-deleteButton->width() - 10, -deleteButton->height() - 10));
+
+    QPoint leftBottom = QPoint(0, event->size().height());
+    changeColorButton->move(leftBottom + QPoint(10, -changeColorButton->height() - 10));
 }
 
 bool NoteButton::getIsPinned() const
@@ -85,6 +140,18 @@ bool NoteButton::getIsPinned() const
 void NoteButton::setPinCheckboxVisible(bool visible)
 {
     pinCheckBox->setVisible(visible);
+}
+
+void NoteButton::setColor(const QColor &newColor)
+{
+    if (color == newColor)
+        return;
+
+    color = newColor;
+    setStyleSheet(QString("QPushButton#NoteButton{border-style: solid; border-color: transparent; border-width: "
+                          "1px;border-radius:8px; background-color: %1;}")
+                      .arg(newColor.name()));
+    emit colorChanged(newColor);
 }
 
 void NoteButton::setIsPinned(bool newIsPinned)
