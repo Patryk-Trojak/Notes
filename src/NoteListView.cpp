@@ -23,12 +23,6 @@ NoteListView::NoteListView(QWidget *parent) : QListView(parent), editor(nullptr)
     setFlow(Flow::LeftToRight);
 }
 
-void NoteListView::setModel(QAbstractItemModel *model)
-{
-    QObject::connect(model, &QAbstractItemModel::dataChanged, this, &NoteListView::updateEditorOnDataChanged);
-    QListView::setModel(model);
-}
-
 void NoteListView::removeNote(const QModelIndex &index)
 {
     const QString message = [index]() {
@@ -55,6 +49,8 @@ void NoteListView::onNewEditorCreated(NoteButton *editor, const QModelIndex &ind
     QObject::connect(editor, &NoteButton::clicked, this, [this, index]() { emit this->noteSelected(index); });
     QObject::connect(editor, &NoteButton::pinCheckboxToogled, this,
                      [this, editor, index]() { noteListDelegate.setModelData(editor, this->model(), index); });
+    QObject::connect(editor, &NoteButton::colorChanged, this,
+                     [this, editor, index]() { noteListDelegate.setModelData(editor, this->model(), index); });
 }
 
 void NoteListView::onItemEntered(const QModelIndex &index)
@@ -73,12 +69,6 @@ void NoteListView::onItemEntered(const QModelIndex &index)
 
         setCurrentIndex(index);
     }
-}
-
-void NoteListView::updateEditorOnDataChanged()
-{
-    if (editor)
-        noteListDelegate.setEditorData(editor, currentIndex());
 }
 
 NoteListModel *NoteListView::getSourceModelAtTheBottom() const

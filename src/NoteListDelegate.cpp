@@ -38,13 +38,14 @@ QWidget *NoteListDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
 void NoteListDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
     NoteButton *button = static_cast<NoteButton *>(editor);
-    setupNoteButtonFromIndex(*button, index);
+    //    setupNoteButtonFromIndex(*button, index);
 }
 
 void NoteListDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
     NoteButton *noteButton = static_cast<NoteButton *>(editor);
     model->setData(index, noteButton->getIsPinned(), NoteListModel::isPinned);
+    model->setData(index, QVariant::fromValue(noteButton->getColor()), NoteListModel::Color);
 }
 
 void NoteListDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
@@ -59,4 +60,5 @@ void NoteListDelegate::setupNoteButtonFromIndex(NoteButton &noteButton, const QM
     noteButton.setContent(index.data(NoteListModel::Content).toString());
     noteButton.setModificationTime(index.data(NoteListModel::ModificationTime).toDateTime());
     noteButton.setIsPinned(index.data(NoteListModel::isPinned).toBool());
+    noteButton.setColor(index.data(NoteListModel::Color).value<QColor>());
 }

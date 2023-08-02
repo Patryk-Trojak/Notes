@@ -22,7 +22,8 @@ class NoteListModel : public QAbstractItemModel
         CreationTime,
         ModificationTime,
         isInTrash,
-        isPinned
+        isPinned,
+        Color
     };
 
     QModelIndex index(int row, int column, const QModelIndex &parent) const;

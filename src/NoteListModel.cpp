@@ -50,6 +50,8 @@ QVariant NoteListModel::data(const QModelIndex &index, int role) const
         return notes[row].getIsInTrash();
     case Role::isPinned:
         return notes[row].getIsPinned();
+    case Role::Color:
+        return QVariant::fromValue(notes[row].getColor());
     default:
         return QVariant();
     }
@@ -113,6 +115,11 @@ bool NoteListModel::setData(const QModelIndex &index, const QVariant &value, int
         persistenceManager.updateNote(notes[index.row()]);
         emit dataChanged(index, index);
         return true;
+    case Role::Color:
+        notes[row].setColor(value.value<QColor>());
+        persistenceManager.updateNote(notes[index.row()]);
+        emit dataChanged(index, index);
+        return true;
     }
 
     return false;
@@ -132,6 +139,7 @@ bool NoteListModel::insertRows(int row, int count, const QModelIndex &parent)
         inserted->setTitle("Untitled");
         inserted->setCreationTime(QDateTime::currentDateTime());
         inserted->setModificationTime(QDateTime::currentDateTime());
+        inserted->setColor(QColor(133, 165, 204));
         int id = persistenceManager.addNote(*inserted);
         inserted->setId(id);
     }

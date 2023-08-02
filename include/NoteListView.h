@@ -12,7 +12,6 @@ class NoteListView : public QListView
 
   public:
     NoteListView(QWidget *parent);
-    void setModel(QAbstractItemModel *model);
     bool eventFilter(QObject *watched, QEvent *event);
 
   signals:
