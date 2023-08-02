@@ -40,6 +40,7 @@ class NoteListModel : public QAbstractItemModel
     void createNewNote();
     void restoreNoteFromTrash(const QModelIndex &index);
     int getCurrentSelectedFolderId() const;
+    void saveDirtyIndexes();
 
   public slots:
     void onNewFolderSelected(int selectedFolderId = 5);
@@ -48,6 +49,8 @@ class NoteListModel : public QAbstractItemModel
   private:
     PersistenceManager &persistenceManager;
     QVector<NoteData> notes;
+    QVector<QPersistentModelIndex> dirtyIndexes;
+    void markIndexAsDirty(const QModelIndex &index);
     int currentSelectedFolderId;
 };
 

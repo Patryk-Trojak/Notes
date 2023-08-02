@@ -1,8 +1,12 @@
 #include "NoteListModel.h"
+#include <QTimer>
 
 NoteListModel::NoteListModel(QObject *parent, PersistenceManager &persistenceManager)
     : QAbstractItemModel(parent), persistenceManager(persistenceManager), currentSelectedFolderId(-1)
 {
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &NoteListModel::saveDirtyIndexes);
+    timer->start(10000);
 }
 
 QModelIndex NoteListModel::index(int row, int column, const QModelIndex &parent) const
@@ -62,7 +66,7 @@ QVariant NoteListModel::data(const QModelIndex &index, int role) const
 void NoteListModel::setNoteData(const QModelIndex &index, const NoteData &noteData)
 {
     notes[index.row()] = noteData;
-    persistenceManager.updateNote(notes[index.row()]);
+    markIndexAsDirty(index);
     emit dataChanged(index, index);
 }
 
@@ -77,47 +81,47 @@ bool NoteListModel::setData(const QModelIndex &index, const QVariant &value, int
     case Role::Title:
     case Role::EditRole:
         notes[row].setTitle(value.toString());
-        persistenceManager.updateNote(notes[index.row()]);
+        markIndexAsDirty(index);
         emit dataChanged(index, index);
         return true;
     case Role::Content:
         notes[row].setContent(value.toString());
-        persistenceManager.updateNote(notes[index.row()]);
+        markIndexAsDirty(index);
         emit dataChanged(index, index);
         return true;
     case Role::Id:
         notes[row].setId(value.toInt());
-        persistenceManager.updateNote(notes[index.row()]);
+        markIndexAsDirty(index);
         emit dataChanged(index, index);
         return true;
     case Role::ParentFolderId:
         notes[row].setParentFolderId(value.toInt());
-        persistenceManager.updateNote(notes[index.row()]);
+        markIndexAsDirty(index);
         emit dataChanged(index, index);
         return true;
     case Role::CreationTime:
         notes[row].setCreationTime(value.toDateTime());
-        persistenceManager.updateNote(notes[index.row()]);
+        markIndexAsDirty(index);
         emit dataChanged(index, index);
         return true;
     case Role::ModificationTime:
         notes[row].setModificationTime(value.toDateTime());
-        persistenceManager.updateNote(notes[index.row()]);
+        markIndexAsDirty(index);
         emit dataChanged(index, index);
         return true;
     case Role::isInTrash:
         notes[row].setIsInTrash(value.toBool());
-        persistenceManager.updateNote(notes[index.row()]);
+        markIndexAsDirty(index);
         emit dataChanged(index, index);
         return true;
     case Role::isPinned:
         notes[row].setIsPinned(value.toBool());
-        persistenceManager.updateNote(notes[index.row()]);
+        markIndexAsDirty(index);
         emit dataChanged(index, index);
         return true;
     case Role::Color:
         notes[row].setColor(value.value<QColor>());
-        persistenceManager.updateNote(notes[index.row()]);
+        markIndexAsDirty(index);
         emit dataChanged(index, index);
         return true;
     }
@@ -178,6 +182,7 @@ void NoteListModel::restoreNoteFromTrash(const QModelIndex &index)
 
 void NoteListModel::onNewFolderSelected(int selectedFolderId)
 {
+    saveDirtyIndexes();
     beginResetModel();
     currentSelectedFolderId = selectedFolderId;
     notes.clear();
@@ -198,6 +203,24 @@ void NoteListModel::onFolderDeleted(int deletedFolderId)
         persistenceManager.deleteAllNotesFromFolder(deletedFolderId);
     else
         persistenceManager.moveAllNotesFromFolderToTrash(deletedFolderId);
+}
+
+void NoteListModel::markIndexAsDirty(const QModelIndex &index)
+{
+    if (dirtyIndexes.contains(index))
+        return;
+
+    dirtyIndexes.emplace_back(index);
+}
+
+void NoteListModel::saveDirtyIndexes()
+{
+    for (auto const &dirty : dirtyIndexes)
+    {
+        if (dirty.isValid())
+            persistenceManager.updateNote(notes[dirty.row()]);
+    }
+    dirtyIndexes.clear();
 }
 
 int NoteListModel::getCurrentSelectedFolderId() const
