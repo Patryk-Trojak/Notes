@@ -35,3 +35,8 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 
     notesDisplayingTab->setGeometry(0, 0, width(), height());
 }
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    noteModel.saveDirtyIndexes();
+}

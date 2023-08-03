@@ -23,5 +23,6 @@ class MainWindow : public QMainWindow
 
   protected:
     void resizeEvent(QResizeEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 };
 #endif // MAINWINDOW_H
