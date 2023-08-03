@@ -41,6 +41,11 @@ NoteButton::NoteButton(const QString &title, const QDateTime &modificationTime, 
     setTitle(title);
 }
 
+NoteButton::~NoteButton()
+{
+    delete ui;
+}
+
 QString NoteButton::getTitle() const
 {
     return ui->title->text();

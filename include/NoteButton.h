@@ -20,7 +20,7 @@ class NoteButton : public QPushButton
     explicit NoteButton(QWidget *parent);
     explicit NoteButton(const QString &title, const QDateTime &modificationTime, bool isPinned,
                         QWidget *parent = nullptr);
-
+    ~NoteButton();
     void setTitle(const QString &title);
     void setContent(const QString &content);
     void setModificationTime(const QDateTime &newModificationTime);
