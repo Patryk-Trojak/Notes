@@ -20,13 +20,10 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql)
 
 set(PROJECT_SOURCES
         ${SOURCE_DIR}/main.cpp
-        ${SOURCE_DIR}/MainWindow.cpp
-        ${INCLUDE_DIR}/MainWindow.h
-        ${FORMS_DIR}/MainWindow.ui
+        ${SOURCE_DIR}/MainWindow.cpp ${INCLUDE_DIR}/MainWindow.h
         ${INCLUDE_DIR}/NoteData.h ${SOURCE_DIR}/NoteData.cpp
-        ${FORMS_DIR}/NoteButton.ui
-        ${INCLUDE_DIR}/NoteButton.h ${SOURCE_DIR}/NoteButton.cpp
-        ${INCLUDE_DIR}/NoteEditingTab.h ${SOURCE_DIR}/NoteEditingTab.cpp ${FORMS_DIR}/NoteEditingTab.ui
+        ${INCLUDE_DIR}/NoteButton.h ${SOURCE_DIR}/NoteButton.cpp ${FORMS_DIR}/NoteButton.ui
+        ${INCLUDE_DIR}/NoteEditingTab.h ${SOURCE_DIR}/NoteEditingTab.cpp
         ${INCLUDE_DIR}/NotesDisplayingTab.h ${SOURCE_DIR}/NotesDisplayingTab.cpp ${FORMS_DIR}/NotesDisplayingTab.ui
         ${INCLUDE_DIR}/PersistenceManager.h ${SOURCE_DIR}/PersistenceManager.cpp
         ${INCLUDE_DIR}/Utils.h ${SOURCE_DIR}/Utils.cpp
@@ -44,6 +41,7 @@ set(PROJECT_SOURCES
         ${INCLUDE_DIR}/ElidedLabel.h ${SOURCE_DIR}/ElidedLabel.cpp
         ${INCLUDE_DIR}/ColorButton.h ${SOURCE_DIR}/ColorButton.cpp
         ${INCLUDE_DIR}/ColorPicker.h ${SOURCE_DIR}/ColorPicker.cpp
+        ${INCLUDE_DIR}/NoteEditor.h ${SOURCE_DIR}/NoteEditor.cpp ${FORMS_DIR}/NoteEditor.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

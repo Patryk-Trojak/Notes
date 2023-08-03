@@ -1,38 +1,35 @@
 #ifndef NOTEEDITINGTAB_H
 #define NOTEEDITINGTAB_H
 
-#include "NoteData.h"
+#include "NoteEditor.h"
 #include "NoteListModel.h"
+#include <QPropertyAnimation>
 #include <QWidget>
-
-namespace Ui
-{
-class NoteEditingTab;
-}
 
 class NoteEditingTab : public QWidget
 {
     Q_OBJECT
   public:
-    explicit NoteEditingTab(NoteListModel &noteModel, QWidget *parent = nullptr);
-    ~NoteEditingTab();
-  public slots:
-    void startEditingNewNote(const QModelIndex &index);
+    explicit NoteEditingTab(NoteListModel &noteModel, const QModelIndex &editingNote, QWidget *parent = nullptr);
+
   signals:
-    void exitEditingNote(const QModelIndex &index);
+    void exitEditingNoteRequested();
 
   private:
-    Ui::NoteEditingTab *ui;
     NoteListModel &noteModel;
-    QModelIndex currentEditingNote;
-    void saveNoteIfChanged();
-    QString lastSavedTitle;
-    QString lastSavedContent;
-    bool hasNoteChanged();
+    const QModelIndex editingNote;
+    NoteEditor *editor;
+    QPropertyAnimation *openingEditorAnimation;
+    QRect calculateGeometryOfEditor();
+    void saveNoteAndEmitExitSignal();
 
   private slots:
-    void onDeleteNoteButtonPressed();
-    void onReturnWithoutSavingButtonPressed();
+    void onTitleChanged(const QString &newTitle);
+    void onContentChanged(const QString &newContent);
+
+  protected:
+    void resizeEvent(QResizeEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 };
 
 #endif // NOTEEDITINGTAB_H

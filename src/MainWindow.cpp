@@ -1,33 +1,37 @@
 #include "MainWindow.h"
-#include "./ui_MainWindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow), noteModel(this, persistenceManager),
-      notesDisplayingTab(noteModel, persistenceManager, this), noteEditTab(noteModel, this)
+    : QMainWindow(parent), noteModel(this, persistenceManager), noteEditingTab(nullptr)
 {
-    ui->setupUi(this);
-    ui->stackedWidget->setCurrentIndex(0);
-    QObject::connect(&noteEditTab, &NoteEditingTab::exitEditingNote, this, &MainWindow::exitEditingNote);
-    QObject::connect(&notesDisplayingTab, &NotesDisplayingTab::enterEditingNote, this, &MainWindow::enterEditingNote);
-
-    ui->stackedWidget->insertWidget(0, &notesDisplayingTab);
-    ui->stackedWidget->setCurrentIndex(0);
-    ui->stackedWidget->insertWidget(1, &noteEditTab);
-    ui->stackedWidget->setCurrentIndex(0);
-}
-
-MainWindow::~MainWindow()
-{
-    delete ui;
+    notesDisplayingTab = new NotesDisplayingTab(noteModel, persistenceManager, this);
+    QObject::connect(notesDisplayingTab, &NotesDisplayingTab::enterEditingNote, this, &MainWindow::enterEditingNote);
+    setMinimumSize(350, 350);
+    setGeometry(200, 200, 975, 550);
 }
 
 void MainWindow::enterEditingNote(const QModelIndex &note)
 {
-    noteEditTab.startEditingNewNote(note);
-    ui->stackedWidget->setCurrentIndex(1);
+    if (noteEditingTab)
+        delete noteEditingTab;
+
+    noteEditingTab = new NoteEditingTab(noteModel, note, this);
+    QObject::connect(noteEditingTab, &NoteEditingTab::exitEditingNoteRequested, this, &MainWindow::exitEditingNote);
+    noteEditingTab->show();
 }
 
 void MainWindow::exitEditingNote()
 {
-    ui->stackedWidget->setCurrentIndex(0);
+    if (noteEditingTab)
+    {
+        delete noteEditingTab;
+        noteEditingTab = nullptr;
+    }
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    if (noteEditingTab)
+        noteEditingTab->setGeometry(0, 0, width(), height());
+
+    notesDisplayingTab->setGeometry(0, 0, width(), height());
 }

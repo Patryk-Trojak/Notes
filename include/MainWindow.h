@@ -5,28 +5,23 @@
 #include "NotesDisplayingTab.h"
 #include <QMainWindow>
 
-QT_BEGIN_NAMESPACE
-namespace Ui
-{
-class MainWindow;
-}
-QT_END_NAMESPACE
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
   public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+
+  private:
+    PersistenceManager persistenceManager;
+    NoteListModel noteModel;
+    NotesDisplayingTab *notesDisplayingTab;
+    NoteEditingTab *noteEditingTab;
+
   public slots:
     void enterEditingNote(const QModelIndex &index);
     void exitEditingNote();
 
-  private:
-    Ui::MainWindow *ui;
-    PersistenceManager persistenceManager;
-    NoteListModel noteModel;
-    NotesDisplayingTab notesDisplayingTab;
-    NoteEditingTab noteEditTab;
+  protected:
+    void resizeEvent(QResizeEvent *event) override;
 };
 #endif // MAINWINDOW_H

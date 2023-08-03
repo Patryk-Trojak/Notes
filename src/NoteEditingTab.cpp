@@ -1,89 +1,75 @@
 #include "NoteEditingTab.h"
-#include "ui_NoteEditingTab.h"
 #include <NoteListModel.h>
 #include <QMessageBox>
 #include <QModelIndex>
+#include <QMouseEvent>
+#include <QPropertyAnimation>
 #include <QShortcut>
 
-NoteEditingTab::NoteEditingTab(NoteListModel &noteModel, QWidget *parent)
-    : QWidget(parent), ui(new Ui::NoteEditingTab), noteModel(noteModel)
+NoteEditingTab::NoteEditingTab(NoteListModel &noteModel, const QModelIndex &editingNote, QWidget *parent)
+    : QWidget(parent), editingNote(editingNote), noteModel(noteModel), editor(new NoteEditor(editingNote, this))
 {
-    ui->setupUi(this);
-    QObject::connect(ui->saveAndReturn, &QPushButton::clicked, this, &NoteEditingTab::saveNoteIfChanged);
-    QObject::connect(ui->saveAndReturn, &QPushButton::clicked, this,
-                     [this]() { emit exitEditingNote(currentEditingNote); });
-    QObject::connect(ui->deleteButton, &QPushButton::clicked, this, &NoteEditingTab::onDeleteNoteButtonPressed);
-    QObject::connect(ui->returnWithoutSavingButton, &QPushButton::clicked, this,
-                     &NoteEditingTab::onReturnWithoutSavingButtonPressed);
-    QObject::connect(ui->saveButton, &QPushButton::clicked, this, &NoteEditingTab::saveNoteIfChanged);
-    QObject::connect(new QShortcut(QKeySequence(QKeySequence::Save), this), &QShortcut::activated, this,
-                     &NoteEditingTab::saveNoteIfChanged);
+    QObject::connect(editor, &NoteEditor::closeNoteRequested, this, &NoteEditingTab::saveNoteAndEmitExitSignal);
     QObject::connect(new QShortcut(QKeySequence(Qt::Key_Escape), this), &QShortcut::activated, this,
-                     &NoteEditingTab::onReturnWithoutSavingButtonPressed);
+                     &NoteEditingTab::saveNoteAndEmitExitSignal);
+    QObject::connect(editor, &NoteEditor::titleChanged, this, &NoteEditingTab::onTitleChanged);
+    QObject::connect(editor, &NoteEditor::contentChanged, this, &NoteEditingTab::onContentChanged);
+
+    setPalette(QPalette(QColor(0, 0, 0, 190)));
+    setAutoFillBackground(true);
+
+    if (parent)
+        QWidget::setGeometry(0, 0, parent->width(), parent->height());
+
+    editor->setGeometry(QRect(width() / 2, height() / 2, 0, 0));
+    openingEditorAnimation = new QPropertyAnimation(editor, "geometry");
+    openingEditorAnimation->setStartValue(QRect(parent->width() / 2, parent->height() / 2, 0, 0));
+    openingEditorAnimation->setEndValue(calculateGeometryOfEditor());
+    openingEditorAnimation->setDuration(150);
+    openingEditorAnimation->start();
 }
 
-NoteEditingTab::~NoteEditingTab()
+void NoteEditingTab::onTitleChanged(const QString &newTitle)
 {
-    delete ui;
+    QDateTime modificationTime = QDateTime::currentDateTime();
+    noteModel.setData(editingNote, newTitle, NoteListModel::Title);
+    noteModel.setData(editingNote, modificationTime, NoteListModel::ModificationTime);
 }
 
-void NoteEditingTab::startEditingNewNote(const QModelIndex &index)
+void NoteEditingTab::onContentChanged(const QString &newContent)
 {
-    currentEditingNote = index;
-    const NoteData *note = static_cast<const NoteData *>(index.constInternalPointer());
-
-    ui->titleEdit->setText(note->getTitle());
-    ui->contentEdit->setText(note->getContent());
-    lastSavedTitle = note->getTitle();
-    lastSavedContent = note->getContent();
+    QDateTime modificationTime = QDateTime::currentDateTime();
+    noteModel.setData(editingNote, newContent, NoteListModel::Content);
+    noteModel.setData(editingNote, modificationTime, NoteListModel::ModificationTime);
 }
 
-void NoteEditingTab::saveNoteIfChanged()
+void NoteEditingTab::saveNoteAndEmitExitSignal()
 {
-    if (!hasNoteChanged())
+    noteModel.saveDirtyIndexes();
+    emit exitEditingNoteRequested();
+}
+
+QRect NoteEditingTab::calculateGeometryOfEditor()
+{
+    int editorWidth = width() * 2 / 3;
+    int editorHeight = height() * 2 / 3;
+    int editorLeft = (width() - editorWidth) / 2;
+    int editorTop = (height() - editorHeight) / 2;
+
+    return QRect(editorLeft, editorTop, editorWidth, editorHeight);
+}
+
+void NoteEditingTab::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    if (openingEditorAnimation->state() == QAbstractAnimation::Running)
         return;
 
-    noteModel.setData(currentEditingNote, ui->contentEdit->toPlainText(), NoteListModel::Content);
-    noteModel.setData(currentEditingNote, ui->titleEdit->text(), NoteListModel::Title);
-    noteModel.setData(currentEditingNote, QDateTime::currentDateTime(), NoteListModel::ModificationTime);
-    lastSavedTitle = ui->contentEdit->toPlainText();
-    lastSavedContent = ui->titleEdit->text();
+    editor->setGeometry(calculateGeometryOfEditor());
 }
 
-bool NoteEditingTab::hasNoteChanged()
+void NoteEditingTab::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (lastSavedTitle == ui->titleEdit->text() and lastSavedContent == ui->contentEdit->toPlainText())
-        return false;
-
-    return true;
-}
-
-void NoteEditingTab::onDeleteNoteButtonPressed()
-{
-    auto reply = QMessageBox::question(this, "Delete note?", "Are you sure you want to delete this note?");
-    if (reply == QMessageBox::No)
-        return;
-    noteModel.removeRows(currentEditingNote.row(), 1, QModelIndex());
-}
-
-void NoteEditingTab::onReturnWithoutSavingButtonPressed()
-{
-    if (!hasNoteChanged())
-    {
-        emit exitEditingNote(currentEditingNote);
-        return;
-    }
-
-    auto reply =
-        QMessageBox::question(this, "Discard changes?", "Are you sure you want to discard unsaved changes and return?",
-                              QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::Save);
-
-    if (reply == QMessageBox::Yes)
-        emit exitEditingNote(currentEditingNote);
-
-    if (reply == QMessageBox::Save)
-    {
-        saveNoteIfChanged();
-        emit exitEditingNote(currentEditingNote);
-    }
+    if (!editor->geometry().contains(event->pos()))
+        saveNoteAndEmitExitSignal();
 }
