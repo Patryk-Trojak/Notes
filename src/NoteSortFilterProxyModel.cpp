@@ -37,6 +37,9 @@ bool NoteSortFilterProxyModel::lessThan(const QModelIndex &source_left, const QM
     }
     else
     {
-        return leftData.toString() < rightData.toString();
+        if (QString::compare(leftData.toString(), rightData.toString(), Qt::CaseInsensitive) < 0)
+            return true;
+        else
+            return false;
     }
 }
