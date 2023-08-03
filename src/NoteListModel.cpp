@@ -167,9 +167,10 @@ bool NoteListModel::removeRows(int row, int count, const QModelIndex &parent)
     return true;
 }
 
-void NoteListModel::createNewNote()
+QModelIndex NoteListModel::createNewNote()
 {
     insertRows(0, 1, QModelIndex());
+    return index(0, 0, QModelIndex());
 }
 
 void NoteListModel::restoreNoteFromTrash(const QModelIndex &index)

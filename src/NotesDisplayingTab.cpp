@@ -60,7 +60,8 @@ NotesDisplayingTab::~NotesDisplayingTab()
 
 void NotesDisplayingTab::onNewNoteButtonPressed()
 {
-    noteModel.createNewNote();
+    QModelIndex createdNoteIndex = noteModel.createNewNote();
+    emit enterEditingNote(createdNoteIndex);
 }
 
 void NotesDisplayingTab::onSortByTitleButtonToggled()

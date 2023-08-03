@@ -37,7 +37,7 @@ class NoteListModel : public QAbstractItemModel
     bool removeRows(int row, int count, const QModelIndex &parent);
     QModelIndex parent(const QModelIndex &child) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
-    void createNewNote();
+    QModelIndex createNewNote();
     void restoreNoteFromTrash(const QModelIndex &index);
     int getCurrentSelectedFolderId() const;
     void saveDirtyIndexes();
