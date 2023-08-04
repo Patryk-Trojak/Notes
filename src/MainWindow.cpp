@@ -6,7 +6,7 @@ MainWindow::MainWindow(QWidget *parent)
     notesDisplayingTab = new NotesDisplayingTab(noteModel, persistenceManager, this);
     QObject::connect(notesDisplayingTab, &NotesDisplayingTab::enterEditingNote, this, &MainWindow::enterEditingNote);
     setMinimumSize(620, 350);
-    setGeometry(200, 200, 975, 550);
+    setGeometry(200, 200, 1050, 550);
 }
 
 void MainWindow::enterEditingNote(const QModelIndex &note)
