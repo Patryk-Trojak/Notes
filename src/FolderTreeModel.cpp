@@ -91,8 +91,8 @@ Qt::ItemFlags FolderTreeModel::flags(const QModelIndex &index) const
 bool FolderTreeModel::insertRows(int row, int count, const QModelIndex &parent)
 {
     FolderTreeItem *parentItem = getItemFromIndex(parent);
-    if (parentItem == rootItem.get() and row <= 1) // Prevent adding row before special folders
-        row = 2;
+    if (parentItem == rootItem.get() and row <= 0) // Prevent adding row before special folders
+        row = 1;
 
     for (int i = 0; i < count; i++)
     {
@@ -142,7 +142,7 @@ void FolderTreeModel::setupModelData()
     rootItem->insertChild(0, allNotesFolder, FolderTreeItem::Type::AllNotesItem);
 
     FolderData trashFolder(SpecialFolderId::TrashFolder, rootItem->data.getId(), "Trash");
-    rootItem->insertChild(1, trashFolder, FolderTreeItem::Type::TrashFolder);
+    rootItem->insertChild(rootItem->getChildren().size(), trashFolder, FolderTreeItem::Type::TrashFolder);
 }
 
 void FolderTreeModel::setupChildrenRecursively(FolderTreeItem &folderTreeItem, const QVector<FolderData> &listOfFolders)
