@@ -150,6 +150,9 @@ void FolderTreeModel::setupChildrenRecursively(FolderTreeItem &folderTreeItem, c
     auto first = std::lower_bound(listOfFolders.begin(), listOfFolders.end(), folderTreeItem.data.getId(),
                                   [](const FolderData &folder, int id) { return folder.getParentId() < id; });
 
+    if (first == listOfFolders.end())
+        return;
+
     while (first->getParentId() == folderTreeItem.data.getId())
     {
         FolderTreeItem &addedItem = *folderTreeItem.addChild(*first);
