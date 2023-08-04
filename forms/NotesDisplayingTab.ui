@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>704</width>
-    <height>453</height>
+    <width>836</width>
+    <height>571</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -19,9 +19,21 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,7,1">
+  <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
    <item>
     <widget class="FolderTreeView" name="folderTreeView">
+     <property name="minimumSize">
+      <size>
+       <width>165</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>165</width>
+       <height>16777215</height>
+      </size>
+     </property>
      <property name="contextMenuPolicy">
       <enum>Qt::NoContextMenu</enum>
      </property>
@@ -39,19 +51,25 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_4">
      <item>
-      <widget class="SearchBar" name="searchBar"/>
-     </item>
-     <item>
-      <widget class="NoteListView" name="noteListView">
-       <property name="sizeAdjustPolicy">
-        <enum>QAbstractScrollArea::AdjustIgnored</enum>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
-      </widget>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
+    <layout class="QVBoxLayout" name="rightPanel">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetDefaultConstraint</enum>
+     </property>
      <item alignment="Qt::AlignRight">
       <widget class="QPushButton" name="aboutNotes">
        <property name="sizePolicy">
@@ -127,6 +145,12 @@ margin: 0;</string>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>165</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="title">
         <string>Sort by:</string>
        </property>
@@ -140,7 +164,7 @@ margin: 0;</string>
         <item>
          <widget class="QRadioButton" name="sortByCreationDateButton">
           <property name="text">
-           <string>Creation date</string>
+           <string>Creation</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -150,7 +174,7 @@ margin: 0;</string>
         <item>
          <widget class="QRadioButton" name="sortByModificationDateButton">
           <property name="text">
-           <string>Last modification date</string>
+           <string>Last modification</string>
           </property>
          </widget>
         </item>
@@ -208,19 +232,9 @@ margin: 0;</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>SearchBar</class>
-   <extends>QLineEdit</extends>
-   <header>SearchBar.h</header>
-  </customwidget>
-  <customwidget>
    <class>FolderTreeView</class>
    <extends>QTreeView</extends>
    <header>FolderTreeView.h</header>
-  </customwidget>
-  <customwidget>
-   <class>NoteListView</class>
-   <extends>QListView</extends>
-   <header location="global">NoteListView.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -3,7 +3,9 @@
 
 #include "FolderTreeModel.h"
 #include "NoteListModel.h"
+#include "NoteListView.h"
 #include "NoteSortFilterProxyModel.h"
+#include "SearchBar.h"
 #include <QSortFilterProxyModel>
 #include <QWidget>
 
@@ -32,9 +34,18 @@ class NotesDisplayingTab : public QWidget
 
   private:
     Ui::NotesDisplayingTab *ui;
+    NoteListView *noteListView;
+    SearchBar *searchBar;
     NoteListModel &noteModel;
     NoteSortFilterProxyModel noteProxyModel;
     FolderTreeModel folderModel;
+
+    void layoutNoteListView();
+    void layoutSearchBar();
+    void layoutAllElementsWhichDependsOnNumberOfNotes();
+
+  protected:
+    void resizeEvent(QResizeEvent *event);
 };
 
 #endif // NOTESDISPLAYINGTAB_H

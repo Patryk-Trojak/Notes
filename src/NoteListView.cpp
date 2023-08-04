@@ -17,10 +17,13 @@ NoteListView::NoteListView(QWidget *parent) : QListView(parent), editor(nullptr)
     QObject::connect(this, &QListView::entered, this, &NoteListView::onItemEntered);
     QObject::connect(this, &QListView::customContextMenuRequested, this, &NoteListView::onCustomContextMenuRequested);
 
-    setWrapping(true);
     setUniformItemSizes(true);
-    setSpacing(5);
-    setFlow(Flow::LeftToRight);
+    setGridSize(QSize(220, 220));
+    setResizeMode(ResizeMode::Adjust);
+    setViewMode(ViewMode::IconMode);
+    int widthOfScrollbar = 14;
+    setStyleSheet(QString("QListView{border: none;} QScrollBar { width: %1px; }").arg(widthOfScrollbar));
+    verticalScrollBar()->resize(widthOfScrollbar, 0);
 }
 
 void NoteListView::removeNote(const QModelIndex &index)
@@ -168,12 +171,6 @@ void NoteListView::onRestoreNoteFromTrashRequested(const QModelIndex &index)
         noteModel->restoreNoteFromTrash(noteModelIndex);
 }
 
-void NoteListView::resizeEvent(QResizeEvent *event)
-{
-    QListView::resizeEvent(event);
-    setWrapping(true);
-}
-
 bool NoteListView::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == editor)
@@ -186,4 +183,19 @@ bool NoteListView::eventFilter(QObject *watched, QEvent *event)
         }
     }
     return QListView::eventFilter(watched, event);
+}
+
+int NoteListView::getHowManyNotesCanFitInRow(int width) const
+{
+    return (width - verticalScrollBar()->geometry().width() - 1) / gridSize().width();
+}
+
+int NoteListView::getHowManyNotesAreDisplayed() const
+{
+    return model()->rowCount();
+}
+
+void NoteListView::setMinWidthToFitNotesInRow(int numberOfNotesToFitInOneRow)
+{
+    resize(numberOfNotesToFitInOneRow * gridSize().width() + verticalScrollBar()->geometry().width() + 1, height());
 }
