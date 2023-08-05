@@ -231,6 +231,7 @@ QVector<FolderData> PersistenceManager::loadAllFolders() const
         folders.back().setId(query.value(0).toInt());
         folders.back().setName(query.value(1).toString());
         folders.back().setParentId(query.value(2).toInt());
+        folders.back().setNotesInsideCount(query.value(3).toInt());
     }
 
     return folders;
@@ -261,11 +262,12 @@ int PersistenceManager::addFolder(const FolderData &folder) const
 {
     QSqlQuery query(db);
     query.prepare("INSERT INTO folder "
-                  "(name, parent_id)"
-                  "VALUES(:name, :parent_id)");
+                  "(name, parent_id, notes_inside_count)"
+                  "VALUES(:name, :parent_id, :notes_inside_count)");
 
     query.bindValue(":name", folder.getName());
     query.bindValue(":parent_id", folder.getParentId());
+    query.bindValue(":notes_inside_count", folder.getNotesInsideCount());
 
     if (!query.exec())
     {
@@ -280,11 +282,13 @@ void PersistenceManager::updateFolder(const FolderData &folder) const
     QSqlQuery query(db);
 
     query.prepare("UPDATE folder "
-                  "SET name = :name, parent_id = :parent_id "
+                  "SET name = :name, parent_id = :parent_id, notes_inside_count = :notes_inside_count "
                   "WHERE id = :id");
 
     query.bindValue(":name", folder.getName());
     query.bindValue(":parent_id", folder.getParentId());
+    query.bindValue(":notes_inside_count", folder.getNotesInsideCount());
+
     query.bindValue(":id", folder.getId());
 
     if (!query.exec())
@@ -322,7 +326,8 @@ void PersistenceManager::createNewDefaultTables() const
     QString createFolderTable = "CREATE TABLE folder("
                                 "id INTEGER PRIMARY KEY, "
                                 "name TEXT, "
-                                "parent_id INTEGER"
+                                "parent_id INTEGER NOT NULL DEFAULT 0, "
+                                "notes_inside_count INTEGER NOT NULL DEFAULT 0"
                                 ")";
 
     if (!query.exec(createFolderTable))
@@ -331,6 +336,7 @@ void PersistenceManager::createNewDefaultTables() const
     FolderData notesFolder;
     notesFolder.setName("Folder");
     notesFolder.setParentId(SpecialFolderId::RootFolder);
+    notesFolder.setNotesInsideCount(0);
     addFolder(notesFolder);
 }
 
