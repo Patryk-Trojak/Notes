@@ -175,6 +175,22 @@ QVector<NoteData> PersistenceManager::loadAllNotesFromTrash() const
     return loadAllNotesFromFolder(SpecialFolderId::TrashFolder);
 }
 
+int PersistenceManager::countNotesInTrash()
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT COUNT(*) FROM note WHERE parent_folder_id = :thrash_folder_id");
+    query.bindValue(":thrash_folder_id", SpecialFolderId::TrashFolder);
+
+    if (!query.exec())
+    {
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+        return 0;
+    }
+
+    query.next();
+    return query.value(0).toInt();
+}
+
 void PersistenceManager::deleteAllNotesFromFolder(int folderId) const
 {
     QSqlQuery query(db);
@@ -212,6 +228,21 @@ void PersistenceManager::deleteNote(int id) const
 
     if (!query.exec())
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+}
+
+int PersistenceManager::countAllNotes()
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT COUNT(*) FROM note WHERE parent_folder_id != :thrash_folder_id");
+    query.bindValue(":thrash_folder_id", SpecialFolderId::TrashFolder);
+
+    if (!query.exec())
+    {
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+        return 0;
+    }
+    query.next();
+    return query.value(0).toInt();
 }
 
 QVector<FolderData> PersistenceManager::loadAllFolders() const
