@@ -169,8 +169,16 @@ bool NoteListModel::removeRows(int row, int count, const QModelIndex &parent)
 
 QModelIndex NoteListModel::createNewNote()
 {
-    insertRows(0, 1, QModelIndex());
-    return index(0, 0, QModelIndex());
+    if (currentSelectedFolderId == SpecialFolderId::TrashFolder)
+    {
+        return QModelIndex();
+    }
+
+    bool insertedOk = insertRows(0, 1, QModelIndex());
+    if (insertedOk)
+        return index(0, 0, QModelIndex());
+
+    return QModelIndex();
 }
 
 void NoteListModel::restoreNoteFromTrash(const QModelIndex &index)
