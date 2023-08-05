@@ -148,7 +148,9 @@ bool NoteListModel::insertRows(int row, int count, const QModelIndex &parent)
         inserted->setId(id);
     }
     endInsertRows();
-
+    emit notesAddedToFolder(currentSelectedFolderId, count);
+    if (currentSelectedFolderId != SpecialFolderId::AllNotesFolder)
+        emit notesAddedToFolder(SpecialFolderId::AllNotesFolder, count);
     return true;
 }
 
@@ -157,9 +159,18 @@ bool NoteListModel::removeRows(int row, int count, const QModelIndex &parent)
     for (int i = row; i < row + count; i++)
     {
         if (currentSelectedFolderId == SpecialFolderId::TrashFolder)
+        {
             persistenceManager.deleteNote(notes[i].getId());
+            emit notesRemovedFromFolder(SpecialFolderId::TrashFolder, 1);
+        }
         else
+        {
+            emit notesRemovedFromFolder(notes[i].getParentFolderId());
+            if (notes[i].getParentFolderId() != SpecialFolderId::AllNotesFolder)
+                emit notesRemovedFromFolder(SpecialFolderId::AllNotesFolder);
             persistenceManager.moveNoteToTrash(notes[i].getId());
+            emit notesAddedToFolder(SpecialFolderId::TrashFolder, 1);
+        }
     }
     beginRemoveRows(parent, row, row + count - 1);
     notes.remove(row, count);
@@ -184,6 +195,8 @@ QModelIndex NoteListModel::createNewNote()
 void NoteListModel::restoreNoteFromTrash(const QModelIndex &index)
 {
     persistenceManager.restoreNoteFromTrash(notes[index.row()].getId());
+    emit notesRemovedFromFolder(SpecialFolderId::TrashFolder, 1);
+    emit notesAddedToFolder(SpecialFolderId::AllNotesFolder, 1);
     beginRemoveRows(QModelIndex(), index.row(), index.row());
     notes.remove(index.row(), 1);
     endRemoveRows();

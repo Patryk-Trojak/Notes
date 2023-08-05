@@ -46,6 +46,10 @@ class NoteListModel : public QAbstractItemModel
     void onNewFolderSelected(int selectedFolderId = 5);
     void onFolderDeleted(int deletedFolderId);
 
+  signals:
+    void notesRemovedFromFolder(int folderId, int notesRemovedCount = 1);
+    void notesAddedToFolder(int folderId, int notesAddedCount);
+
   private:
     PersistenceManager &persistenceManager;
     QVector<NoteData> notes;

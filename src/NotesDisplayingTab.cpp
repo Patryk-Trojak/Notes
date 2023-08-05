@@ -55,6 +55,17 @@ NotesDisplayingTab::NotesDisplayingTab(NoteListModel &noteModel, PersistenceMana
     QObject::connect(&folderModel, &FolderTreeModel::folderDeletedFromDatabase, &noteModel,
                      &NoteListModel::onFolderDeleted);
 
+    QObject::connect(&noteModel, &NoteListModel::notesAddedToFolder, this, [this](int folderId, int addedNoteCount) {
+        this->folderModel.updateNotesInsideCountOfFolder(folderId, addedNoteCount);
+    });
+    QObject::connect(&noteModel, &NoteListModel::notesRemovedFromFolder, this,
+                     [this](int folderId, int removedNoteCount) {
+                         this->folderModel.updateNotesInsideCountOfFolder(folderId, -removedNoteCount);
+                     });
+
+    QObject::connect(&folderModel, &FolderTreeModel::folderDeletedFromDatabase, &noteModel,
+                     &NoteListModel::onFolderDeleted);
+
     layoutAllElementsWhichDependsOnNumberOfNotes();
     QObject::connect(&noteProxyModel, &NoteSortFilterProxyModel::rowsInserted, this,
                      &NotesDisplayingTab::layoutAllElementsWhichDependsOnNumberOfNotes);

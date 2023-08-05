@@ -140,6 +140,16 @@ bool FolderTreeModel::removeRows(int row, int count, const QModelIndex &parent)
     return true;
 }
 
+void FolderTreeModel::updateNotesInsideCountOfFolder(int folderId, int deltaNoteInsideCount)
+{
+    QModelIndex folderIndex = findIndex(folderId);
+    FolderTreeItem *folder = static_cast<FolderTreeItem *>(folderIndex.internalPointer());
+    folder->data.setNotesInsideCount(folder->data.getNotesInsideCount() + deltaNoteInsideCount);
+
+    persistenceManager.updateFolder(folder->data);
+    emit dataChanged(folderIndex, folderIndex);
+}
+
 void FolderTreeModel::setupModelData()
 {
     QVector<FolderData> folders = persistenceManager.loadAllFolders();
@@ -147,15 +157,17 @@ void FolderTreeModel::setupModelData()
         return folder1.getParentId() < folder2.getParentId();
     });
 
-    FolderData rootFolder(SpecialFolderId::RootFolder, SpecialFolderId::InvalidId, "/");
+    FolderData rootFolder(SpecialFolderId::RootFolder, SpecialFolderId::InvalidId, "/", 0);
     rootItem = std::make_unique<FolderTreeItem>(nullptr, rootFolder, FolderTreeItem::Type::RootFolder);
 
     setupChildrenRecursively(*rootItem, folders);
 
-    FolderData allNotesFolder(SpecialFolderId::AllNotesFolder, rootItem->data.getId(), "All notes");
+    int allNoteCount = persistenceManager.countAllNotes();
+    FolderData allNotesFolder(SpecialFolderId::AllNotesFolder, rootItem->data.getId(), "All notes", allNoteCount);
     rootItem->insertChild(0, allNotesFolder, FolderTreeItem::Type::AllNotesItem);
 
-    FolderData trashFolder(SpecialFolderId::TrashFolder, rootItem->data.getId(), "Trash");
+    int notesInTrashCount = persistenceManager.countNotesInTrash();
+    FolderData trashFolder(SpecialFolderId::TrashFolder, rootItem->data.getId(), "Trash", notesInTrashCount);
     rootItem->insertChild(rootItem->getChildren().size(), trashFolder, FolderTreeItem::Type::TrashFolder);
 }
 
@@ -177,6 +189,7 @@ void FolderTreeModel::setupChildrenRecursively(FolderTreeItem &folderTreeItem, c
 
 void FolderTreeModel::deleteFolderRecursivelyFromDb(const FolderTreeItem &folderTreeItem)
 {
+    updateNotesInsideCountOfFolder(SpecialFolderId::TrashFolder, folderTreeItem.data.getNotesInsideCount());
     persistenceManager.deleteFolder(folderTreeItem.data.getId());
     emit folderDeletedFromDatabase(folderTreeItem.data.getId());
 
