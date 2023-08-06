@@ -1,6 +1,7 @@
 #include "NotesDisplayingTab.h"
 #include "ui_NotesDisplayingTab.h"
 #include <AboutWindow.h>
+#include <QMoveEvent>
 #include <QScrollBar>
 #include <QShortcut>
 #include <QStringListModel>
@@ -11,8 +12,16 @@ NotesDisplayingTab::NotesDisplayingTab(NoteListModel &noteModel, PersistenceMana
       noteProxyModel(this)
 {
     ui->setupUi(this);
-    noteListView = new NoteListView(this);
-    searchBar = new SearchBar(this);
+    ui->middleFrame->installEventFilter(this);
+    ui->splitter->handle(1)->setStyleSheet("border: none; background-color: rgb(191, 191, 191);");
+    ui->splitter->handle(1)->setAttribute(Qt::WA_StyledBackground, true);
+    ui->splitter->handle(2)->setStyleSheet("border: none; background-color: rgb(191, 191, 191);");
+    ui->splitter->handle(2)->setAttribute(Qt::WA_StyledBackground, true);
+    ui->splitter->setHandleWidth(2);
+    ui->splitter->setSizes({300, 2000, 1});
+    noteListView = new NoteListView(ui->middleFrame);
+    searchBar = new SearchBar(ui->middleFrame);
+
     QObject::connect(ui->aboutNotes, &QPushButton::clicked, this, [this]() {
         auto aboutWindow = new AboutWindow(this);
         aboutWindow->show();
@@ -66,11 +75,12 @@ NotesDisplayingTab::NotesDisplayingTab(NoteListModel &noteModel, PersistenceMana
     QObject::connect(&folderModel, &FolderTreeModel::folderDeletedFromDatabase, &noteModel,
                      &NoteListModel::onFolderDeleted);
 
-    layoutAllElementsWhichDependsOnNumberOfNotes();
     QObject::connect(&noteProxyModel, &NoteSortFilterProxyModel::rowsInserted, this,
                      &NotesDisplayingTab::layoutAllElementsWhichDependsOnNumberOfNotes);
     QObject::connect(&noteProxyModel, &NoteSortFilterProxyModel::rowsRemoved, this,
                      &NotesDisplayingTab::layoutAllElementsWhichDependsOnNumberOfNotes);
+
+    layoutAllElementsWhichDependsOnNumberOfNotes();
 }
 
 NotesDisplayingTab::~NotesDisplayingTab()
@@ -118,6 +128,14 @@ void NotesDisplayingTab::onNewFolderSelected(int selectedFolderId)
 
 void NotesDisplayingTab::layoutSearchBar()
 {
+    if (ui->splitter->sizes().at(1) == 0)
+    {
+        searchBar->setVisible(false);
+        return;
+    }
+    else
+        searchBar->setVisible(true);
+
     int widthOfSearchBar = qMin(noteListView->width(), 600);
     widthOfSearchBar = qMax(widthOfSearchBar, 200);
     int leftOfSearchBar = noteListView->pos().x() +
@@ -127,20 +145,27 @@ void NotesDisplayingTab::layoutSearchBar()
 
 void NotesDisplayingTab::layoutNoteListView()
 {
-    int leftMargin = 9;
-    int rightMargin = 9;
-    int availableWidthForNoteView =
-        ui->rightPanel->geometry().left() - ui->folderTreeView->geometry().right() - leftMargin - rightMargin;
+    int leftMargin = 7;
+    int rightMargin = 7;
+
+    if (ui->splitter->sizes().at(1) == 0)
+    {
+        noteListView->setVisible(false);
+        return;
+    }
+    else
+        noteListView->setVisible(true);
+
+    int availableWidthForNoteView = ui->middleFrame->width() - rightMargin - leftMargin;
     int numberOfNotesInRow = qMin(noteListView->getHowManyNotesCanFitInRow(availableWidthForNoteView),
                                   noteListView->getHowManyNotesAreDisplayed());
     noteListView->setMinWidthToFitNotesInRow(numberOfNotesInRow);
 
     int newLeftOfNoteView =
-        ui->folderTreeView->geometry().right() + leftMargin +
+        leftMargin +
         (availableWidthForNoteView - noteListView->width() + noteListView->verticalScrollBar()->width()) / 2;
 
-    noteListView->move(newLeftOfNoteView, 51);
-    noteListView->resize(noteListView->width(), height() - 60);
+    noteListView->setGeometry(newLeftOfNoteView, 51, noteListView->width(), height() - 60);
 }
 
 void NotesDisplayingTab::layoutAllElementsWhichDependsOnNumberOfNotes()
@@ -152,6 +177,17 @@ void NotesDisplayingTab::layoutAllElementsWhichDependsOnNumberOfNotes()
 void NotesDisplayingTab::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-
     layoutAllElementsWhichDependsOnNumberOfNotes();
+}
+
+bool NotesDisplayingTab::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == ui->middleFrame)
+    {
+        if (event->type() == QEvent::Resize or event->type() == QEvent::Move)
+        {
+            layoutAllElementsWhichDependsOnNumberOfNotes();
+        }
+    }
+    return false;
 }

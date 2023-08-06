@@ -46,6 +46,7 @@ class NotesDisplayingTab : public QWidget
 
   protected:
     void resizeEvent(QResizeEvent *event);
+    bool eventFilter(QObject *watched, QEvent *event);
 };
 
 #endif // NOTESDISPLAYINGTAB_H
