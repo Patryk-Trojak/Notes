@@ -11,6 +11,7 @@ FolderTreeView::FolderTreeView(QWidget *parent) : QTreeView(parent)
     setContextMenuPolicy(Qt::CustomContextMenu);
     QObject::connect(this, &FolderTreeView::customContextMenuRequested, this,
                      &FolderTreeView::onCustomContextMenuRequested);
+    setStyleSheet("border: none;");
 }
 
 void FolderTreeView::setModel(QAbstractItemModel *model)
