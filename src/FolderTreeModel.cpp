@@ -192,6 +192,8 @@ void FolderTreeModel::setupChildrenRecursively(FolderTreeItem &folderTreeItem, c
 void FolderTreeModel::deleteFolderRecursivelyFromDb(const FolderTreeItem &folderTreeItem)
 {
     updateNotesInsideCountOfFolder(SpecialFolderId::TrashFolder, folderTreeItem.data.getNotesInsideCount());
+    updateNotesInsideCountOfFolder(SpecialFolderId::AllNotesFolder, -folderTreeItem.data.getNotesInsideCount());
+
     persistenceManager.deleteFolder(folderTreeItem.data.getId());
     emit folderDeletedFromDatabase(folderTreeItem.data.getId());
 
