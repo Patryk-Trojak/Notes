@@ -8,5 +8,7 @@
         <file>images/pinChecked.png</file>
         <file>images/pinUnchecked.png</file>
         <file>images/palette.png</file>
+        <file>images/emptyFolder.png</file>
+        <file>images/folderWithNotes.png</file>
     </qresource>
 </RCC>
