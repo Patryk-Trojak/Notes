@@ -12,16 +12,18 @@ QModelIndex FolderTreeModel::index(int row, int column, const QModelIndex &paren
     return createIndex(row, column, parentItem->getChild(row));
 }
 
-QModelIndex FolderTreeModel::findIndex(int folderId, const QModelIndex &parent)
+QModelIndex FolderTreeModel::findIndex(int folderId, const QModelIndex &root)
 {
-    const FolderTreeItem *root = getItemFromIndex(parent);
-    auto &children = root->getChildren();
+    const FolderTreeItem *rootItem = getItemFromIndex(root);
+    if (rootItem->data.getId() == folderId)
+        return root;
+
+    auto &children = rootItem->getChildren();
     for (auto child = children.begin(); child < children.end(); child++)
     {
-        if ((*child)->data.getId() == folderId)
-            return index(child - children.begin(), 0, parent);
-
-        findIndex(folderId, index(child - children.begin(), 0, parent));
+        QModelIndex found = findIndex(folderId, index(child - children.begin(), 0, root));
+        if (found.isValid())
+            return found;
     }
     return QModelIndex();
 }
