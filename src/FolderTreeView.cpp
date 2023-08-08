@@ -66,7 +66,7 @@ void FolderTreeView::deleteFolder(const QModelIndex &index)
     if (reply == QMessageBox::No)
         return;
 
-    model()->removeRow(index.row());
+    model()->removeRow(index.row(), index.parent());
 }
 
 void FolderTreeView::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
