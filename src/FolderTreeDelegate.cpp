@@ -66,17 +66,9 @@ void FolderTreeDelegate::paintName(QPainter *painter, const QStyleOptionViewItem
 {
     QRect textRect = option.rect.adjusted(31, 0, -28, 0);
     QFont font("Verdana", 11);
-    if (item->getType() == FolderTreeItem::Type::TrashFolder)
-    {
-        font.setBold(true);
-        painter->setPen(Qt::red);
-    }
     painter->setFont(font);
     QString elidedName = painter->fontMetrics().elidedText(item->data.getName(), Qt::ElideRight, textRect.width());
     painter->drawText(textRect, Qt::AlignVCenter, elidedName);
-
-    font.setBold(false);
-    painter->setFont(font);
 }
 
 void FolderTreeDelegate::paintNotesInsideCount(QPainter *painter, const QStyleOptionViewItem &option,
