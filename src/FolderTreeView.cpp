@@ -6,12 +6,14 @@
 #include <QMessageBox>
 #include <QModelIndex>
 
-FolderTreeView::FolderTreeView(QWidget *parent) : QTreeView(parent)
+FolderTreeView::FolderTreeView(QWidget *parent) : QTreeView(parent), delegate(this)
 {
     setContextMenuPolicy(Qt::CustomContextMenu);
     QObject::connect(this, &FolderTreeView::customContextMenuRequested, this,
                      &FolderTreeView::onCustomContextMenuRequested);
-    setStyleSheet("border: none;");
+    setStyleSheet("FolderTreeView{border: none; selection-color: transparent; selection-background-color: transparent;}"
+                  "QTreeView::branch { background: transparent; } ");
+    setItemDelegate(&delegate);
 }
 
 void FolderTreeView::setModel(QAbstractItemModel *model)

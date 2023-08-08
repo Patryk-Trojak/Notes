@@ -42,6 +42,7 @@ set(PROJECT_SOURCES
         ${INCLUDE_DIR}/ColorButton.h ${SOURCE_DIR}/ColorButton.cpp
         ${INCLUDE_DIR}/ColorPicker.h ${SOURCE_DIR}/ColorPicker.cpp
         ${INCLUDE_DIR}/NoteEditor.h ${SOURCE_DIR}/NoteEditor.cpp ${FORMS_DIR}/NoteEditor.ui
+        ${INCLUDE_DIR}/FolderTreeDelegate.h ${SOURCE_DIR}/FolderTreeDelegate.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

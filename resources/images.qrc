@@ -10,5 +10,6 @@
         <file>images/palette.png</file>
         <file>images/emptyFolder.png</file>
         <file>images/folderWithNotes.png</file>
+        <file>images/branchArrow.png</file>
     </qresource>
 </RCC>

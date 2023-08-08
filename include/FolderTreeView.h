@@ -1,5 +1,6 @@
 #ifndef FOLDERTREEVIEW_H
 #define FOLDERTREEVIEW_H
+#include "FolderTreeDelegate.h"
 #include <QTreeView>
 
 class FolderTreeView : public QTreeView
@@ -10,8 +11,12 @@ class FolderTreeView : public QTreeView
     FolderTreeView(QWidget *parent = nullptr);
     void setModel(QAbstractItemModel *model);
     int getCurrentFolderSelectedId() const;
+
   signals:
     void newFolderSelected(int selectedFolderId);
+
+  private:
+    FolderTreeDelegate delegate;
 
   private slots:
     void onCustomContextMenuRequested(const QPoint &pos);
