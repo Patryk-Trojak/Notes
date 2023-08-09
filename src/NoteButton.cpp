@@ -6,6 +6,9 @@
 NoteButton::NoteButton(QWidget *parent) : QPushButton{parent}, ui(new Ui::NoteButton), colorPicker(nullptr)
 {
     ui->setupUi(this);
+    QFont titleFont("Cantarell", 13);
+    titleFont.setBold(true);
+    ui->title->setFont(titleFont);
     pinCheckBox = new QCheckBox(this);
     pinCheckBox->setStyleSheet("QCheckBox::indicator:checked {image: url(:/images/pinChecked.png);}"
                                "QCheckBox::indicator:unchecked {image: url(:/images/pinUnchecked.png);}"
