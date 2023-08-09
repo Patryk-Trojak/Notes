@@ -159,7 +159,7 @@ void NotesDisplayingTab::layoutNoteListView()
 {
     int leftMargin = 7;
     int rightMargin = 7;
-
+    int marginTop = 51;
     if (ui->splitter->sizes().at(1) == 0)
     {
         noteListView->setVisible(false);
@@ -177,7 +177,8 @@ void NotesDisplayingTab::layoutNoteListView()
         leftMargin +
         (availableWidthForNoteView - noteListView->width() + noteListView->verticalScrollBar()->width()) / 2;
 
-    noteListView->setGeometry(newLeftOfNoteView, 51, noteListView->width(), height() - 60);
+    noteListView->setGeometry(newLeftOfNoteView, marginTop, noteListView->width(),
+                              ui->middleFrame->height() - marginTop);
 }
 
 void NotesDisplayingTab::layoutAllElementsWhichDependsOnNumberOfNotes()
