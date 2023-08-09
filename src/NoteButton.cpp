@@ -31,6 +31,7 @@ NoteButton::NoteButton(QWidget *parent) : QPushButton{parent}, ui(new Ui::NoteBu
                   "1px;border-radius:8px;}");
 
     QObject::connect(changeColorButton, &QPushButton::clicked, this, &NoteButton::onChangeColorButtonClicked);
+    ui->modificationTime->setStyleSheet("color: rgba(26, 26, 26, 200)");
 }
 
 NoteButton::NoteButton(const QString &title, const QDateTime &modificationTime, bool isPinned, QWidget *parent)
@@ -74,15 +75,17 @@ void NoteButton::setContent(const QString &content)
 void NoteButton::setModificationTime(const QDateTime &newModificationTime)
 {
     this->modificationTime = newModificationTime;
-    ui->modificationTime->setText("Modified: " + convertDateTimeToString(modificationTime));
+    ui->modificationTime->setText(convertDateTimeToString(modificationTime));
 }
 
 QString NoteButton::convertDateTimeToString(const QDateTime &dateTime)
 {
     if (dateTime.date() == QDate::currentDate())
-        return dateTime.toString("hh:mm");
+        return "Today, " + dateTime.toString("hh:mm");
+    else if (dateTime.date() == QDate::currentDate().addDays(-1))
+        return "Yesterday, " + dateTime.toString("hh:mm");
     else
-        return dateTime.toString("dd.MM.yy");
+        return dateTime.toString("MMM dd, yyyy");
 }
 
 void NoteButton::createColorPicker()
