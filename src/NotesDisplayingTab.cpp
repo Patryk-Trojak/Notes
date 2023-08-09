@@ -17,7 +17,7 @@ NotesDisplayingTab::NotesDisplayingTab(NoteListModel &noteModel, PersistenceMana
     ui->splitter->handle(1)->setStyleSheet("border: none; background-color: rgb(191, 191, 191);");
     ui->splitter->handle(1)->setAttribute(Qt::WA_StyledBackground, true);
     ui->splitter->setHandleWidth(2);
-    ui->splitter->setSizes({300, 2000, 1});
+    ui->splitter->setSizes({400, 2000});
     noteListView = new NoteListView(ui->middleFrame);
     searchBar = new SearchBar(ui->middleFrame);
     openNoteSortOptionsButton = new QPushButton(ui->middleFrame);
