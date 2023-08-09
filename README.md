@@ -1,5 +1,9 @@
 # Notes
-It is simple note-taking app.
+It is a minimalistic note-taking app that allows you to organize your notes using folders
+
+## Screenshots
+![Alt text](/screenshots/NotesScreenshot.png?raw=true)
+![Alt text](/screenshots/NotesEditingScreenshot.png?raw=true)
 
 ## Technologies Used
 - C++17
