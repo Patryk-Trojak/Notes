@@ -13,14 +13,18 @@ class ElidedLabel : public QFrame
     const QString &text() const;
     bool isElided() const;
 
-  protected:
-    void paintEvent(QPaintEvent *event) override;
+    QFont getFont() const;
+    void setFont(const QFont &newFont);
 
   signals:
     void elisionChanged(bool elided);
 
+  protected:
+    void paintEvent(QPaintEvent *event) override;
+
   private:
     bool elided;
     QString content;
+    QFont font;
 };
 #endif // ELIDEDLABEL_H

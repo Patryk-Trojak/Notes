@@ -31,6 +31,7 @@ void ElidedLabel::paintEvent(QPaintEvent *event)
     QFrame::paintEvent(event);
 
     QPainter painter(this);
+    painter.setFont(font);
     QFontMetrics fontMetrics = painter.fontMetrics();
 
     bool didElide = false;
@@ -70,4 +71,14 @@ void ElidedLabel::paintEvent(QPaintEvent *event)
         elided = didElide;
         emit elisionChanged(didElide);
     }
+}
+
+QFont ElidedLabel::getFont() const
+{
+    return font;
+}
+
+void ElidedLabel::setFont(const QFont &newFont)
+{
+    font = newFont;
 }
