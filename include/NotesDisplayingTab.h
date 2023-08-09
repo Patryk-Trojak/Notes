@@ -5,6 +5,7 @@
 #include "NoteListModel.h"
 #include "NoteListView.h"
 #include "NoteSortFilterProxyModel.h"
+#include "NoteSortOptionsWidget.h"
 #include "SearchBar.h"
 #include <QSortFilterProxyModel>
 #include <QWidget>
@@ -26,22 +27,23 @@ class NotesDisplayingTab : public QWidget
     void enterEditingNote(const QModelIndex &note);
   private slots:
     void onNewNoteButtonPressed();
-    void onSortByTitleButtonToggled();
-    void onSortByCreationDateButtonToggled();
-    void onSortByModificationDateButtonToggled();
-    void onSortOrderButtonToggled();
+    void onNewNoteSortRoleSelected(int newSortRole);
+    void onNewNoteSortOrderSelected(Qt::SortOrder newSortOrder);
     void onNewFolderSelected(int selectedFolderId);
+    void onOpenNoteSortOptionsButtonClicked();
 
   private:
     Ui::NotesDisplayingTab *ui;
     NoteListView *noteListView;
     SearchBar *searchBar;
+    QPushButton *openNoteSortOptionsButton;
     NoteListModel &noteModel;
     NoteSortFilterProxyModel noteProxyModel;
     FolderTreeModel folderModel;
 
     void layoutNoteListView();
     void layoutSearchBar();
+    void layoutOpenNoteSortOptionsButton();
     void layoutAllElementsWhichDependsOnNumberOfNotes();
 
   protected:

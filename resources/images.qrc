@@ -11,5 +11,6 @@
         <file>images/emptyFolder.png</file>
         <file>images/folderWithNotes.png</file>
         <file>images/branchArrow.png</file>
+        <file>images/options.png</file>
     </qresource>
 </RCC>

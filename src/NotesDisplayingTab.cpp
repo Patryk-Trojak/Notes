@@ -13,30 +13,22 @@ NotesDisplayingTab::NotesDisplayingTab(NoteListModel &noteModel, PersistenceMana
 {
     ui->setupUi(this);
     ui->middleFrame->installEventFilter(this);
+    ui->newNoteButton->setAttribute(Qt::WA_StyledBackground, true);
     ui->splitter->handle(1)->setStyleSheet("border: none; background-color: rgb(191, 191, 191);");
     ui->splitter->handle(1)->setAttribute(Qt::WA_StyledBackground, true);
-    ui->splitter->handle(2)->setStyleSheet("border: none; background-color: rgb(191, 191, 191);");
-    ui->splitter->handle(2)->setAttribute(Qt::WA_StyledBackground, true);
     ui->splitter->setHandleWidth(2);
     ui->splitter->setSizes({300, 2000, 1});
     noteListView = new NoteListView(ui->middleFrame);
     searchBar = new SearchBar(ui->middleFrame);
+    openNoteSortOptionsButton = new QPushButton(ui->middleFrame);
+    openNoteSortOptionsButton->setIcon(QIcon(":/images/options.png"));
+    openNoteSortOptionsButton->setStyleSheet("border: none; padding: 0px; margin: 0px;");
+    openNoteSortOptionsButton->resize(22, 22);
+    openNoteSortOptionsButton->setIconSize(QSize(22, 22));
+    QObject::connect(openNoteSortOptionsButton, &QPushButton::clicked, this,
+                     &NotesDisplayingTab::onOpenNoteSortOptionsButtonClicked);
 
-    QObject::connect(ui->aboutNotes, &QPushButton::clicked, this, [this]() {
-        auto aboutWindow = new AboutWindow(this);
-        aboutWindow->show();
-    });
     QObject::connect(ui->newNoteButton, &QPushButton::clicked, this, &NotesDisplayingTab::onNewNoteButtonPressed);
-    QObject::connect(ui->sortByTitleButton, &QRadioButton::toggled, this,
-                     &NotesDisplayingTab::onSortByTitleButtonToggled);
-    QObject::connect(ui->sortByCreationDateButton, &QRadioButton::toggled, this,
-                     &NotesDisplayingTab::onSortByCreationDateButtonToggled);
-    QObject::connect(ui->sortByModificationDateButton, &QRadioButton::toggled, this,
-                     &NotesDisplayingTab::onSortByModificationDateButtonToggled);
-    QObject::connect(ui->sortInAscendingOrderButton, &QRadioButton::toggled, this,
-                     &NotesDisplayingTab::onSortOrderButtonToggled);
-    QObject::connect(ui->sortInDescendingOrder, &QRadioButton::toggled, this,
-                     &NotesDisplayingTab::onSortOrderButtonToggled);
 
     QShortcut *createNewNoteShortcut = new QShortcut(QKeySequence(QKeySequence::New), this);
     QObject::connect(createNewNoteShortcut, &QShortcut::activated, this, &NotesDisplayingTab::onNewNoteButtonPressed);
@@ -95,28 +87,14 @@ void NotesDisplayingTab::onNewNoteButtonPressed()
         emit enterEditingNote(createdNoteIndex);
 }
 
-void NotesDisplayingTab::onSortByTitleButtonToggled()
+void NotesDisplayingTab::onNewNoteSortRoleSelected(int newSortRole)
 {
-    noteProxyModel.setSortRole(NoteListModel::Title);
+    noteProxyModel.setSortRole(newSortRole);
 }
 
-void NotesDisplayingTab::onSortByCreationDateButtonToggled()
+void NotesDisplayingTab::onNewNoteSortOrderSelected(Qt::SortOrder newSortOrder)
 {
-    noteProxyModel.setSortRole(NoteListModel::CreationTime);
-}
-
-void NotesDisplayingTab::onSortByModificationDateButtonToggled()
-{
-    noteProxyModel.setSortRole(NoteListModel::ModificationTime);
-}
-
-void NotesDisplayingTab::onSortOrderButtonToggled()
-{
-    Qt::SortOrder sortOrder = Qt::DescendingOrder;
-    if (ui->sortInAscendingOrderButton->isChecked())
-        sortOrder = Qt::AscendingOrder;
-
-    noteProxyModel.sort(0, sortOrder);
+    noteProxyModel.sort(0, newSortOrder);
 }
 
 void NotesDisplayingTab::onNewFolderSelected(int selectedFolderId)
@@ -124,6 +102,25 @@ void NotesDisplayingTab::onNewFolderSelected(int selectedFolderId)
     noteModel.onNewFolderSelected(selectedFolderId);
     searchBar->setText("");
     layoutAllElementsWhichDependsOnNumberOfNotes();
+}
+
+void NotesDisplayingTab::onOpenNoteSortOptionsButtonClicked()
+{
+    NoteSortOptionsWidget *noteSortOptionsWidget =
+        new NoteSortOptionsWidget(noteProxyModel.sortRole(), noteProxyModel.sortOrder(), ui->middleFrame, Qt::Popup);
+
+    QPoint positionOfNoteSortOptionsWidget = this->ui->middleFrame->mapToGlobal(openNoteSortOptionsButton->pos());
+    QSize sizeOfSortOptions(210, 100);
+    noteSortOptionsWidget->setGeometry(positionOfNoteSortOptionsWidget.x() - sizeOfSortOptions.width(),
+                                       positionOfNoteSortOptionsWidget.y() + openNoteSortOptionsButton->height() + 10,
+                                       sizeOfSortOptions.width(), sizeOfSortOptions.height());
+
+    QObject::connect(noteSortOptionsWidget, &NoteSortOptionsWidget::newSortRoleSelected, this,
+                     &NotesDisplayingTab::onNewNoteSortRoleSelected);
+    QObject::connect(noteSortOptionsWidget, &NoteSortOptionsWidget::newSortOrderSelected, this,
+                     &NotesDisplayingTab::onNewNoteSortOrderSelected);
+
+    noteSortOptionsWidget->show();
 }
 
 void NotesDisplayingTab::layoutSearchBar()
@@ -136,11 +133,26 @@ void NotesDisplayingTab::layoutSearchBar()
     else
         searchBar->setVisible(true);
 
-    int widthOfSearchBar = qMin(noteListView->width(), 600);
+    int widthOfSearchBar = qMin(noteListView->width() - 50, 600);
     widthOfSearchBar = qMax(widthOfSearchBar, 200);
     int leftOfSearchBar = noteListView->pos().x() +
                           (noteListView->width() - widthOfSearchBar - noteListView->verticalScrollBar()->width()) / 2;
     searchBar->setGeometry(leftOfSearchBar, 9, widthOfSearchBar, searchBar->height());
+}
+
+void NotesDisplayingTab::layoutOpenNoteSortOptionsButton()
+{
+    if (ui->splitter->sizes().at(1) == 0)
+    {
+        openNoteSortOptionsButton->setVisible(false);
+        return;
+    }
+    else
+        openNoteSortOptionsButton->setVisible(true);
+
+    openNoteSortOptionsButton->move(searchBar->pos().x() + searchBar->width() + 5,
+                                    searchBar->pos().y() +
+                                        (searchBar->height() - openNoteSortOptionsButton->height()) / 2);
 }
 
 void NotesDisplayingTab::layoutNoteListView()
@@ -172,6 +184,7 @@ void NotesDisplayingTab::layoutAllElementsWhichDependsOnNumberOfNotes()
 {
     layoutNoteListView();
     layoutSearchBar();
+    layoutOpenNoteSortOptionsButton();
 }
 
 void NotesDisplayingTab::resizeEvent(QResizeEvent *event)
