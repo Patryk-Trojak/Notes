@@ -1,12 +1,14 @@
 #include "MainWindow.h"
 
+#include <QResizeEvent>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), noteModel(this, persistenceManager), noteEditingTab(nullptr)
 {
     notesDisplayingTab = new NotesDisplayingTab(noteModel, persistenceManager, this);
     QObject::connect(notesDisplayingTab, &NotesDisplayingTab::enterEditingNote, this, &MainWindow::enterEditingNote);
     setMinimumSize(620, 350);
-    setGeometry(200, 200, 1050, 550);
+    setGeometry(200, 200, 1386, 780);
 }
 
 void MainWindow::enterEditingNote(const QModelIndex &note)
