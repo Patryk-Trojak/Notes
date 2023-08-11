@@ -27,7 +27,6 @@ QSize NoteListDelegate::sizeHint(const QStyleOptionViewItem &option, const QMode
 QWidget *NoteListDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                                         const QModelIndex &index) const
 {
-    const NoteListModel *model = static_cast<const NoteListModel *>(index.model());
     NoteButton *button = new NoteButton(parent);
     button->setFocusPolicy(Qt::NoFocus);
     setupNoteButtonFromIndex(*button, index);
