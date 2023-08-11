@@ -29,6 +29,7 @@ QWidget *NoteListDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
 {
     const NoteListModel *model = static_cast<const NoteListModel *>(index.model());
     NoteButton *button = new NoteButton(parent);
+    button->setFocusPolicy(Qt::NoFocus);
     setupNoteButtonFromIndex(*button, index);
     button->setGeometry(option.rect);
     emit newEditorCreated(button, index);
