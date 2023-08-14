@@ -38,14 +38,16 @@ QWidget *NoteListDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
 void NoteListDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
     NoteButton *button = static_cast<NoteButton *>(editor);
-    //    setupNoteButtonFromIndex(*button, index);
+    setupNoteButtonFromIndex(*button, index);
 }
 
 void NoteListDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
     NoteButton *noteButton = static_cast<NoteButton *>(editor);
+    QColor newColor =
+        noteButton->getColor(); // We need to copy color because next line will update our editor with old color
     model->setData(index, noteButton->getIsPinned(), NoteListModel::isPinned);
-    model->setData(index, QVariant::fromValue(noteButton->getColor()), NoteListModel::Color);
+    model->setData(index, QVariant::fromValue(newColor), NoteListModel::Color);
 }
 
 void NoteListDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
