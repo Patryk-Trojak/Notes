@@ -12,10 +12,10 @@ class NoteListView : public QListView
 
   public:
     NoteListView(QWidget *parent);
-    bool eventFilter(QObject *watched, QEvent *event);
     int getHowManyNotesCanFitInRow(int width) const;
     int getHowManyNotesAreDisplayed() const;
     void setMinWidthToFitNotesInRow(int numberOfNotesToFitInOneRow);
+    bool event(QEvent *event);
 
   signals:
     void noteSelected(const QModelIndex &index);
@@ -23,13 +23,14 @@ class NoteListView : public QListView
   private:
     NoteListDelegate noteListDelegate;
     NoteButton *editor;
+    QPersistentModelIndex currentIndexWithEditor;
+    void updateEditor();
     void removeNote(const QModelIndex &index);
     void onNewEditorCreated(NoteButton *editor, const QModelIndex &index);
-    void onItemEntered(const QModelIndex &index);
-    void updateEditorOnDataChanged();
     NoteListModel *getSourceModelAtTheBottom() const;
     QModelIndex mapIndexToSourceModelAtTheBott(const QModelIndex &index) const;
     bool isTrashFolderLoaded();
+
   private slots:
     void onCustomContextMenuRequested(const QPoint &pos);
     void onRestoreNoteFromTrashRequested(const QModelIndex &index);

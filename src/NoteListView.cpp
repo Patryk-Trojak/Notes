@@ -1,11 +1,11 @@
 #include "NoteListView.h"
 #include "NoteListModel.h"
-
 #include <QAbstractProxyModel>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QScrollBar>
 #include <qmessagebox.h>
+
 NoteListView::NoteListView(QWidget *parent) : QListView(parent), editor(nullptr), noteListDelegate(this)
 {
     setSelectionMode(QAbstractItemView::NoSelection);
@@ -14,7 +14,6 @@ NoteListView::NoteListView(QWidget *parent) : QListView(parent), editor(nullptr)
     setAutoScroll(false);
 
     QObject::connect(&noteListDelegate, &NoteListDelegate::newEditorCreated, this, &NoteListView::onNewEditorCreated);
-    QObject::connect(this, &QListView::entered, this, &NoteListView::onItemEntered);
     QObject::connect(this, &QListView::customContextMenuRequested, this, &NoteListView::onCustomContextMenuRequested);
 
     setUniformItemSizes(true);
@@ -52,14 +51,12 @@ void NoteListView::removeNote(const QModelIndex &index)
     if (reply == QMessageBox::No)
         return;
 
-    model()->removeRow(index.row());
+    model()->removeRow(currentIndexWithEditor.row());
 }
 
 void NoteListView::onNewEditorCreated(NoteButton *editor, const QModelIndex &index)
 {
     this->editor = editor;
-    editor->setMouseTracking(true);
-    editor->installEventFilter(this);
     QObject::connect(editor, &NoteButton::deleteNote, this,
                      [this, index]() { this->removeNote(this->currentIndex()); });
     QObject::connect(editor, &NoteButton::clicked, this, [this, index]() { emit this->noteSelected(index); });
@@ -67,24 +64,6 @@ void NoteListView::onNewEditorCreated(NoteButton *editor, const QModelIndex &ind
                      [this, editor, index]() { noteListDelegate.setModelData(editor, this->model(), index); });
     QObject::connect(editor, &NoteButton::colorChanged, this,
                      [this, editor, index]() { noteListDelegate.setModelData(editor, this->model(), index); });
-}
-
-void NoteListView::onItemEntered(const QModelIndex &index)
-{
-    // We create editor when mouse is over item.
-    if (index.isValid())
-    {
-        if (currentIndex().isValid())
-        {
-            closePersistentEditor(currentIndex());
-            editor = nullptr;
-        }
-
-        if (index.isValid())
-            openPersistentEditor(index);
-
-        setCurrentIndex(index);
-    }
 }
 
 NoteListModel *NoteListView::getSourceModelAtTheBottom() const
@@ -184,18 +163,32 @@ void NoteListView::onRestoreNoteFromTrashRequested(const QModelIndex &index)
         noteModel->restoreNoteFromTrash(noteModelIndex);
 }
 
-bool NoteListView::eventFilter(QObject *watched, QEvent *event)
+void NoteListView::updateEditor()
 {
-    if (watched == editor)
+    QPoint mousePosition = mapFromGlobal(QCursor::pos());
+    const QModelIndex index = indexAt(mousePosition);
+
+    if (currentIndexWithEditor == index)
+        return;
+
+    if (currentIndexWithEditor.isValid())
     {
-        if (event->type() == QEvent::Leave)
-        {
-            // Destroy editor when mouse leaves it
-            closePersistentEditor(currentIndex());
-            editor = nullptr;
-        }
+        closePersistentEditor(currentIndexWithEditor);
+        editor = nullptr;
     }
-    return QListView::eventFilter(watched, event);
+
+    if (index.isValid())
+        openPersistentEditor(index);
+
+    currentIndexWithEditor = index;
+}
+
+bool NoteListView::event(QEvent *event)
+{
+    if (event->type() == QEvent::MouseMove || event->type() == QEvent::Paint)
+        updateEditor();
+
+    return QListView::event(event);
 }
 
 int NoteListView::getHowManyNotesCanFitInRow(int width) const
