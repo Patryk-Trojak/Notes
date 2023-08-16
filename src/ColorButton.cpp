@@ -24,7 +24,6 @@ void ColorButton::resizeEvent(QResizeEvent *event)
 
 void ColorButton::paintEvent(QPaintEvent *event)
 {
-    int minEdge = qMin(height(), width());
     QColor backgroundColor = isDown() ? color.darker() : color;
 
     QPainter painter(this);
