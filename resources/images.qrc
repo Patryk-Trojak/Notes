@@ -12,5 +12,10 @@
         <file>images/folderWithNotes.png</file>
         <file>images/branchArrow.png</file>
         <file>images/options.png</file>
+        <file>images/deleteWhite.png</file>
+        <file>images/paletteWhite.png</file>
+        <file>images/pinCheckedWhite.png</file>
+        <file>images/cancelWhite.png</file>
+        <file>images/cancel.png</file>
     </qresource>
 </RCC>
