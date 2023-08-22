@@ -1,9 +1,11 @@
 #include "NoteButton.h"
 #include "./ui_NoteButton.h"
 
+#include <QPainter>
 #include <QResizeEvent>
 
-NoteButton::NoteButton(QWidget *parent) : QPushButton{parent}, ui(new Ui::NoteButton), colorPicker(nullptr)
+NoteButton::NoteButton(QWidget *parent)
+    : QPushButton{parent}, ui(new Ui::NoteButton), colorPicker(nullptr), isSelected(false)
 {
     ui->setupUi(this);
     QFont titleFont("Cantarell", 13);
@@ -30,8 +32,7 @@ NoteButton::NoteButton(QWidget *parent) : QPushButton{parent}, ui(new Ui::NoteBu
     QObject::connect(pinCheckBox, &QCheckBox::toggled, this, &NoteButton::pinCheckboxToogled);
     QObject::connect(deleteButton, &QPushButton::clicked, this, &NoteButton::deleteNote);
 
-    setStyleSheet("QPushButton#NoteButton{border-style: solid; border-color: transparent; border-width: "
-                  "1px;border-radius:8px;}");
+    updateStyleSheets();
 
     QObject::connect(changeColorButton, &QPushButton::clicked, this, &NoteButton::onChangeColorButtonClicked);
     ui->modificationTime->setStyleSheet("color: rgba(26, 26, 26, 200)");
@@ -63,6 +64,17 @@ QString NoteButton::getContent() const
 const QColor &NoteButton::getColor() const
 {
     return color;
+}
+
+bool NoteButton::getIsSelected() const
+{
+    return isSelected;
+}
+
+void NoteButton::setIsSelected(bool newIsSelected)
+{
+    isSelected = newIsSelected;
+    updateStyleSheets();
 }
 
 void NoteButton::setTitle(const QString &title)
@@ -129,6 +141,14 @@ void NoteButton::onChangeColorButtonClicked()
         this->createColorPicker();
 }
 
+void NoteButton::updateStyleSheets()
+{
+    QColor borderColor = getIsSelected() ? QColor(36, 36, 36) : Qt::transparent;
+    setStyleSheet(QString("QPushButton#NoteButton{background-color: %1;"
+                          "border-style: solid; border-color: %2; border-width: 3px; border-radius: 8px;}")
+                      .arg(getColor().name(), borderColor.name(QColor::HexArgb)));
+}
+
 void NoteButton::resizeEvent(QResizeEvent *event)
 {
     QPushButton::resizeEvent(event);
@@ -159,9 +179,7 @@ void NoteButton::setColor(const QColor &newColor)
         return;
 
     color = newColor;
-    setStyleSheet(QString("QPushButton#NoteButton{border-style: solid; border-color: transparent; border-width: "
-                          "1px;border-radius:8px; background-color: %1;}")
-                      .arg(newColor.name()));
+    updateStyleSheets();
     emit colorChanged(newColor);
 }
 

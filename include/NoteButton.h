@@ -21,18 +21,21 @@ class NoteButton : public QPushButton
     explicit NoteButton(const QString &title, const QDateTime &modificationTime, bool isPinned,
                         QWidget *parent = nullptr);
     ~NoteButton();
+
     void setTitle(const QString &title);
     void setContent(const QString &content);
     void setModificationTime(const QDateTime &newModificationTime);
     void setIsPinned(bool newIsPinned);
     void setPinCheckboxVisible(bool visible);
     void setColor(const QColor &newColor);
+    void setIsSelected(bool newIsSelected);
 
     QString getTitle() const;
     QString getContent() const;
     const QDateTime &getModificationTime() const;
     bool getIsPinned() const;
     const QColor &getColor() const;
+    bool getIsSelected() const;
 
   signals:
     void deleteNote();
@@ -47,12 +50,14 @@ class NoteButton : public QPushButton
     QCheckBox *pinCheckBox;
     QDateTime modificationTime;
     QColor color;
-    QString convertDateTimeToString(const QDateTime &dateTime);
+    bool isSelected;
 
+    QString convertDateTimeToString(const QDateTime &dateTime);
     void createColorPicker();
     void deleteColorPicker();
     void onColorSelected(const QColor &color);
     void onChangeColorButtonClicked();
+    void updateStyleSheets();
 
   protected:
     void resizeEvent(QResizeEvent *event);
