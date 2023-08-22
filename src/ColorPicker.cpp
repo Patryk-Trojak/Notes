@@ -11,6 +11,11 @@ ColorPicker::ColorPicker(QWidget *parent) : QWidget(parent)
     colorButtons.emplaceBack(new ColorButton(this, QColor(146, 196, 109)));
     colorButtons.emplaceBack(new ColorButton(this, QColor(41, 125, 125)));
 
+    cancelButton = new QPushButton(this);
+    cancelButton->setIcon(QIcon(":/images/cancel.png"));
+    cancelButton->setStyleSheet("Margin: 0px; Padding: 0px; Border:none;");
+    cancelButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QObject::connect(cancelButton, &QPushButton::clicked, this, &ColorPicker::cancelButtonClicked);
     for (auto const &button : colorButtons)
     {
         button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy ::Expanding);
@@ -22,6 +27,7 @@ ColorPicker::ColorPicker(QWidget *parent) : QWidget(parent)
     for (int i = 0; i < colorButtons.size(); i++)
         layout->addWidget(colorButtons[i], 0, i);
 
+    layout->addWidget(cancelButton, 0, colorButtons.size());
 
     setAttribute(Qt::WA_StyledBackground, true);
     setStyleSheet("background-color: white");
@@ -31,4 +37,11 @@ void ColorPicker::onColorButtonClicked()
 {
     ColorButton *button = static_cast<ColorButton *>(QObject::sender());
     emit colorSelected(button->getColor());
+}
+
+void ColorPicker::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    if (!colorButtons.empty())
+        cancelButton->setIconSize(colorButtons[0]->size() - QSize(3, 3));
 }

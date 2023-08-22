@@ -14,10 +14,15 @@ class ColorPicker : public QWidget
 
   signals:
     void colorSelected(const QColor &color);
+    void cancelButtonClicked();
 
   private:
     QVector<ColorButton *> colorButtons;
+    QPushButton *cancelButton;
     void onColorButtonClicked();
+
+  protected:
+    void resizeEvent(QResizeEvent *event);
 };
 
 #endif // COLORPICKER_H
