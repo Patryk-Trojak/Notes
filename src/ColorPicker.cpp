@@ -30,6 +30,7 @@ ColorPicker::ColorPicker(QWidget *parent) : QWidget(parent)
     layout->addWidget(cancelButton, 0, colorButtons.size());
 
     setAttribute(Qt::WA_StyledBackground, true);
+    setAttribute(Qt::WA_NoMousePropagation, true);
     setStyleSheet("background-color: white");
 }
 
