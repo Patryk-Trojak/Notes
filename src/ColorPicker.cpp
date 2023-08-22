@@ -22,8 +22,9 @@ ColorPicker::ColorPicker(QWidget *parent) : QWidget(parent)
     for (int i = 0; i < colorButtons.size(); i++)
         layout->addWidget(colorButtons[i], 0, i);
 
-    setAutoFillBackground(true);
-    setPalette(Qt::white);
+
+    setAttribute(Qt::WA_StyledBackground, true);
+    setStyleSheet("background-color: white");
 }
 
 void ColorPicker::onColorButtonClicked()
