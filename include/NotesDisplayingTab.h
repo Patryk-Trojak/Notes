@@ -18,6 +18,7 @@ class NotesDisplayingTab;
 class NotesDisplayingTab : public QWidget
 {
     Q_OBJECT
+
   public:
     explicit NotesDisplayingTab(NoteListModel &noteModel, PersistenceManager &persistenceManager,
                                 QWidget *parent = nullptr);
@@ -25,6 +26,7 @@ class NotesDisplayingTab : public QWidget
 
   signals:
     void enterEditingNote(const QModelIndex &note);
+
   private slots:
     void onNewNoteButtonPressed();
     void onNewNoteSortRoleSelected(int newSortRole);
@@ -38,6 +40,10 @@ class NotesDisplayingTab : public QWidget
     SearchBar *searchBar;
     QPushButton *openNoteSortOptionsButton;
     NoteListModel &noteModel;
+    QRubberBand *rubberBand;
+    QPoint originOfRubberBandInNoteListView;
+    bool wasRubberBandMoved;
+    void updateRubberBand();
     NoteSortFilterProxyModel noteProxyModel;
     FolderTreeModel folderModel;
 
@@ -49,6 +55,9 @@ class NotesDisplayingTab : public QWidget
   protected:
     void resizeEvent(QResizeEvent *event);
     bool eventFilter(QObject *watched, QEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
 };
 
 #endif // NOTESDISPLAYINGTAB_H

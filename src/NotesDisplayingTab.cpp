@@ -9,7 +9,7 @@
 NotesDisplayingTab::NotesDisplayingTab(NoteListModel &noteModel, PersistenceManager &persistenceManager,
                                        QWidget *parent)
     : QWidget(parent), ui(new Ui::NotesDisplayingTab), folderModel(persistenceManager, this), noteModel(noteModel),
-      noteProxyModel(this)
+      noteProxyModel(this), rubberBand(nullptr)
 {
     ui->setupUi(this);
     ui->middleFrame->installEventFilter(this);
@@ -51,7 +51,8 @@ NotesDisplayingTab::NotesDisplayingTab(NoteListModel &noteModel, PersistenceMana
         auto sourceIndex = this->noteProxyModel.mapToSource(index);
         emit this->enterEditingNote(sourceIndex);
     });
-
+    QObject::connect(noteListView->verticalScrollBar(), &QScrollBar::valueChanged, this,
+                     &NotesDisplayingTab::updateRubberBand);
     onNewFolderSelected(ui->folderTreeView->getCurrentFolderSelectedId());
     QObject::connect(&folderModel, &FolderTreeModel::folderDeletedFromDatabase, &noteModel,
                      &NoteListModel::onFolderDeleted);
@@ -121,6 +122,30 @@ void NotesDisplayingTab::onOpenNoteSortOptionsButtonClicked()
                      &NotesDisplayingTab::onNewNoteSortOrderSelected);
 
     noteSortOptionsWidget->show();
+}
+
+void NotesDisplayingTab::updateRubberBand()
+{
+    if (!rubberBand)
+        return;
+
+    QPoint currentOriginOfRubberBand(originOfRubberBandInNoteListView - noteListView->getOffsetOfViewport() +
+                                     noteListView->pos());
+    if (currentOriginOfRubberBand.y() < noteListView->y())
+        currentOriginOfRubberBand.setY(noteListView->y());
+
+    QPoint mousePosition = ui->middleFrame->mapFromGlobal(QCursor::pos());
+    if (mousePosition.y() < noteListView->y())
+    {
+        mousePosition.setY(noteListView->y());
+        if (mousePosition.y() == currentOriginOfRubberBand.y())
+        {
+            rubberBand->setGeometry(0, 0, 0, 0);
+            return;
+        }
+    }
+
+    rubberBand->setGeometry(QRect(currentOriginOfRubberBand, mousePosition).normalized());
 }
 
 void NotesDisplayingTab::layoutSearchBar()
@@ -199,9 +224,53 @@ bool NotesDisplayingTab::eventFilter(QObject *watched, QEvent *event)
     if (watched == ui->middleFrame)
     {
         if (event->type() == QEvent::Resize or event->type() == QEvent::Move)
-        {
             layoutAllElementsWhichDependsOnNumberOfNotes();
-        }
     }
     return false;
+}
+
+void NotesDisplayingTab::mousePressEvent(QMouseEvent *event)
+{
+    QWidget::mousePressEvent(event);
+    if (ui->middleFrame->geometry().contains(event->pos()))
+    {
+        if (!rubberBand)
+        {
+            originOfRubberBandInNoteListView =
+                noteListView->mapFromGlobal(event->globalPosition().toPoint()) + noteListView->getOffsetOfViewport();
+            if (originOfRubberBandInNoteListView.y() < noteListView->y())
+                originOfRubberBandInNoteListView.setY(noteListView->getOffsetOfViewport().y());
+
+            noteListView->startDragSelecting(noteListView->mapFromGlobal(event->globalPosition().toPoint()));
+            rubberBand = new QRubberBand(QRubberBand::Rectangle, ui->middleFrame);
+            wasRubberBandMoved = false;
+            updateRubberBand();
+            rubberBand->show();
+        }
+    }
+}
+
+void NotesDisplayingTab::mouseReleaseEvent(QMouseEvent *event)
+{
+    QWidget::mouseReleaseEvent(event);
+    if (rubberBand)
+    {
+        if (!wasRubberBandMoved)
+            noteListView->clearSelection();
+        delete rubberBand;
+        rubberBand = nullptr;
+        noteListView->endDragSelecting();
+    }
+}
+
+void NotesDisplayingTab::mouseMoveEvent(QMouseEvent *event)
+{
+    QWidget::mouseMoveEvent(event);
+    if (rubberBand)
+    {
+        updateRubberBand();
+        wasRubberBandMoved = true;
+        noteListView->updateMousePositionOfDragSelecting(
+            noteListView->mapFromGlobal(event->globalPosition().toPoint()));
+    }
 }
