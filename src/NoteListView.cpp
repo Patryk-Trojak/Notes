@@ -1,18 +1,24 @@
 #include "NoteListView.h"
 #include "NoteListModel.h"
 #include <QAbstractProxyModel>
+#include <QApplication>
+#include <QEvent>
+#include <QHBoxLayout>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QScrollBar>
 #include <qmessagebox.h>
 
-NoteListView::NoteListView(QWidget *parent) : QListView(parent), editor(nullptr), noteListDelegate(this)
+NoteListView::NoteListView(QWidget *parent)
+    : QListView(parent), editor(nullptr), noteListDelegate(this), inSelectingState(false), isDragSelecting(false),
+      wasCtrlPressedWhileStartingDragSelecting(false)
 {
-    setSelectionMode(QAbstractItemView::NoSelection);
+    setSelectionMode(QAbstractItemView::NoSelection); // there is implemented custom selection
     setMouseTracking(true);
     setItemDelegate(&noteListDelegate);
     setAutoScroll(false);
-
+    setVerticalScrollMode(ScrollMode::ScrollPerPixel);
+    verticalScrollBar()->setSingleStep(20);
     QObject::connect(&noteListDelegate, &NoteListDelegate::newEditorCreated, this, &NoteListView::onNewEditorCreated);
     QObject::connect(this, &QListView::customContextMenuRequested, this, &NoteListView::onCustomContextMenuRequested);
 
@@ -36,6 +42,17 @@ NoteListView::NoteListView(QWidget *parent) : QListView(parent), editor(nullptr)
 
     verticalScrollBar()->resize(widthOfScrollbar, 0);
     setStyleSheet(style);
+
+    selectionMenu = new NoteListViewSelectionMenu(this);
+    QObject::connect(selectionMenu, &NoteListViewSelectionMenu::colorSelected, this,
+                     &NoteListView::changeColorOfSelectedNotes);
+    QObject::connect(selectionMenu, &NoteListViewSelectionMenu::deleteButtonClicked, this,
+                     &NoteListView::removeSelectedNotes);
+    QObject::connect(selectionMenu, &NoteListViewSelectionMenu::pinButtonClicked, this,
+                     &NoteListView::toogleIsPinnedOfSelectedNotes);
+    QObject::connect(selectionMenu, &NoteListViewSelectionMenu::cancelButtonClicked, this,
+                     [this]() { this->setInSelectingState(false); });
+    setInSelectingState(false);
 }
 
 void NoteListView::removeNote(const QModelIndex &index)
@@ -57,6 +74,15 @@ void NoteListView::removeNote(const QModelIndex &index)
 void NoteListView::onNewEditorCreated(NoteButton *editor, const QModelIndex &index)
 {
     this->editor = editor;
+    editor->installEventFilter(this);
+    auto children = editor->findChildren<QWidget *>();
+    for (auto const &child : children)
+        child->installEventFilter(this);
+
+    editor->setIsSelected(selectionModel()->isSelected(index));
+    if (inSelectingState and !editor->getIsPinned())
+        editor->setPinCheckboxVisible(false);
+
     QObject::connect(editor, &NoteButton::deleteNote, this,
                      [this, index]() { this->removeNote(this->currentIndex()); });
     QObject::connect(editor, &NoteButton::clicked, this, [this, index]() { emit this->noteSelected(index); });
@@ -163,6 +189,182 @@ void NoteListView::onRestoreNoteFromTrashRequested(const QModelIndex &index)
         noteModel->restoreNoteFromTrash(noteModelIndex);
 }
 
+void NoteListView::removeSelectedNotes()
+{
+    const QString message = [this]() {
+        if (this->isTrashFolderLoaded())
+            return "Are you sure you want to delete selected notes? You won't be able to recover deleted notes";
+        else
+            return "Are you sure you want to remove selected notes? You will be able to restore them from trash folder";
+    }();
+
+    auto reply = QMessageBox::question(this, "Delete selected notes?", message);
+    if (reply == QMessageBox::No)
+        return;
+
+    auto selected = selectionModel()->selectedIndexes();
+    std::sort(selected.begin(), selected.end(),
+              [](const QModelIndex &first, const QModelIndex &second) { return first.row() > second.row(); });
+
+    for (auto it = selected.constBegin(); it != selected.constEnd(); ++it)
+    {
+        model()->removeRow(it->row());
+    }
+}
+
+void NoteListView::changeColorOfSelectedNotes(const QColor &newColor)
+{
+    auto selected = selectionModel()->selectedIndexes();
+    for (auto const &index : selected)
+    {
+        model()->setData(index, newColor, NoteListModel::Color);
+    }
+}
+
+void NoteListView::toogleIsPinnedOfSelectedNotes()
+{
+    auto selected = selectionModel()->selectedIndexes();
+    QVector<QPersistentModelIndex> persistentSelected;
+    for (auto const &index : selected)
+        persistentSelected.append(index);
+
+    bool allSelectedNotesArePinned = std::find_if(selected.begin(), selected.end(), [](const QModelIndex &index) {
+                                         return !index.data(NoteListModel::isPinned).toBool();
+                                     }) == selected.end();
+
+    bool pinNotes;
+    if (allSelectedNotesArePinned)
+        pinNotes = false;
+    else
+        pinNotes = true;
+
+    for (auto const &index : persistentSelected)
+    {
+        model()->setData(index, pinNotes, NoteListModel::isPinned);
+    }
+}
+
+bool NoteListView::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == verticalScrollBar() or watched == horizontalScrollBar())
+        return QListView::eventFilter(watched, event);
+
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier or inSelectingState)
+    {
+        if (event->type() == QEvent::MouseButtonPress or event->type() == QEvent::MouseButtonDblClick)
+            return true;
+        if (event->type() == QEvent::MouseButtonRelease)
+        {
+            setInSelectingState(true);
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+            QPoint positionInView = this->mapFromGlobal(mouseEvent->globalPosition().toPoint());
+            QModelIndex clickedIndex = indexAt(positionInView);
+            selectionModel()->select(clickedIndex, QItemSelectionModel::Toggle);
+            if (selectionModel()->selectedIndexes().count() == 0)
+                setInSelectingState(false);
+
+            return true;
+        }
+    }
+    return QListView::eventFilter(watched, event);
+}
+
+void NoteListView::selectNotes(const QRect &rubberBand)
+{
+    auto currentState = state();
+    setSelectionMode(QAbstractItemView::ExtendedSelection);
+    setState(State::DragSelectingState);
+    setSelection(rubberBand, QItemSelectionModel::Select);
+
+    if (!selectionModel()->selection().isEmpty())
+        setInSelectingState(true);
+
+    setSelectionMode(QAbstractItemView::NoSelection);
+    setState(currentState);
+}
+
+QPoint NoteListView::getOffsetOfViewport() const
+{
+    return QPoint(horizontalOffset(), verticalOffset());
+}
+
+void NoteListView::startDragSelecting(QPoint startPoint)
+{
+    isDragSelecting = true;
+    startPoint.setY(qBound(-1, startPoint.y(), height()));
+    dragSelectingInitialPoint = startPoint + QPoint(horizontalOffset(), verticalOffset());
+    wasCtrlPressedWhileStartingDragSelecting = QApplication::keyboardModifiers() & Qt::ControlModifier;
+}
+
+void NoteListView::updateMousePositionOfDragSelecting(QPoint mousePositionPoint)
+{
+    if (!isDragSelecting)
+        return;
+
+    mousePositionPoint.setY(qBound(-1, mousePositionPoint.y(), height()));
+    QRect selectionBound(dragSelectingInitialPoint - QPoint(horizontalOffset(), verticalOffset()), mousePositionPoint);
+
+    if (!wasCtrlPressedWhileStartingDragSelecting)
+        clearSelection();
+
+    selectNotes(selectionBound.normalized());
+}
+
+void NoteListView::endDragSelecting()
+{
+    isDragSelecting = false;
+}
+
+void NoteListView::resizeEvent(QResizeEvent *event)
+{
+    QListView::resizeEvent(event);
+    int widthOfSelectionMenu = 200;
+    selectionMenu->setGeometry((width() - widthOfSelectionMenu - verticalScrollBar()->width()) / 2,
+                               viewport()->height() - 75, widthOfSelectionMenu, 50);
+}
+
+void NoteListView::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    if (!selectionModel())
+        return;
+
+    int selectedNotesCount = selectionModel()->selectedIndexes().count();
+    selectionMenu->setSelectedNotesCount(selectedNotesCount);
+    if (selectedNotesCount == 0)
+        setInSelectingState(false);
+
+    if (selected.contains(currentIndexWithEditor) && editor)
+        editor->setIsSelected(true);
+
+    if (deselected.contains(currentIndexWithEditor) && editor)
+        editor->setIsSelected(false);
+
+    QListView::selectionChanged(selected, deselected);
+}
+
+void NoteListView::setModel(QAbstractItemModel *model)
+{
+    QListView::setModel(model);
+    QObject::connect(model, &QAbstractItemModel::modelReset, this, [this]() { setInSelectingState(false); });
+}
+
+bool NoteListView::viewportEvent(QEvent *event)
+{
+    bool result = QListView::viewportEvent(event);
+    if (event->type() == QEvent::MouseButtonPress or event->type() == QEvent::MouseMove or
+        event->type() == QEvent::MouseButtonRelease)
+    {
+        event->ignore();
+    }
+    return result;
+}
+
+void NoteListView::verticalScrollbarValueChanged(int value)
+{
+    QListView::verticalScrollbarValueChanged(value);
+    updateMousePositionOfDragSelecting(mapFromGlobal(QCursor::pos()));
+}
+
 void NoteListView::updateEditor()
 {
     QPoint mousePosition = mapFromGlobal(QCursor::pos());
@@ -189,6 +391,36 @@ bool NoteListView::event(QEvent *event)
         updateEditor();
 
     return QListView::event(event);
+}
+
+bool NoteListView::getInSelectingState() const
+{
+    return inSelectingState;
+}
+
+void NoteListView::setInSelectingState(bool newInSelectingState)
+{
+    inSelectingState = newInSelectingState;
+    selectionMenu->setVisible(newInSelectingState);
+    if (selectionModel())
+        selectionMenu->setSelectedNotesCount(selectionModel()->selectedIndexes().count());
+
+    if (!newInSelectingState)
+    {
+        selectionMenu->setColorPickerVisible(false);
+        if (selectionModel() and !selectionModel()->selectedIndexes().empty())
+            selectionModel()->clearSelection();
+        if (editor)
+        {
+            editor->setPinCheckboxVisible(true);
+            editor->setIsSelected(false);
+        }
+    }
+    else
+    {
+        if (editor and !editor->getIsPinned())
+            editor->setPinCheckboxVisible(false);
+    }
 }
 
 int NoteListView::getHowManyNotesCanFitInRow(int width) const

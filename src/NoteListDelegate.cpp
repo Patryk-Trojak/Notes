@@ -15,6 +15,7 @@ void NoteListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     painter->save();
     noteButton.resize(option.rect.size());
     painter->translate(option.rect.topLeft());
+    noteButton.setIsSelected(option.state & QStyle::State_Selected);
     noteButton.render(painter, QPoint(), QRegion(), QWidget::DrawChildren);
     painter->restore();
 }

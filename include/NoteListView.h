@@ -2,6 +2,7 @@
 #define NOTELISTVIEW_H
 
 #include "NoteListModel.h"
+#include "NoteListViewSelectionMenu.h"
 #include <NoteButton.h>
 #include <NoteListDelegate.h>
 #include <QListView>
@@ -12,10 +13,17 @@ class NoteListView : public QListView
 
   public:
     NoteListView(QWidget *parent);
+
     int getHowManyNotesCanFitInRow(int width) const;
     int getHowManyNotesAreDisplayed() const;
     void setMinWidthToFitNotesInRow(int numberOfNotesToFitInOneRow);
     bool event(QEvent *event);
+    bool eventFilter(QObject *watched, QEvent *event);
+    void setModel(QAbstractItemModel *model);
+    QPoint getOffsetOfViewport() const;
+    void startDragSelecting(QPoint startPoint);
+    void updateMousePositionOfDragSelecting(QPoint mousePosition);
+    void endDragSelecting();
 
   signals:
     void noteSelected(const QModelIndex &index);
@@ -24,16 +32,34 @@ class NoteListView : public QListView
     NoteListDelegate noteListDelegate;
     NoteButton *editor;
     QPersistentModelIndex currentIndexWithEditor;
+    NoteListViewSelectionMenu *selectionMenu;
+    QPoint dragSelectingInitialPoint;
+    bool wasCtrlPressedWhileStartingDragSelecting;
+    bool isDragSelecting;
+    bool inSelectingState;
+
     void updateEditor();
     void removeNote(const QModelIndex &index);
-    void onNewEditorCreated(NoteButton *editor, const QModelIndex &index);
+    void removeSelectedNotes();
+    void changeColorOfSelectedNotes(const QColor &newColor);
+    void toogleIsPinnedOfSelectedNotes();
+    bool getInSelectingState() const;
+    void setInSelectingState(bool newInSelectingState);
+    void selectNotes(const QRect &rubberBand);
     NoteListModel *getSourceModelAtTheBottom() const;
     QModelIndex mapIndexToSourceModelAtTheBott(const QModelIndex &index) const;
     bool isTrashFolderLoaded();
 
   private slots:
+    void onNewEditorCreated(NoteButton *editor, const QModelIndex &index);
     void onCustomContextMenuRequested(const QPoint &pos);
     void onRestoreNoteFromTrashRequested(const QModelIndex &index);
+
+  protected:
+    void resizeEvent(QResizeEvent *event);
+    void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    bool viewportEvent(QEvent *event);
+    void verticalScrollbarValueChanged(int value);
 };
 
 #endif // NOTELISTVIEW_H
