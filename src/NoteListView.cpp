@@ -13,7 +13,8 @@ NoteListView::NoteListView(QWidget *parent)
     : QListView(parent), editor(nullptr), noteListDelegate(this), inSelectingState(false), isDragSelecting(false),
       wasCtrlPressedWhileStartingDragSelecting(false)
 {
-    setSelectionMode(QAbstractItemView::NoSelection); // there is implemented custom selection
+    setSelectionMode(QAbstractItemView::NoSelection);   // there is implemented custom selection
+    setEditTriggers(QAbstractItemView::NoEditTriggers); // there is implemented custom editing
     setMouseTracking(true);
     setItemDelegate(&noteListDelegate);
     setAutoScroll(false);
@@ -249,23 +250,23 @@ bool NoteListView::eventFilter(QObject *watched, QEvent *event)
     if (watched == verticalScrollBar() or watched == horizontalScrollBar())
         return QListView::eventFilter(watched, event);
 
-    if (QApplication::keyboardModifiers() & Qt::ControlModifier or inSelectingState)
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier)
     {
         if (event->type() == QEvent::MouseButtonPress or event->type() == QEvent::MouseButtonDblClick)
             return true;
+
         if (event->type() == QEvent::MouseButtonRelease)
         {
             setInSelectingState(true);
             QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
             QPoint positionInView = this->mapFromGlobal(mouseEvent->globalPosition().toPoint());
             QModelIndex clickedIndex = indexAt(positionInView);
-            selectionModel()->select(clickedIndex, QItemSelectionModel::Toggle);
-            if (selectionModel()->selectedIndexes().count() == 0)
-                setInSelectingState(false);
-
+            selectionModel()->select(clickedIndex, QItemSelectionModel::Select);
+            setInSelectingState(true);
             return true;
         }
     }
+
     return QListView::eventFilter(watched, event);
 }
 
@@ -333,12 +334,6 @@ void NoteListView::selectionChanged(const QItemSelection &selected, const QItemS
     if (selectedNotesCount == 0)
         setInSelectingState(false);
 
-    if (selected.contains(currentIndexWithEditor) && editor)
-        editor->setIsSelected(true);
-
-    if (deselected.contains(currentIndexWithEditor) && editor)
-        editor->setIsSelected(false);
-
     QListView::selectionChanged(selected, deselected);
 }
 
@@ -354,7 +349,17 @@ bool NoteListView::viewportEvent(QEvent *event)
     if (event->type() == QEvent::MouseButtonPress or event->type() == QEvent::MouseMove or
         event->type() == QEvent::MouseButtonRelease)
     {
-        event->ignore();
+        if (!indexAt(static_cast<QMouseEvent *>(event)->position().toPoint()).isValid() or isDragSelecting)
+        {
+            event->ignore();
+        }
+        else if (event->type() == QEvent::MouseButtonRelease)
+        {
+            QModelIndex clickedIndex = indexAt(static_cast<QMouseEvent *>(event)->position().toPoint());
+            selectionModel()->select(clickedIndex, QItemSelectionModel::Toggle);
+            if (selectionModel()->selection().empty())
+                setInSelectingState(false);
+        }
     }
     return result;
 }
@@ -367,6 +372,17 @@ void NoteListView::verticalScrollbarValueChanged(int value)
 
 void NoteListView::updateEditor()
 {
+    if (inSelectingState or isDragSelecting)
+    {
+        if (editor)
+        {
+            closePersistentEditor(currentIndexWithEditor);
+            editor = nullptr;
+            currentIndexWithEditor = QModelIndex();
+        }
+        return;
+    }
+
     QPoint mousePosition = mapFromGlobal(QCursor::pos());
     const QModelIndex index = indexAt(mousePosition);
 
@@ -410,17 +426,8 @@ void NoteListView::setInSelectingState(bool newInSelectingState)
         selectionMenu->setColorPickerVisible(false);
         if (selectionModel() and !selectionModel()->selectedIndexes().empty())
             selectionModel()->clearSelection();
-        if (editor)
-        {
-            editor->setPinCheckboxVisible(true);
-            editor->setIsSelected(false);
-        }
     }
-    else
-    {
-        if (editor and !editor->getIsPinned())
-            editor->setPinCheckboxVisible(false);
-    }
+    updateEditor();
 }
 
 int NoteListView::getHowManyNotesCanFitInRow(int width) const
