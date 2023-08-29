@@ -1,6 +1,6 @@
 #include "NoteListDelegate.h"
 
-#include <NoteListModel.h>
+#include <NoteListModelRole.h>
 #include <QPainter>
 
 NoteListDelegate::NoteListDelegate(QObject *parent)
@@ -46,13 +46,13 @@ void NoteListDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, 
 {
     NoteButton *noteButton = static_cast<NoteButton *>(editor);
 
-    if (index.data(NoteListModel::isPinned).toBool() != noteButton->getIsPinned())
+    if (index.data(NoteListModelRole::isPinned).toBool() != noteButton->getIsPinned())
     {
-        model->setData(index, noteButton->getIsPinned(), NoteListModel::isPinned);
+        model->setData(index, noteButton->getIsPinned(), NoteListModelRole::isPinned);
     }
-    else if (index.data(NoteListModel::Color).value<QColor>() != noteButton->getColor())
+    else if (index.data(NoteListModelRole::Color).value<QColor>() != noteButton->getColor())
     {
-        model->setData(index, QVariant::fromValue(noteButton->getColor()), NoteListModel::Color);
+        model->setData(index, QVariant::fromValue(noteButton->getColor()), NoteListModelRole::Color);
     }
 }
 
@@ -64,9 +64,9 @@ void NoteListDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionV
 
 void NoteListDelegate::setupNoteButtonFromIndex(NoteButton &noteButton, const QModelIndex &index) const
 {
-    noteButton.setTitle(index.data(NoteListModel::Title).toString());
-    noteButton.setContent(index.data(NoteListModel::Content).toString());
-    noteButton.setModificationTime(index.data(NoteListModel::ModificationTime).toDateTime());
-    noteButton.setIsPinned(index.data(NoteListModel::isPinned).toBool());
-    noteButton.setColor(index.data(NoteListModel::Color).value<QColor>());
+    noteButton.setTitle(index.data(NoteListModelRole::Title).toString());
+    noteButton.setContent(index.data(NoteListModelRole::Content).toString());
+    noteButton.setModificationTime(index.data(NoteListModelRole::ModificationTime).toDateTime());
+    noteButton.setIsPinned(index.data(NoteListModelRole::isPinned).toBool());
+    noteButton.setColor(index.data(NoteListModelRole::Color).value<QColor>());
 }

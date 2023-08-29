@@ -1,5 +1,5 @@
 #include "NoteEditingTab.h"
-#include <NoteListModel.h>
+#include <NoteListModelRole.h>
 #include <QMessageBox>
 #include <QModelIndex>
 #include <QMouseEvent>
@@ -32,15 +32,15 @@ NoteEditingTab::NoteEditingTab(NoteListModel &noteModel, const QModelIndex &edit
 void NoteEditingTab::onTitleChanged(const QString &newTitle)
 {
     QDateTime modificationTime = QDateTime::currentDateTime();
-    noteModel.setData(editingNote, newTitle, NoteListModel::Title);
-    noteModel.setData(editingNote, modificationTime, NoteListModel::ModificationTime);
+    noteModel.setData(editingNote, newTitle, NoteListModelRole::Title);
+    noteModel.setData(editingNote, modificationTime, NoteListModelRole::ModificationTime);
 }
 
 void NoteEditingTab::onContentChanged(const QString &newContent)
 {
     QDateTime modificationTime = QDateTime::currentDateTime();
-    noteModel.setData(editingNote, newContent, NoteListModel::Content);
-    noteModel.setData(editingNote, modificationTime, NoteListModel::ModificationTime);
+    noteModel.setData(editingNote, newContent, NoteListModelRole::Content);
+    noteModel.setData(editingNote, modificationTime, NoteListModelRole::ModificationTime);
 }
 
 void NoteEditingTab::saveNoteAndEmitExitSignal()

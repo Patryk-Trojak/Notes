@@ -2,7 +2,7 @@
 #include "./ui_NoteSortOptionsWidget.h"
 
 #include "AboutWindow.h"
-#include "NoteListModel.h"
+#include "NoteListModelRole.h"
 #include <QPainter>
 #include <QPainterPath>
 #include <QRegion>
@@ -14,9 +14,9 @@ NoteSortOptionsWidget::NoteSortOptionsWidget(int currentSortRole, Qt::SortOrder 
     ui->setupUi(this);
     setAttribute(Qt::WA_TranslucentBackground);
 
-    indexToSortRoleMap[0] = NoteListModel::Role::CreationTime;
-    indexToSortRoleMap[1] = NoteListModel::Role::ModificationTime;
-    indexToSortRoleMap[2] = NoteListModel::Role::Title;
+    indexToSortRoleMap[0] = NoteListModelRole::CreationTime;
+    indexToSortRoleMap[1] = NoteListModelRole::ModificationTime;
+    indexToSortRoleMap[2] = NoteListModelRole::Title;
 
     indexToSordOrderMap[0] = Qt::AscendingOrder;
     indexToSordOrderMap[1] = Qt::DescendingOrder;

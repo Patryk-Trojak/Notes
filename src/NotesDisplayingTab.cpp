@@ -40,7 +40,7 @@ NotesDisplayingTab::NotesDisplayingTab(NoteListModel &noteModel, PersistenceMana
     noteProxyModel.setSourceModel(&noteModel);
     noteProxyModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
     noteProxyModel.setSortCaseSensitivity(Qt::CaseInsensitive);
-    noteProxyModel.setSortRole(NoteListModel::CreationTime);
+    noteProxyModel.setSortRole(NoteListModelRole::CreationTime);
     noteProxyModel.sort(0, Qt::DescendingOrder);
     QObject::connect(searchBar, &QLineEdit::textChanged, this,
                      [this](const QString &searched) { this->noteProxyModel.setFilterFixedString(searched); });

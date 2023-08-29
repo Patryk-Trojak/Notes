@@ -1,6 +1,7 @@
 #include "NoteEditor.h"
 #include "./ui_NoteEditor.h"
-#include "NoteListModel.h"
+#include "NoteListModelRole.h"
+#include <QDateTime>
 #include <QResizeEvent>
 
 NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent) : QWidget(parent), ui(new Ui::NoteEditor)
@@ -22,15 +23,15 @@ NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent) : QWidge
             "margin;}"
             "QScrollBar::sub-line:vertical {width: 0px;height: 0px;subcontrol-position: top;subcontrol-origin: "
             "margin;}")
-            .arg(editingNote.data(NoteListModel::Color).value<QColor>().name());
+            .arg(editingNote.data(NoteListModelRole::Color).value<QColor>().name());
     setStyleSheet(style);
     setAttribute(Qt::WA_StyledBackground, true);
     ui->creationTime->setStyleSheet("QLabel{color: black}");
     ui->modificationTime->setStyleSheet("QLabel{color: black}");
-    ui->titleEdit->setText(editingNote.data(NoteListModel::Title).toString());
-    ui->contentEdit->setText(editingNote.data(NoteListModel::Content).toString());
-    setCreationTime(editingNote.data(NoteListModel::CreationTime).toDateTime());
-    setModificationTime(editingNote.data(NoteListModel::ModificationTime).toDateTime());
+    ui->titleEdit->setText(editingNote.data(NoteListModelRole::Title).toString());
+    ui->contentEdit->setText(editingNote.data(NoteListModelRole::Content).toString());
+    setCreationTime(editingNote.data(NoteListModelRole::CreationTime).toDateTime());
+    setModificationTime(editingNote.data(NoteListModelRole::ModificationTime).toDateTime());
 
     closeButton = new QPushButton(this);
     closeButton->setIcon(QIcon(":/images/clear.png"));

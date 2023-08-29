@@ -59,7 +59,7 @@ NoteListView::NoteListView(QWidget *parent)
 void NoteListView::removeNote(const QModelIndex &index)
 {
     const QString message = [index]() {
-        if (index.data(NoteListModel::isInTrash).toBool())
+        if (index.data(NoteListModelRole::isInTrash).toBool())
             return "Are you sure you want to delete this note? You won't be able to recover deleted note";
         else
             return "Are you sure you want to remove this note? You will be able to restore it from trash folder";
@@ -148,18 +148,19 @@ void NoteListView::onCustomContextMenuRequested(const QPoint &pos)
         menu->addAction(createNote);
         if (index.isValid())
         {
-            if (!index.data(NoteListModel::isPinned).toBool())
+            if (!index.data(NoteListModelRole::isPinned).toBool())
             {
                 QAction *pinNote = new QAction("Pin note");
                 QObject::connect(pinNote, &QAction::triggered, this,
-                                 [this, index]() { this->model()->setData(index, true, NoteListModel::isPinned); });
+                                 [this, index]() { this->model()->setData(index, true, NoteListModelRole::isPinned); });
                 menu->addAction(pinNote);
             }
             else
             {
                 QAction *unpinNote = new QAction("Unpin note");
-                QObject::connect(unpinNote, &QAction::triggered, this,
-                                 [this, index]() { this->model()->setData(index, false, NoteListModel::isPinned); });
+                QObject::connect(unpinNote, &QAction::triggered, this, [this, index]() {
+                    this->model()->setData(index, false, NoteListModelRole::isPinned);
+                });
                 menu->addAction(unpinNote);
             }
         }
@@ -218,7 +219,7 @@ void NoteListView::changeColorOfSelectedNotes(const QColor &newColor)
     auto selected = selectionModel()->selectedIndexes();
     for (auto const &index : selected)
     {
-        model()->setData(index, newColor, NoteListModel::Color);
+        model()->setData(index, newColor, NoteListModelRole::Color);
     }
 }
 
@@ -230,7 +231,7 @@ void NoteListView::toogleIsPinnedOfSelectedNotes()
         persistentSelected.append(index);
 
     bool allSelectedNotesArePinned = std::find_if(selected.begin(), selected.end(), [](const QModelIndex &index) {
-                                         return !index.data(NoteListModel::isPinned).toBool();
+                                         return !index.data(NoteListModelRole::isPinned).toBool();
                                      }) == selected.end();
 
     bool pinNotes;
@@ -241,7 +242,7 @@ void NoteListView::toogleIsPinnedOfSelectedNotes()
 
     for (auto const &index : persistentSelected)
     {
-        model()->setData(index, pinNotes, NoteListModel::isPinned);
+        model()->setData(index, pinNotes, NoteListModelRole::isPinned);
     }
 }
 

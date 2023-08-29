@@ -36,25 +36,25 @@ QVariant NoteListModel::data(const QModelIndex &index, int role) const
     int row = index.row();
     switch (role)
     {
-    case Role::Title:
-    case Role::EditRole:
-    case Role::DisplayRole:
+    case NoteListModelRole::Title:
+    case NoteListModelRole::EditRole:
+    case NoteListModelRole::DisplayRole:
         return notes[row].getTitle();
-    case Role::Content:
+    case NoteListModelRole::Content:
         return notes[row].getContent();
-    case Role::Id:
+    case NoteListModelRole::Id:
         return notes[row].getId();
-    case Role::ParentFolderId:
+    case NoteListModelRole::ParentFolderId:
         return notes[row].getParentFolderId();
-    case Role::CreationTime:
+    case NoteListModelRole::CreationTime:
         return notes[row].getCreationTime();
-    case Role::ModificationTime:
+    case NoteListModelRole::ModificationTime:
         return notes[row].getModificationTime();
-    case Role::isInTrash:
+    case NoteListModelRole::isInTrash:
         return notes[row].getIsInTrash();
-    case Role::isPinned:
+    case NoteListModelRole::isPinned:
         return notes[row].getIsPinned();
-    case Role::Color:
+    case NoteListModelRole::Color:
         return QVariant::fromValue(notes[row].getColor());
     default:
         return QVariant();
@@ -78,48 +78,48 @@ bool NoteListModel::setData(const QModelIndex &index, const QVariant &value, int
     int row = index.row();
     switch (role)
     {
-    case Role::Title:
-    case Role::EditRole:
+    case NoteListModelRole::Title:
+    case NoteListModelRole::EditRole:
         notes[row].setTitle(value.toString());
         markIndexAsDirty(index);
         emit dataChanged(index, index);
         return true;
-    case Role::Content:
+    case NoteListModelRole::Content:
         notes[row].setContent(value.toString());
         markIndexAsDirty(index);
         emit dataChanged(index, index);
         return true;
-    case Role::Id:
+    case NoteListModelRole::Id:
         notes[row].setId(value.toInt());
         markIndexAsDirty(index);
         emit dataChanged(index, index);
         return true;
-    case Role::ParentFolderId:
+    case NoteListModelRole::ParentFolderId:
         notes[row].setParentFolderId(value.toInt());
         markIndexAsDirty(index);
         emit dataChanged(index, index);
         return true;
-    case Role::CreationTime:
+    case NoteListModelRole::CreationTime:
         notes[row].setCreationTime(value.toDateTime());
         markIndexAsDirty(index);
         emit dataChanged(index, index);
         return true;
-    case Role::ModificationTime:
+    case NoteListModelRole::ModificationTime:
         notes[row].setModificationTime(value.toDateTime());
         markIndexAsDirty(index);
         emit dataChanged(index, index);
         return true;
-    case Role::isInTrash:
+    case NoteListModelRole::isInTrash:
         notes[row].setIsInTrash(value.toBool());
         markIndexAsDirty(index);
         emit dataChanged(index, index);
         return true;
-    case Role::isPinned:
+    case NoteListModelRole::isPinned:
         notes[row].setIsPinned(value.toBool());
         markIndexAsDirty(index);
         emit dataChanged(index, index);
         return true;
-    case Role::Color:
+    case NoteListModelRole::Color:
         notes[row].setColor(value.value<QColor>());
         markIndexAsDirty(index);
         emit dataChanged(index, index);

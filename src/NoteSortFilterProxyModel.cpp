@@ -1,6 +1,6 @@
 #include "NoteSortFilterProxyModel.h"
 
-#include "NoteListModel.h"
+#include "NoteListModelRole.h"
 #include <QDateTime>
 
 NoteSortFilterProxyModel::NoteSortFilterProxyModel(QObject *parent) : QSortFilterProxyModel(parent)
@@ -11,8 +11,8 @@ bool NoteSortFilterProxyModel::lessThan(const QModelIndex &source_left, const QM
 {
     QVariant leftData = sourceModel()->data(source_left, sortRole());
     QVariant rightData = sourceModel()->data(source_right, sortRole());
-    bool isLeftPinned = sourceModel()->data(source_left, NoteListModel::isPinned).toBool();
-    bool isRightPinned = sourceModel()->data(source_right, NoteListModel::isPinned).toBool();
+    bool isLeftPinned = sourceModel()->data(source_left, NoteListModelRole::isPinned).toBool();
+    bool isRightPinned = sourceModel()->data(source_right, NoteListModelRole::isPinned).toBool();
 
     // Pinned notes always go first
     if (isLeftPinned > isRightPinned)
