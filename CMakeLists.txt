@@ -46,6 +46,8 @@ set(PROJECT_SOURCES
         ${INCLUDE_DIR}/NoteSortOptionsWidget.h ${SOURCE_DIR}/NoteSortOptionsWidget.cpp ${FORMS_DIR}/NoteSortOptionsWidget.ui
         ${INCLUDE_DIR}/NoteListViewSelectionMenu.h ${SOURCE_DIR}/NoteListViewSelectionMenu.cpp
         ${INCLUDE_DIR}/NoteListModelRole.h
+        ${INCLUDE_DIR}/NoteMimeData.h ${SOURCE_DIR}//NoteMimeData.cpp
+
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -53,6 +55,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
     )
+
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Notes APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
 #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
