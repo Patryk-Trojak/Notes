@@ -233,6 +233,17 @@ void NoteListModel::setColorOfNotes(const QModelIndexList &indexes, const QColor
     }
 }
 
+void NoteListModel::setIsPinnedOfNotes(const QModelIndexList &indexes, bool isPinned)
+{
+    QVector<int> noteIds = getNoteIds(indexes);
+    persistenceManager.setIsPinnedOfNotes(noteIds, isPinned);
+    for (auto const &index : indexes)
+    {
+        notes[index.row()].setIsPinned(isPinned);
+        emit dataChanged(index, index);
+    }
+}
+
 void NoteListModel::removeNotes(QModelIndexList &indexes)
 {
     QVector<int> noteIds = getNoteIds(indexes);

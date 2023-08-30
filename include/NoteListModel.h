@@ -30,6 +30,7 @@ class NoteListModel : public QAbstractItemModel
     QModelIndex createNewNote();
     void moveNotesToFolder(const QSet<int> &noteIds, int folderId);
     void setColorOfNotes(const QModelIndexList &indexes, const QColor &color);
+    void setIsPinnedOfNotes(const QModelIndexList &indexes, bool isPinned);
     void removeNotes(QModelIndexList &indexes);
     void restoreNoteFromTrash(const QModelIndex &index);
     int getCurrentSelectedFolderId() const;

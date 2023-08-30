@@ -85,6 +85,25 @@ void PersistenceManager::setColorOfNotes(const QVector<int> &noteIds, const QCol
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
 }
 
+void PersistenceManager::setIsPinnedOfNotes(const QVector<int> &noteIds, bool isPinned)
+{
+    QSqlQuery query(db);
+    QString queryString = "UPDATE note "
+                          "SET is_pinned = :is_pinned "
+                          "WHERE id IN (";
+
+    foreach (int id, noteIds)
+        queryString.append(QString::number(id) + ",");
+    queryString.removeLast();
+    queryString.append(")");
+
+    query.prepare(queryString);
+    query.bindValue(":is_pinned", isPinned);
+
+    if (!query.exec())
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+}
+
 NoteData PersistenceManager::loadNote(int id) const
 {
     QSqlQuery query(db);

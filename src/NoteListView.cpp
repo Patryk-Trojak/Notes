@@ -196,10 +196,6 @@ void NoteListView::changeColorOfSelectedNotes(const QColor &newColor)
 void NoteListView::toogleIsPinnedOfSelectedNotes()
 {
     auto selected = selectionModel()->selectedIndexes();
-    QVector<QPersistentModelIndex> persistentSelected;
-    for (auto const &index : selected)
-        persistentSelected.append(index);
-
     bool allSelectedNotesArePinned = std::find_if(selected.begin(), selected.end(), [](const QModelIndex &index) {
                                          return !index.data(NoteListModelRole::isPinned).toBool();
                                      }) == selected.end();
@@ -210,10 +206,9 @@ void NoteListView::toogleIsPinnedOfSelectedNotes()
     else
         pinNotes = true;
 
-    for (auto const &index : persistentSelected)
-    {
-        model()->setData(index, pinNotes, NoteListModelRole::isPinned);
-    }
+    QModelIndexList noteModelIndexes = mapIndexesToSourceModelAtTheBottom(selected);
+    NoteListModel *noteModel = getSourceModelAtTheBottom();
+    noteModel->setIsPinnedOfNotes(noteModelIndexes, pinNotes);
 }
 
 bool NoteListView::eventFilter(QObject *watched, QEvent *event)
