@@ -34,7 +34,7 @@ class NoteListModel : public QAbstractItemModel
     void saveDirtyIndexes();
 
   public slots:
-    void onNewFolderSelected(int selectedFolderId = 5);
+    void onNewFolderSelected(int selectedFolderId);
     void onFolderDeleted(int deletedFolderId);
 
   signals:
