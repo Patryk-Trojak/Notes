@@ -154,6 +154,12 @@ void NoteListView::onCustomContextMenuRequested(const QPoint &pos)
         QObject::connect(deleteNote, &QAction::triggered, this, [this, index]() { removeNote(index); });
         menu->addAction(deleteNote);
     }
+    else
+    {
+        QAction *selectAll = new QAction("Select all");
+        QObject::connect(selectAll, &QAction::triggered, this, &NoteListView::selectAll);
+        menu->addAction(selectAll);
+    }
 
     menu->exec(mapToGlobal(pos));
 }
@@ -300,6 +306,13 @@ void NoteListView::updateMousePositionOfDragSelecting(QPoint mousePositionPoint)
 void NoteListView::endDragSelecting()
 {
     isDragSelecting = false;
+}
+
+void NoteListView::selectAll()
+{
+    selectionModel()->select(QItemSelection(model()->index(0, 0), model()->index(model()->rowCount() - 1, 0)),
+                             QItemSelectionModel::Select);
+    setInSelectingState(true);
 }
 
 void NoteListView::resizeEvent(QResizeEvent *event)

@@ -24,6 +24,7 @@ class NoteListView : public QListView
     void startDragSelecting(QPoint startPoint);
     void updateMousePositionOfDragSelecting(QPoint mousePosition);
     void endDragSelecting();
+    void selectAll();
 
   signals:
     void noteSelected(const QModelIndex &index);
