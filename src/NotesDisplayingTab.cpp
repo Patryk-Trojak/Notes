@@ -63,9 +63,6 @@ NotesDisplayingTab::NotesDisplayingTab(NoteListModel &noteModel, PersistenceMana
     QObject::connect(&noteModel, &NoteListModel::notesRemoved, &folderModel, &FolderTreeModel::onNotesRemoved);
     QObject::connect(&noteModel, &NoteListModel::notesMoved, &folderModel, &FolderTreeModel::onNotesMoved);
 
-    QObject::connect(&folderModel, &FolderTreeModel::folderDeletedFromDatabase, &noteModel,
-                     &NoteListModel::onFolderDeleted);
-
     QObject::connect(&noteProxyModel, &NoteSortFilterProxyModel::rowsInserted, this,
                      &NotesDisplayingTab::layoutAllElementsWhichDependsOnNumberOfNotes);
     QObject::connect(&noteProxyModel, &NoteSortFilterProxyModel::rowsRemoved, this,
