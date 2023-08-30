@@ -63,7 +63,8 @@ class NoteListView : public QListView
     bool isTrashFolderLoaded();
     QPixmap drawDragPixmap(const QModelIndexList &indexes);
     QVector<QColor> getNMostFrequentNotesColors(const QModelIndexList &indexes, int N);
-
+    QMenu *createContextMenuForSelectingState();
+    QMenu *createContextMenuForNormalState(const QPoint &position);
   private slots:
     void onNewEditorCreated(NoteButton *editor, const QModelIndex &index);
     void onCustomContextMenuRequested(const QPoint &pos);

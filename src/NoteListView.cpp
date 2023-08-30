@@ -112,53 +112,12 @@ void NoteListView::onCustomContextMenuRequested(const QPoint &pos)
     if (isDragSelecting)
         return;
 
-    QModelIndex index = indexAt(pos);
-    QMenu *menu = new QMenu(this);
+    QMenu *menu;
 
-    if (!isTrashFolderLoaded())
-    {
-        QAction *createNote = new QAction("Create new note");
-        QObject::connect(createNote, &QAction::triggered, this, [this, index]() { this->model()->insertRow(0); });
-        menu->addAction(createNote);
-        if (index.isValid())
-        {
-            if (!index.data(NoteListModelRole::isPinned).toBool())
-            {
-                QAction *pinNote = new QAction("Pin note");
-                QObject::connect(pinNote, &QAction::triggered, this,
-                                 [this, index]() { this->model()->setData(index, true, NoteListModelRole::isPinned); });
-                menu->addAction(pinNote);
-            }
-            else
-            {
-                QAction *unpinNote = new QAction("Unpin note");
-                QObject::connect(unpinNote, &QAction::triggered, this, [this, index]() {
-                    this->model()->setData(index, false, NoteListModelRole::isPinned);
-                });
-                menu->addAction(unpinNote);
-            }
-        }
-    }
-    else if (index.isValid())
-    {
-        QAction *restoreNote = new QAction("Restore note");
-        QObject::connect(restoreNote, &QAction::triggered, this,
-                         [this, index]() { this->onRestoreNoteFromTrashRequested(index); });
-        menu->addAction(restoreNote);
-    }
-
-    if (index.isValid())
-    {
-        QAction *deleteNote = new QAction("Delete note");
-        QObject::connect(deleteNote, &QAction::triggered, this, [this, index]() { removeNote(index); });
-        menu->addAction(deleteNote);
-    }
+    if (inSelectingState)
+        menu = createContextMenuForSelectingState();
     else
-    {
-        QAction *selectAll = new QAction("Select all");
-        QObject::connect(selectAll, &QAction::triggered, this, &NoteListView::selectAll);
-        menu->addAction(selectAll);
-    }
+        menu = createContextMenuForNormalState(pos);
 
     menu->exec(mapToGlobal(pos));
 }
@@ -454,6 +413,94 @@ QVector<QColor> NoteListView::getNMostFrequentNotesColors(const QModelIndexList 
         result.emplaceBack(i.first);
 
     return result;
+}
+
+QMenu *NoteListView::createContextMenuForSelectingState()
+{
+    QMenu *menu = new QMenu(this);
+
+    QAction *deleteSelectedNotes = new QAction("Remove selected notes");
+    QObject::connect(deleteSelectedNotes, &QAction::triggered, this, &NoteListView::removeSelectedNotes);
+    menu->addAction(deleteSelectedNotes);
+
+    auto selected = selectionModel()->selectedIndexes();
+    bool allSelectedNotesArePinned = std::find_if(selected.begin(), selected.end(), [](const QModelIndex &index) {
+                                         return !index.data(NoteListModelRole::isPinned).toBool();
+                                     }) == selected.end();
+
+    QAction *toogleIsPinnedOfSelectedNotes =
+        new QAction(allSelectedNotesArePinned ? "Unpin selected notes" : "Pin selected notes");
+    QObject::connect(toogleIsPinnedOfSelectedNotes, &QAction::triggered, this,
+                     &NoteListView::toogleIsPinnedOfSelectedNotes);
+    menu->addAction(toogleIsPinnedOfSelectedNotes);
+
+    QAction *selectAll = new QAction("Select all");
+    QObject::connect(selectAll, &QAction::triggered, this, &NoteListView::selectAll);
+    menu->addAction(selectAll);
+
+    QAction *exitSelecting = new QAction("Exit selecting");
+    QObject::connect(exitSelecting, &QAction::triggered, this, [this]() { this->setInSelectingState(false); });
+    menu->addAction(exitSelecting);
+
+    return menu;
+}
+
+QMenu *NoteListView::createContextMenuForNormalState(const QPoint &position)
+{
+    QMenu *menu = new QMenu(this);
+    QModelIndex index = indexAt(position);
+
+    if (!isTrashFolderLoaded())
+    {
+        QAction *createNote = new QAction("New note");
+        QObject::connect(createNote, &QAction::triggered, this, [this, index]() { this->model()->insertRow(0); });
+        menu->addAction(createNote);
+        if (index.isValid())
+        {
+            if (!index.data(NoteListModelRole::isPinned).toBool())
+            {
+                QAction *pinNote = new QAction("Pin note");
+                QObject::connect(pinNote, &QAction::triggered, this,
+                                 [this, index]() { this->model()->setData(index, true, NoteListModelRole::isPinned); });
+                menu->addAction(pinNote);
+            }
+            else
+            {
+                QAction *unpinNote = new QAction("Unpin note");
+                QObject::connect(unpinNote, &QAction::triggered, this, [this, index]() {
+                    this->model()->setData(index, false, NoteListModelRole::isPinned);
+                });
+                menu->addAction(unpinNote);
+            }
+        }
+    }
+    else if (index.isValid())
+    {
+        QAction *restoreNote = new QAction("Restore note");
+        QObject::connect(restoreNote, &QAction::triggered, this,
+                         [this, index]() { this->onRestoreNoteFromTrashRequested(index); });
+        menu->addAction(restoreNote);
+    }
+
+    if (index.isValid())
+    {
+        QAction *deleteNote = new QAction("Delete note");
+        QObject::connect(deleteNote, &QAction::triggered, this, [this, index]() { removeNote(index); });
+        menu->addAction(deleteNote);
+
+        QAction *selectNote = new QAction("Select note");
+        QObject::connect(selectNote, &QAction::triggered, this, [this, index]() {
+            this->selectionModel()->select(index, QItemSelectionModel::Select);
+            this->setInSelectingState(true);
+        });
+        menu->addAction(selectNote);
+    }
+
+    QAction *selectAll = new QAction("Select all");
+    QObject::connect(selectAll, &QAction::triggered, this, &NoteListView::selectAll);
+    menu->addAction(selectAll);
+
+    return menu;
 }
 
 void NoteListView::updateEditor()
