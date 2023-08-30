@@ -281,7 +281,6 @@ QVector<FolderData> PersistenceManager::loadAllFolders() const
         folders.back().setId(query.value(0).toInt());
         folders.back().setName(query.value(1).toString());
         folders.back().setParentId(query.value(2).toInt());
-        folders.back().setNotesInsideCount(query.value(3).toInt());
     }
 
     return folders;
@@ -312,12 +311,11 @@ int PersistenceManager::addFolder(const FolderData &folder) const
 {
     QSqlQuery query(db);
     query.prepare("INSERT INTO folder "
-                  "(name, parent_id, notes_inside_count)"
-                  "VALUES(:name, :parent_id, :notes_inside_count)");
+                  "(name, parent_id) "
+                  "VALUES(:name, :parent_id)");
 
     query.bindValue(":name", folder.getName());
     query.bindValue(":parent_id", folder.getParentId());
-    query.bindValue(":notes_inside_count", folder.getNotesInsideCount());
 
     if (!query.exec())
     {
@@ -332,13 +330,11 @@ void PersistenceManager::updateFolder(const FolderData &folder) const
     QSqlQuery query(db);
 
     query.prepare("UPDATE folder "
-                  "SET name = :name, parent_id = :parent_id, notes_inside_count = :notes_inside_count "
+                  "SET name = :name, parent_id = :parent_id "
                   "WHERE id = :id");
 
     query.bindValue(":name", folder.getName());
     query.bindValue(":parent_id", folder.getParentId());
-    query.bindValue(":notes_inside_count", folder.getNotesInsideCount());
-
     query.bindValue(":id", folder.getId());
 
     if (!query.exec())
@@ -353,6 +349,28 @@ void PersistenceManager::deleteFolder(int id) const
 
     if (!query.exec())
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+}
+
+QHash<int, int> PersistenceManager::getNotesInsideFoldersCounts()
+{
+    QHash<int, int> result;
+    QSqlQuery query(db);
+    query.prepare("SELECT parent_folder_id, COUNT(*) "
+                  "FROM note "
+                  "GROUP BY parent_folder_id");
+
+    if (!query.exec())
+    {
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+        return result;
+    }
+
+    while (query.next())
+    {
+        result.insert(query.value(0).toInt(), query.value(1).toInt());
+    }
+
+    return result;
 }
 
 void PersistenceManager::createNewDefaultTables() const
@@ -376,8 +394,7 @@ void PersistenceManager::createNewDefaultTables() const
     QString createFolderTable = "CREATE TABLE folder("
                                 "id INTEGER PRIMARY KEY, "
                                 "name TEXT, "
-                                "parent_id INTEGER NOT NULL DEFAULT 0, "
-                                "notes_inside_count INTEGER NOT NULL DEFAULT 0"
+                                "parent_id INTEGER NOT NULL DEFAULT 0 "
                                 ")";
 
     if (!query.exec(createFolderTable))

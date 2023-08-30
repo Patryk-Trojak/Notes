@@ -182,7 +182,8 @@ void FolderTreeModel::updateNotesInsideCountOfFolder(int folderId, int deltaNote
 
 void FolderTreeModel::setupModelData()
 {
-    QVector<FolderData> folders = persistenceManager.loadAllFolders();
+    QVector<FolderData> folders = setupFolderList();
+
     std::sort(folders.begin(), folders.end(), [](const FolderData &folder1, const FolderData &folder2) {
         return folder1.getParentId() < folder2.getParentId();
     });
@@ -199,6 +200,23 @@ void FolderTreeModel::setupModelData()
     int notesInTrashCount = persistenceManager.countNotesInTrash();
     FolderData trashFolder(SpecialFolderId::TrashFolder, rootItem->data.getId(), "Trash", notesInTrashCount);
     rootItem->insertChild(rootItem->getChildren().size(), trashFolder, FolderTreeItem::Type::TrashFolder);
+}
+
+QVector<FolderData> FolderTreeModel::setupFolderList()
+{
+    QVector<FolderData> folders = persistenceManager.loadAllFolders();
+    QHash<int, int> notesInsideFoldersCounts = persistenceManager.getNotesInsideFoldersCounts();
+
+    for (auto &folder : folders)
+    {
+        auto found = notesInsideFoldersCounts.find(folder.getId());
+        if (found != notesInsideFoldersCounts.end())
+            folder.setNotesInsideCount(*found);
+        else
+            folder.setNotesInsideCount(0);
+    }
+
+    return folders;
 }
 
 void FolderTreeModel::setupChildrenRecursively(FolderTreeItem &folderTreeItem, const QVector<FolderData> &listOfFolders)

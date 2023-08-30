@@ -37,6 +37,7 @@ class FolderTreeModel : public QAbstractItemModel
     std::unique_ptr<FolderTreeItem> rootItem;
     PersistenceManager &persistenceManager;
     void setupModelData();
+    QVector<FolderData> setupFolderList();
     void setupChildrenRecursively(FolderTreeItem &folderTreeItem, const QVector<FolderData> &listOfFolders);
     void deleteFolderRecursivelyFromDb(const FolderTreeItem &folderTreeItem);
     const QMimeData *lastCheckedMimeData;

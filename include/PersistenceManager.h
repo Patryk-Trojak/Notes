@@ -44,6 +44,7 @@ class PersistenceManager
     int addFolder(const FolderData &folder) const;
     void updateFolder(const FolderData &folder) const;
     void deleteFolder(int id) const;
+    QHash<int, int> getNotesInsideFoldersCounts();
 
   private:
     QSqlDatabase db;
