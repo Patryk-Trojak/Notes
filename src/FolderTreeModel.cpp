@@ -1,4 +1,6 @@
 #include "FolderTreeModel.h"
+#include <NoteMimeData.h>
+#include <QMimeData>
 
 FolderTreeModel::FolderTreeModel(PersistenceManager &persistenceManager, QObject *parent)
     : persistenceManager(persistenceManager), QAbstractItemModel(parent)
@@ -96,12 +98,13 @@ bool FolderTreeModel::setData(const QModelIndex &index, const QVariant &value, i
 
 Qt::ItemFlags FolderTreeModel::flags(const QModelIndex &index) const
 {
-    FolderTreeItem *item = getItemFromIndex(index);
-    if (item->getType() == FolderTreeItem::Type::UserFolder)
-    {
-        return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
-    }
-    return QAbstractItemModel::flags(index);
+    Qt::ItemFlags flags = QAbstractItemModel::flags(index);
+    if (index.isValid())
+        flags |= Qt::ItemIsDropEnabled;
+    if (getItemFromIndex(index)->getType() == FolderTreeItem::Type::UserFolder)
+        flags |= Qt::ItemIsEditable;
+
+    return flags;
 }
 
 bool FolderTreeModel::insertRows(int row, int count, const QModelIndex &parent)
@@ -140,6 +143,31 @@ bool FolderTreeModel::removeRows(int row, int count, const QModelIndex &parent)
     parentItem->removeChildren(row, count);
     endRemoveRows();
     return true;
+}
+
+bool FolderTreeModel::areAllDragingNotesInFolderIndex(const QModelIndex &index, const QMimeData *data)
+{
+    if (data == lastCheckedMimeData)
+        return lastParentFolderIndexOfAllDragingNotes == index;
+
+    lastCheckedMimeData = data;
+    QVector<NoteMimeData> decodedData = NoteMimeData::decodeData(data);
+    if (decodedData.empty())
+        return false;
+
+    int parentFolderId = decodedData[0].parentFolderId;
+
+    for (auto const i : decodedData)
+    {
+        if (parentFolderId != i.parentFolderId)
+        {
+            lastParentFolderIndexOfAllDragingNotes = QModelIndex();
+            return false;
+        }
+    }
+
+    lastParentFolderIndexOfAllDragingNotes = findIndex(parentFolderId);
+    return lastParentFolderIndexOfAllDragingNotes == index;
 }
 
 void FolderTreeModel::updateNotesInsideCountOfFolder(int folderId, int deltaNoteInsideCount)
@@ -199,4 +227,21 @@ void FolderTreeModel::deleteFolderRecursivelyFromDb(const FolderTreeItem &folder
 
     for (auto const &i : folderTreeItem.getChildren())
         deleteFolderRecursivelyFromDb(*i);
+}
+
+bool FolderTreeModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
+                                   const QModelIndex &parent)
+{
+    QVector<NoteMimeData> decodedData = NoteMimeData::decodeData(data);
+    QSet<int> noteIds;
+    for (auto const &noteData : decodedData)
+        noteIds.insert(noteData.noteId);
+
+    emit moveNotesToFolderRequested(noteIds, getItemFromIndex(parent)->data.getId());
+    return true;
+}
+
+QStringList FolderTreeModel::mimeTypes() const
+{
+    return QStringList(NoteMimeData::type);
 }

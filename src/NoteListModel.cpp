@@ -194,6 +194,37 @@ QModelIndex NoteListModel::createNewNote()
     return QModelIndex();
 }
 
+void NoteListModel::moveNotesToFolder(const QSet<int> &noteIds, int folderId)
+{
+    auto note = notes.begin();
+    persistenceManager.moveNotesToFolder(noteIds, folderId);
+
+    while (note != notes.end())
+    {
+        if (!noteIds.contains(note->getId()))
+        {
+            note++;
+            continue;
+        }
+
+        int oldParentFolderId = note->getParentFolderId();
+        note->setParentFolderId(folderId);
+        emit notesRemovedFromFolder(oldParentFolderId, 1);
+        emit notesAddedToFolder(folderId, 1);
+
+        if (noteShouldBeDisplayedInCurrentSelectedFolder(*note))
+        {
+            note++;
+            continue;
+        }
+
+        int indexToRemove = note - notes.begin();
+        beginRemoveRows(QModelIndex(), indexToRemove, indexToRemove);
+        note = notes.erase(note);
+        endRemoveRows();
+    }
+}
+
 void NoteListModel::restoreNoteFromTrash(const QModelIndex &index)
 {
     persistenceManager.restoreNoteFromTrash(notes[index.row()].getId());
@@ -235,6 +266,18 @@ void NoteListModel::markIndexAsDirty(const QModelIndex &index)
         return;
 
     dirtyIndexes.emplace_back(index);
+}
+
+bool NoteListModel::noteShouldBeDisplayedInCurrentSelectedFolder(const NoteData &note)
+{
+    if (note.getParentFolderId() == currentSelectedFolderId)
+        return true;
+
+    if (currentSelectedFolderId == SpecialFolderId::AllNotesFolder and
+        note.getParentFolderId() != SpecialFolderId::TrashFolder)
+        return true;
+
+    return false;
 }
 
 QStringList NoteListModel::mimeTypes() const

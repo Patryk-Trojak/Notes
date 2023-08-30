@@ -28,6 +28,7 @@ class PersistenceManager
     QVector<NoteData> loadAllNotes() const;
     QVector<NoteData> loadAllNotesFromFolder(int folderId) const;
     void deleteAllNotesFromFolder(int folderId) const;
+    void moveNotesToFolder(const QSet<int> &noteIds, int folderId);
     std::vector<int> getIdsNotes() const;
     void deleteNote(int id) const;
     int countAllNotes();

@@ -1,7 +1,9 @@
 #include "FolderTreeView.h"
 
 #include "FolderData.h"
+#include "FolderTreeModel.h"
 #include "PersistenceManager.h"
+#include <QDragMoveEvent>
 #include <QMenu>
 #include <QMessageBox>
 #include <QModelIndex>
@@ -31,6 +33,16 @@ FolderTreeView::FolderTreeView(QWidget *parent) : QTreeView(parent), delegate(th
             "margin;}")
             .arg(widthOfScrollbar);
     setStyleSheet(style);
+
+    setStyle(new FolderTreeViewProxyStyle);
+    setDragDropOverwriteMode(true);
+    setDropIndicatorShown(true);
+    dropTooltip = new QLabel(QWidget::window()); // We may want part of it to be drawn outside of the folder tree view
+    dropTooltip->setStyleSheet("background-color: white;"
+                               "border-style: solid; border-color: black; border-width: 2px; border-radius: 8px;");
+    dropTooltip->setAttribute(Qt::WA_StyledBackground);
+    dropTooltip->setVisible(false);
+    dropTooltip->setAlignment(Qt::AlignCenter);
 }
 
 void FolderTreeView::setModel(QAbstractItemModel *model)
@@ -95,4 +107,71 @@ void FolderTreeView::selectionChanged(const QItemSelection &selected, const QIte
         FolderData *selectedFolder = static_cast<FolderData *>(selectedIndexes[0].internalPointer());
         emit newFolderSelected(selectedFolder->getId());
     }
+}
+
+void FolderTreeView::updateDropTooltip(const QDragMoveEvent *event)
+{
+    QModelIndex dropIndex = indexAt(event->position().toPoint());
+    FolderTreeModel *folderModel = static_cast<FolderTreeModel *>(model());
+    QString textOfTooltip;
+    if (folderModel->areAllDragingNotesInFolderIndex(dropIndex, event->mimeData()))
+        textOfTooltip = "Notes already in this folder";
+    else
+        textOfTooltip = "Move to: " + dropIndex.data().toString();
+
+    dropTooltip->move(QWidget::window()->mapFromGlobal(this->mapToGlobal(event->position().toPoint())) + QPoint(5, 5));
+    QSize sizeOftooltip = dropTooltip->fontMetrics().size(Qt::TextSingleLine, textOfTooltip);
+    sizeOftooltip.setWidth(qMin(sizeOftooltip.width(), 300));
+    QString elidedText = dropTooltip->fontMetrics().elidedText(textOfTooltip, Qt::ElideRight, sizeOftooltip.width());
+    if (!folderModel->areAllDragingNotesInFolderIndex(dropIndex, event->mimeData()))
+    {
+        elidedText.insert(8, "</font>");
+        elidedText.insert(0, "<font color = #1741d5>");
+    }
+    dropTooltip->setText(elidedText);
+    sizeOftooltip = sizeOftooltip.grownBy(QMargins(10, 5, 10, 10));
+    dropTooltip->resize(sizeOftooltip);
+    dropTooltip->setVisible(true);
+}
+
+FolderTreeDelegate::DropIndicatorPosition FolderTreeView::convertDropIndicatorPosition(
+    DropIndicatorPosition dropIndicator)
+{
+    return static_cast<FolderTreeDelegate::DropIndicatorPosition>(static_cast<int>(dropIndicator));
+}
+
+void FolderTreeView::dropEvent(QDropEvent *event)
+{
+    QTreeView::dropEvent(event);
+    delegate.setDropIndex(QModelIndex());
+    delegate.setIndicator(convertDropIndicatorPosition(dropIndicatorPosition()));
+    dropTooltip->setVisible(false);
+}
+
+void FolderTreeView::dragMoveEvent(QDragMoveEvent *event)
+{
+    QTreeView::dragMoveEvent(event);
+    QModelIndex dropIndex = indexAt(event->position().toPoint());
+    delegate.setDropIndex(dropIndex);
+    delegate.setIndicator(convertDropIndicatorPosition(dropIndicatorPosition()));
+
+    if (!dropIndex.isValid())
+    {
+        dropTooltip->setVisible(false);
+        return;
+    }
+    updateDropTooltip(event);
+}
+
+void FolderTreeView::dragLeaveEvent(QDragLeaveEvent *event)
+{
+    QAbstractItemView::dragLeaveEvent(event);
+    delegate.setDropIndex(QModelIndex());
+    delegate.setIndicator(convertDropIndicatorPosition(dropIndicatorPosition()));
+    dropTooltip->setVisible(false);
+}
+
+void FolderTreeView::dragEnterEvent(QDragEnterEvent *event)
+{
+    QTreeView::dragEnterEvent(event);
 }

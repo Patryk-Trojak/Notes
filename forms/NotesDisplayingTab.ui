@@ -136,6 +136,9 @@ color: white;
          <property name="acceptDrops">
           <bool>false</bool>
          </property>
+         <property name="dragDropMode">
+          <enum>QAbstractItemView::DropOnly</enum>
+         </property>
          <property name="animated">
           <bool>true</bool>
          </property>

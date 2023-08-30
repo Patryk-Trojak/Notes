@@ -28,6 +28,7 @@ class NoteListModel : public QAbstractItemModel
     QStringList mimeTypes() const;
     QMimeData *mimeData(const QModelIndexList &indexes) const;
     QModelIndex createNewNote();
+    void moveNotesToFolder(const QSet<int> &noteIds, int folderId);
     void restoreNoteFromTrash(const QModelIndex &index);
     int getCurrentSelectedFolderId() const;
     void saveDirtyIndexes();
@@ -46,6 +47,7 @@ class NoteListModel : public QAbstractItemModel
     QVector<QPersistentModelIndex> dirtyIndexes;
     void markIndexAsDirty(const QModelIndex &index);
     int currentSelectedFolderId;
+    bool noteShouldBeDisplayedInCurrentSelectedFolder(const NoteData &note);
 };
 
 #endif // NOTELISTMODEL_H

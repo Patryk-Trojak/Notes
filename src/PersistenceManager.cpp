@@ -201,6 +201,25 @@ void PersistenceManager::deleteAllNotesFromFolder(int folderId) const
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
 }
 
+void PersistenceManager::moveNotesToFolder(const QSet<int> &noteIds, int folderId)
+{
+    QSqlQuery query(db);
+    QString queryString = "UPDATE note "
+                          "SET parent_folder_id = :folder_id "
+                          "WHERE id IN (";
+
+    foreach (int id, noteIds)
+        queryString.append(QString::number(id) + ",");
+    queryString.removeLast();
+    queryString.append(")");
+
+    query.prepare(queryString);
+    query.bindValue(":folder_id", folderId);
+
+    if (!query.exec())
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+}
+
 std::vector<int> PersistenceManager::getIdsNotes() const
 {
     std::vector<int> ids;

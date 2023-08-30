@@ -22,12 +22,16 @@ class FolderTreeModel : public QAbstractItemModel
     Qt::ItemFlags flags(const QModelIndex &index) const;
     bool insertRows(int row, int count, const QModelIndex &parent);
     bool removeRows(int row, int count, const QModelIndex &parent);
+    bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
+    QStringList mimeTypes() const;
+    bool areAllDragingNotesInFolderIndex(const QModelIndex &index, const QMimeData *data);
 
   public slots:
     void updateNotesInsideCountOfFolder(int folderId, int deltaNoteInsideCount);
 
   signals:
     void folderDeletedFromDatabase(int deletedFolderId);
+    void moveNotesToFolderRequested(const QSet<int> &noteIds, int folderId);
 
   private:
     std::unique_ptr<FolderTreeItem> rootItem;
@@ -35,6 +39,8 @@ class FolderTreeModel : public QAbstractItemModel
     void setupModelData();
     void setupChildrenRecursively(FolderTreeItem &folderTreeItem, const QVector<FolderData> &listOfFolders);
     void deleteFolderRecursivelyFromDb(const FolderTreeItem &folderTreeItem);
+    const QMimeData *lastCheckedMimeData;
+    QModelIndex lastParentFolderIndexOfAllDragingNotes;
 };
 
 #endif // FOLDERTREEMODEL_H

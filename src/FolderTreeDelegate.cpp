@@ -11,7 +11,6 @@ FolderTreeDelegate::FolderTreeDelegate(QObject *parent) : QStyledItemDelegate(pa
 void FolderTreeDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     painter->save();
-
     painter->setRenderHint(QPainter::Antialiasing, true);
     const FolderTreeItem *item = static_cast<const FolderTreeItem *>(index.constInternalPointer());
     paintBackground(painter, option, item);
@@ -31,7 +30,19 @@ QSize FolderTreeDelegate::sizeHint(const QStyleOptionViewItem &option, const QMo
 void FolderTreeDelegate::paintBackground(QPainter *painter, const QStyleOptionViewItem &option,
                                          const FolderTreeItem *item) const
 {
-    if ((option.state & QStyle::State_Selected))
+    if (item == dropIndex.constInternalPointer())
+    {
+        QPainterPath path;
+        path.addRoundedRect(option.rect.adjusted(-15, 1, -1, 0), 20, 20);
+        painter->fillPath(path, QColor(218, 232, 240));
+        QPen p(QColor(4, 100, 150));
+        p.setWidth(2);
+        painter->save();
+        painter->setPen(p);
+        painter->drawPath(path);
+        painter->restore();
+    }
+    else if ((option.state & QStyle::State_Selected))
     {
         QPainterPath path;
         path.addRoundedRect(option.rect.adjusted(-15, 0, 0, 0), 20, 20);
@@ -100,6 +111,16 @@ void FolderTreeDelegate::paintBranchArrow(QPainter *painter, const QStyleOptionV
     }
 
     painter->drawPixmap(iconRect, icon.pixmap(iconSize));
+}
+
+void FolderTreeDelegate::setDropIndex(const QModelIndex &newDropIndex)
+{
+    dropIndex = newDropIndex;
+}
+
+void FolderTreeDelegate::setIndicator(DropIndicatorPosition newIndicator)
+{
+    dropIndicatorindicator = newIndicator;
 }
 
 QWidget *FolderTreeDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option,

@@ -56,6 +56,8 @@ NotesDisplayingTab::NotesDisplayingTab(NoteListModel &noteModel, PersistenceMana
     onNewFolderSelected(ui->folderTreeView->getCurrentFolderSelectedId());
     QObject::connect(&folderModel, &FolderTreeModel::folderDeletedFromDatabase, &noteModel,
                      &NoteListModel::onFolderDeleted);
+    QObject::connect(&folderModel, &FolderTreeModel::moveNotesToFolderRequested, &noteModel,
+                     &NoteListModel::moveNotesToFolder);
 
     QObject::connect(&noteModel, &NoteListModel::notesAddedToFolder, this, [this](int folderId, int addedNoteCount) {
         this->folderModel.updateNotesInsideCountOfFolder(folderId, addedNoteCount);
