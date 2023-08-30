@@ -74,7 +74,7 @@ void NoteListView::removeNote(const QModelIndex &index)
     if (reply == QMessageBox::No)
         return;
 
-    model()->removeRow(currentIndexWithEditor.row());
+    model()->removeRow(index.row());
 }
 
 void NoteListView::onNewEditorCreated(NoteButton *editor, const QModelIndex &index)
