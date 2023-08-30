@@ -1,4 +1,6 @@
 #include "NoteListModel.h"
+#include <QHash>
+#include <QMimeData>
 #include <QTimer>
 
 NoteListModel::NoteListModel(QObject *parent, PersistenceManager &persistenceManager)
@@ -235,6 +237,16 @@ void NoteListModel::markIndexAsDirty(const QModelIndex &index)
     dirtyIndexes.emplace_back(index);
 }
 
+QStringList NoteListModel::mimeTypes() const
+{
+    return QStringList(NoteMimeData::type);
+}
+
+QMimeData *NoteListModel::mimeData(const QModelIndexList &indexes) const
+{
+    return NoteMimeData::encodeData(indexes);
+}
+
 void NoteListModel::saveDirtyIndexes()
 {
     for (auto const &dirty : dirtyIndexes)
@@ -257,5 +269,5 @@ QModelIndex NoteListModel::parent(const QModelIndex &child) const
 
 Qt::ItemFlags NoteListModel::flags(const QModelIndex &index) const
 {
-    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable | Qt::ItemIsDragEnabled;
 }

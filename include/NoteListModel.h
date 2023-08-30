@@ -3,6 +3,7 @@
 
 #include "NoteData.h"
 #include "NoteListModelRole.h"
+#include "NoteMimeData.h"
 #include "PersistenceManager.h"
 #include <QAbstractItemModel>
 
@@ -24,6 +25,8 @@ class NoteListModel : public QAbstractItemModel
     bool removeRows(int row, int count, const QModelIndex &parent);
     QModelIndex parent(const QModelIndex &child) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
+    QStringList mimeTypes() const;
+    QMimeData *mimeData(const QModelIndexList &indexes) const;
     QModelIndex createNewNote();
     void restoreNoteFromTrash(const QModelIndex &index);
     int getCurrentSelectedFolderId() const;

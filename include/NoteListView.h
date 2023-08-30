@@ -28,6 +28,13 @@ class NoteListView : public QListView
   signals:
     void noteSelected(const QModelIndex &index);
 
+  protected:
+    void resizeEvent(QResizeEvent *event);
+    void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    bool viewportEvent(QEvent *event);
+    void verticalScrollbarValueChanged(int value);
+    void startDrag(Qt::DropActions supportedActions);
+
   private:
     NoteListDelegate noteListDelegate;
     NoteButton *editor;
@@ -37,6 +44,9 @@ class NoteListView : public QListView
     bool wasCtrlPressedWhileStartingDragSelecting;
     bool isDragSelecting;
     bool inSelectingState;
+
+    QPoint pressedPosition;
+    QModelIndex pressedIndex;
 
     void updateEditor();
     void removeNote(const QModelIndex &index);
@@ -49,17 +59,13 @@ class NoteListView : public QListView
     NoteListModel *getSourceModelAtTheBottom() const;
     QModelIndex mapIndexToSourceModelAtTheBott(const QModelIndex &index) const;
     bool isTrashFolderLoaded();
+    QPixmap drawDragPixmap(const QModelIndexList &indexes);
+    QVector<QColor> getNMostFrequentNotesColors(const QModelIndexList &indexes, int N);
 
   private slots:
     void onNewEditorCreated(NoteButton *editor, const QModelIndex &index);
     void onCustomContextMenuRequested(const QPoint &pos);
     void onRestoreNoteFromTrashRequested(const QModelIndex &index);
-
-  protected:
-    void resizeEvent(QResizeEvent *event);
-    void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
-    bool viewportEvent(QEvent *event);
-    void verticalScrollbarValueChanged(int value);
 };
 
 #endif // NOTELISTVIEW_H

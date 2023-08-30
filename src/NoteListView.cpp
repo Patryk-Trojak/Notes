@@ -2,10 +2,13 @@
 #include "NoteListModel.h"
 #include <QAbstractProxyModel>
 #include <QApplication>
+#include <QDrag>
 #include <QEvent>
 #include <QHBoxLayout>
 #include <QMenu>
 #include <QMouseEvent>
+#include <QPainter>
+#include <QPainterPath>
 #include <QScrollBar>
 #include <qmessagebox.h>
 
@@ -15,18 +18,20 @@ NoteListView::NoteListView(QWidget *parent)
 {
     setSelectionMode(QAbstractItemView::NoSelection);   // there is implemented custom selection
     setEditTriggers(QAbstractItemView::NoEditTriggers); // there is implemented custom editing
-    setMouseTracking(true);
-    setItemDelegate(&noteListDelegate);
-    setAutoScroll(false);
-    setVerticalScrollMode(ScrollMode::ScrollPerPixel);
-    verticalScrollBar()->setSingleStep(20);
-    QObject::connect(&noteListDelegate, &NoteListDelegate::newEditorCreated, this, &NoteListView::onNewEditorCreated);
-    QObject::connect(this, &QListView::customContextMenuRequested, this, &NoteListView::onCustomContextMenuRequested);
-
-    setUniformItemSizes(true);
     setGridSize(QSize(220, 220));
     setResizeMode(ResizeMode::Adjust);
     setViewMode(ViewMode::IconMode);
+    setDragDropMode(DragDropMode::DragOnly);
+    setVerticalScrollMode(ScrollMode::ScrollPerPixel);
+    setUniformItemSizes(true);
+    setMouseTracking(true);
+    setAutoScroll(false);
+    setItemDelegate(&noteListDelegate);
+    verticalScrollBar()->setSingleStep(20);
+
+    QObject::connect(&noteListDelegate, &NoteListDelegate::newEditorCreated, this, &NoteListView::onNewEditorCreated);
+    QObject::connect(this, &QListView::customContextMenuRequested, this, &NoteListView::onCustomContextMenuRequested);
+
     int widthOfScrollbar = 14;
     QString style =
         QString(
@@ -91,39 +96,6 @@ void NoteListView::onNewEditorCreated(NoteButton *editor, const QModelIndex &ind
                      [this, editor, index]() { noteListDelegate.setModelData(editor, this->model(), index); });
     QObject::connect(editor, &NoteButton::colorChanged, this,
                      [this, editor, index]() { noteListDelegate.setModelData(editor, this->model(), index); });
-}
-
-NoteListModel *NoteListView::getSourceModelAtTheBottom() const
-{
-    // We know that at the bottom there is NoteListModel.
-    // If we want to access it, we need to find it, because proxy model can be set to view
-    QAbstractItemModel *currentModel = model();
-    forever
-    {
-        if (NoteListModel *noteModel = qobject_cast<NoteListModel *>(currentModel))
-            return noteModel;
-
-        if (QAbstractProxyModel *proxyModel = qobject_cast<QAbstractProxyModel *>(currentModel))
-            currentModel = proxyModel->sourceModel();
-        else
-            return nullptr;
-    }
-}
-
-QModelIndex NoteListView::mapIndexToSourceModelAtTheBott(const QModelIndex &index) const
-{
-    // We know that at the bottom there is NoteListModel.
-    // Because indexes which view uses can be from proxy model,
-    // we need to map it if we want to access directly NoteListModel
-    QAbstractItemModel *currentModel = model();
-    QModelIndex currentIndex = index;
-    while (QAbstractProxyModel *proxyModel = qobject_cast<QAbstractProxyModel *>(currentModel))
-    {
-        currentIndex = proxyModel->mapToSource(currentIndex);
-        currentModel = proxyModel->sourceModel();
-    }
-
-    return currentIndex;
 }
 
 bool NoteListView::isTrashFolderLoaded()
@@ -251,9 +223,29 @@ bool NoteListView::eventFilter(QObject *watched, QEvent *event)
     if (watched == verticalScrollBar() or watched == horizontalScrollBar())
         return QListView::eventFilter(watched, event);
 
+    if (event->type() == QEvent::MouseButtonPress)
+    {
+        pressedPosition = this->mapFromGlobal(static_cast<QMouseEvent *>(event)->globalPosition().toPoint());
+        pressedIndex = indexAt(pressedPosition);
+    }
+
+    if (event->type() == QEvent::MouseMove and static_cast<QMouseEvent *>(event)->buttons() & Qt::LeftButton and
+        pressedIndex.isValid())
+    {
+        QPoint mouseDistanceSinceLastPressedPosition =
+            pressedPosition - this->mapFromGlobal(static_cast<QMouseEvent *>(event)->globalPosition().toPoint());
+        if (mouseDistanceSinceLastPressedPosition.manhattanLength() > QApplication::startDragDistance())
+        {
+            startDrag(Qt::CopyAction);
+            pressedIndex = QModelIndex();
+        }
+    }
+
     if (QApplication::keyboardModifiers() & Qt::ControlModifier)
     {
-        if (event->type() == QEvent::MouseButtonPress or event->type() == QEvent::MouseButtonDblClick)
+
+        if (event->type() == QEvent::MouseButtonPress or event->type() == QEvent::MouseButtonDblClick or
+            event->type() == QEvent::MouseMove)
             return true;
 
         if (event->type() == QEvent::MouseButtonRelease)
@@ -360,6 +352,8 @@ bool NoteListView::viewportEvent(QEvent *event)
             selectionModel()->select(clickedIndex, QItemSelectionModel::Toggle);
             if (selectionModel()->selection().empty())
                 setInSelectingState(false);
+            else
+                setInSelectingState(true);
         }
     }
     return result;
@@ -369,6 +363,92 @@ void NoteListView::verticalScrollbarValueChanged(int value)
 {
     QListView::verticalScrollbarValueChanged(value);
     updateMousePositionOfDragSelecting(mapFromGlobal(QCursor::pos()));
+}
+
+void NoteListView::startDrag(Qt::DropActions supportedActions)
+{
+    QModelIndexList indexes = selectedIndexes();
+
+    if (indexes.isEmpty() and pressedIndex.isValid()) // Special case when user want to drag note in no electing state
+    {
+        indexes.emplaceBack(pressedIndex);
+        if (editor)
+        {
+            closePersistentEditor(currentIndexWithEditor);
+            editor = nullptr;
+            currentIndexWithEditor = QModelIndex();
+        }
+    }
+
+    if (!indexes.contains(indexAt(mapFromGlobal(QCursor::pos()))))
+        return;
+
+    if (indexes.count() > 0)
+    {
+        QMimeData *data = model()->mimeData(indexes);
+        if (!data)
+            return;
+        QPixmap pixmap = drawDragPixmap(indexes);
+        QDrag *drag = new QDrag(this);
+        drag->setPixmap(pixmap);
+        drag->setMimeData(data);
+        drag->setHotSpot(QPoint((qMin(indexes.size(), 4) - 1) * 3 + 20, (qMin(indexes.size(), 4) - 1) * 3 + 40));
+        drag->exec(supportedActions);
+    }
+}
+
+QPixmap NoteListView::drawDragPixmap(const QModelIndexList &indexes)
+{
+    QPixmap pixmap(60, 60);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    int notesToDrawCount = qMin(4, indexes.size());
+    QVector<QColor> colorOfNotes = getNMostFrequentNotesColors(indexes, notesToDrawCount);
+
+    for (int i = 0; i < notesToDrawCount; i++)
+    {
+        QPainterPath path;
+        path.addRoundedRect(QRect(i * 3, i * 3, 40, 40), 5, 5);
+        painter.fillPath(path, colorOfNotes[qMax(colorOfNotes.size() - 1 - i, 0)]);
+        painter.drawPath(path);
+    }
+    QString dragingNotesCount = QString::number(indexes.size());
+    QFont f;
+    f.setPixelSize(dragingNotesCount.size() <= 3 ? 20 : 15);
+    painter.setFont(f);
+    painter.drawText(QRect((notesToDrawCount - 1) * 3, (notesToDrawCount - 1) * 3, 40, 40), Qt::AlignCenter,
+                     dragingNotesCount);
+
+    return pixmap;
+}
+
+QVector<QColor> NoteListView::getNMostFrequentNotesColors(const QModelIndexList &indexes, int N)
+{
+    QHash<QColor, int> colorsCounts;
+    for (auto const &index : indexes)
+        colorsCounts[index.data(NoteListModelRole::Color).value<QColor>()] += 1;
+
+    QVector<std::pair<QColor, int>> colorCountsVec;
+    for (auto i = colorsCounts.begin(), end = colorsCounts.end(); i != end; ++i)
+        colorCountsVec.emplaceBack(i.key(), i.value());
+    std::sort(colorCountsVec.begin(), colorCountsVec.end(),
+              [](const std::pair<QColor, int> &colorCount1, const std::pair<QColor, int> &colorCount2) {
+                  return colorCount1.second > colorCount2.second;
+              });
+
+    if (colorCountsVec.size() == 2 and colorCountsVec[0].second == colorCountsVec[1].second and indexes.size() > 2)
+        colorCountsVec.append(colorCountsVec[1]);
+
+    if (colorCountsVec.size() > N)
+        colorCountsVec.erase(colorCountsVec.cbegin() + N);
+
+    QVector<QColor> result;
+    for (auto const &i : colorCountsVec)
+        result.emplaceBack(i.first);
+
+    return result;
 }
 
 void NoteListView::updateEditor()
@@ -445,3 +525,44 @@ void NoteListView::setMinWidthToFitNotesInRow(int numberOfNotesToFitInOneRow)
 {
     resize(numberOfNotesToFitInOneRow * gridSize().width() + verticalScrollBar()->geometry().width() + 1, height());
 }
+
+NoteListModel *NoteListView::getSourceModelAtTheBottom() const
+{
+    // We know that at the bottom there is NoteListModel.
+    // If we want to access it, we need to find it, because proxy model can be set to view
+    QAbstractItemModel *currentModel = model();
+    forever
+    {
+        if (NoteListModel *noteModel = qobject_cast<NoteListModel *>(currentModel))
+            return noteModel;
+
+        if (QAbstractProxyModel *proxyModel = qobject_cast<QAbstractProxyModel *>(currentModel))
+            currentModel = proxyModel->sourceModel();
+        else
+            return nullptr;
+    }
+}
+
+QModelIndex NoteListView::mapIndexToSourceModelAtTheBott(const QModelIndex &index) const
+{
+    // We know that at the bottom there is NoteListModel.
+    // Because indexes which view uses can be from proxy model,
+    // we need to map it if we want to access directly NoteListModel
+    QAbstractItemModel *currentModel = model();
+    QModelIndex currentIndex = index;
+    while (QAbstractProxyModel *proxyModel = qobject_cast<QAbstractProxyModel *>(currentModel))
+    {
+        currentIndex = proxyModel->mapToSource(currentIndex);
+        currentModel = proxyModel->sourceModel();
+    }
+
+    return currentIndex;
+}
+
+template <> struct std::hash<QColor>
+{
+    std::size_t operator()(const QColor &c) const noexcept
+    {
+        return std::hash<unsigned int>{}(c.rgba());
+    }
+};
