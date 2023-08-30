@@ -32,6 +32,7 @@ class PersistenceManager
     std::vector<int> getIdsNotes() const;
     void deleteNote(int id) const;
     int countAllNotes();
+    int countNotesInFolder(int folderId);
 
     void moveNoteToTrash(int noteId) const;
     void moveAllNotesFromFolderToTrash(int folderId) const;

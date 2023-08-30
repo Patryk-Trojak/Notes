@@ -170,14 +170,50 @@ bool FolderTreeModel::areAllDragingNotesInFolderIndex(const QModelIndex &index, 
     return lastParentFolderIndexOfAllDragingNotes == index;
 }
 
-void FolderTreeModel::updateNotesInsideCountOfFolder(int folderId, int deltaNoteInsideCount)
+void FolderTreeModel::onNotesMoved(int sourceFolderId, int destinationFolderId, int notesCount)
 {
-    QModelIndex folderIndex = findIndex(folderId);
-    FolderTreeItem *folder = static_cast<FolderTreeItem *>(folderIndex.internalPointer());
-    folder->data.setNotesInsideCount(folder->data.getNotesInsideCount() + deltaNoteInsideCount);
+    FolderTreeItem *sourceFolder = static_cast<FolderTreeItem *>(findIndex(sourceFolderId).internalPointer());
+    FolderTreeItem *destinationFolder = static_cast<FolderTreeItem *>(findIndex(destinationFolderId).internalPointer());
 
-    persistenceManager.updateFolder(folder->data);
-    emit dataChanged(folderIndex, folderIndex);
+    if (sourceFolderId != SpecialFolderId::AllNotesFolder)
+    {
+        sourceFolder->data.setNotesInsideCount(sourceFolder->data.getNotesInsideCount() - notesCount);
+        if (destinationFolderId == SpecialFolderId::TrashFolder)
+        {
+            FolderTreeItem *allNotesFolder =
+                static_cast<FolderTreeItem *>(findIndex(SpecialFolderId::AllNotesFolder).internalPointer());
+            allNotesFolder->data.setNotesInsideCount(allNotesFolder->data.getNotesInsideCount() - notesCount);
+        }
+    }
+    else if (destinationFolderId == SpecialFolderId::TrashFolder)
+        sourceFolder->data.setNotesInsideCount(sourceFolder->data.getNotesInsideCount() - notesCount);
+
+    if (destinationFolderId != SpecialFolderId::AllNotesFolder)
+    {
+        destinationFolder->data.setNotesInsideCount(destinationFolder->data.getNotesInsideCount() + notesCount);
+    }
+}
+
+void FolderTreeModel::onNotesAdded(int parentFolderId, int notesCount)
+{
+    updateNotesInsideCountOfFolders(parentFolderId, notesCount);
+}
+
+void FolderTreeModel::onNotesRemoved(int parentFolderId, int notesCount)
+{
+    updateNotesInsideCountOfFolders(parentFolderId, -notesCount);
+}
+
+void FolderTreeModel::updateNotesInsideCountOfFolders(int updatedFolderId, int notesCount)
+{
+    FolderTreeItem *folder = static_cast<FolderTreeItem *>(findIndex(updatedFolderId).internalPointer());
+    folder->data.setNotesInsideCount(folder->data.getNotesInsideCount() + notesCount);
+    if (updatedFolderId != SpecialFolderId::AllNotesFolder and updatedFolderId != SpecialFolderId::TrashFolder)
+    {
+        FolderTreeItem *allNotesFolder =
+            static_cast<FolderTreeItem *>(findIndex(SpecialFolderId::AllNotesFolder).internalPointer());
+        allNotesFolder->data.setNotesInsideCount(allNotesFolder->data.getNotesInsideCount() + notesCount);
+    }
 }
 
 void FolderTreeModel::setupModelData()
@@ -237,9 +273,6 @@ void FolderTreeModel::setupChildrenRecursively(FolderTreeItem &folderTreeItem, c
 
 void FolderTreeModel::deleteFolderRecursivelyFromDb(const FolderTreeItem &folderTreeItem)
 {
-    updateNotesInsideCountOfFolder(SpecialFolderId::TrashFolder, folderTreeItem.data.getNotesInsideCount());
-    updateNotesInsideCountOfFolder(SpecialFolderId::AllNotesFolder, -folderTreeItem.data.getNotesInsideCount());
-
     persistenceManager.deleteFolder(folderTreeItem.data.getId());
     emit folderDeletedFromDatabase(folderTreeItem.data.getId());
 

@@ -38,8 +38,9 @@ class NoteListModel : public QAbstractItemModel
     void onFolderDeleted(int deletedFolderId);
 
   signals:
-    void notesRemovedFromFolder(int folderId, int notesRemovedCount = 1);
-    void notesAddedToFolder(int folderId, int notesAddedCount);
+    void notesMoved(int sourceFolderId, int destinationFolderId, int notesCount);
+    void notesAdded(int parentFolderId, int notesCount);
+    void notesRemoved(int parentFolderId, int notesCount);
 
   private:
     PersistenceManager &persistenceManager;

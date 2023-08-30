@@ -27,7 +27,9 @@ class FolderTreeModel : public QAbstractItemModel
     bool areAllDragingNotesInFolderIndex(const QModelIndex &index, const QMimeData *data);
 
   public slots:
-    void updateNotesInsideCountOfFolder(int folderId, int deltaNoteInsideCount);
+    void onNotesMoved(int sourceFolderId, int destinationFolderId, int notesCount);
+    void onNotesAdded(int parentFolderId, int notesCount);
+    void onNotesRemoved(int parentFolderId, int notesCount);
 
   signals:
     void folderDeletedFromDatabase(int deletedFolderId);
@@ -42,6 +44,7 @@ class FolderTreeModel : public QAbstractItemModel
     void deleteFolderRecursivelyFromDb(const FolderTreeItem &folderTreeItem);
     const QMimeData *lastCheckedMimeData;
     QModelIndex lastParentFolderIndexOfAllDragingNotes;
+    void updateNotesInsideCountOfFolders(int updatedFolderId, int notesCount);
 };
 
 #endif // FOLDERTREEMODEL_H

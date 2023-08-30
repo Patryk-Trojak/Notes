@@ -264,6 +264,21 @@ int PersistenceManager::countAllNotes()
     return query.value(0).toInt();
 }
 
+int PersistenceManager::countNotesInFolder(int folderId)
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT COUNT(*) FROM note WHERE parent_folder_id = :parent_folder_id");
+    query.bindValue(":parent_folder_id", folderId);
+
+    if (!query.exec())
+    {
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+        return 0;
+    }
+    query.next();
+    return query.value(0).toInt();
+}
+
 QVector<FolderData> PersistenceManager::loadAllFolders() const
 {
     QVector<FolderData> folders;
