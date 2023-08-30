@@ -118,8 +118,7 @@ void NoteListView::onCustomContextMenuRequested(const QPoint &pos)
     if (!isTrashFolderLoaded())
     {
         QAction *createNote = new QAction("Create new note");
-        QObject::connect(createNote, &QAction::triggered, this,
-                         [this, index]() { this->model()->insertRow(0, index); });
+        QObject::connect(createNote, &QAction::triggered, this, [this, index]() { this->model()->insertRow(0); });
         menu->addAction(createNote);
         if (index.isValid())
         {
