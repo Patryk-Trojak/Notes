@@ -220,6 +220,34 @@ void NoteListModel::moveNotesToFolder(const QSet<int> &noteIds, int folderId)
     }
 }
 
+void NoteListModel::removeNotes(QModelIndexList &indexes)
+{
+    QVector<int> noteIds;
+    noteIds.reserve(indexes.size());
+    for (auto const &index : indexes)
+        noteIds.emplaceBack(notes[index.row()].getId());
+
+    if (currentSelectedFolderId == SpecialFolderId::TrashFolder)
+        persistenceManager.deleteNotes(noteIds);
+    else
+        persistenceManager.moveNotesToTrash(noteIds);
+
+    std::sort(indexes.begin(), indexes.end(),
+              [](const QModelIndex &first, const QModelIndex &second) { return first.row() > second.row(); });
+
+    for (auto it = indexes.constBegin(); it != indexes.constEnd(); ++it)
+    {
+        if (currentSelectedFolderId == SpecialFolderId::TrashFolder)
+            emit notesRemoved(notes[it->row()].getParentFolderId(), 1);
+        else
+            emit notesMoved(notes[it->row()].getParentFolderId(), SpecialFolderId::TrashFolder, 1);
+
+        beginRemoveRows(it->parent(), it->row(), it->row());
+        notes.remove(it->row());
+        endRemoveRows();
+    }
+}
+
 void NoteListModel::restoreNoteFromTrash(const QModelIndex &index)
 {
     persistenceManager.restoreNoteFromTrash(notes[index.row()].getId());

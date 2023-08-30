@@ -28,13 +28,16 @@ class PersistenceManager
     QVector<NoteData> loadAllNotes() const;
     QVector<NoteData> loadAllNotesFromFolder(int folderId) const;
     void deleteAllNotesFromFolder(int folderId) const;
+    void deleteNote(int id) const;
+    void deleteNotes(const QVector<int> &noteIds);
     void moveNotesToFolder(const QSet<int> &noteIds, int folderId);
     std::vector<int> getIdsNotes() const;
-    void deleteNote(int id) const;
     int countAllNotes();
     int countNotesInFolder(int folderId);
+    QHash<int, int> getNotesInsideFoldersCounts();
 
     void moveNoteToTrash(int noteId) const;
+    void moveNotesToTrash(const QVector<int> &noteIds);
     void moveAllNotesFromFolderToTrash(int folderId) const;
     void restoreNoteFromTrash(int noteId) const;
     QVector<NoteData> loadAllNotesFromTrash() const;
@@ -45,7 +48,6 @@ class PersistenceManager
     int addFolder(const FolderData &folder) const;
     void updateFolder(const FolderData &folder) const;
     void deleteFolder(int id) const;
-    QHash<int, int> getNotesInsideFoldersCounts();
 
   private:
     QSqlDatabase db;

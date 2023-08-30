@@ -58,6 +58,7 @@ class NoteListView : public QListView
     void selectNotes(const QRect &rubberBand);
     NoteListModel *getSourceModelAtTheBottom() const;
     QModelIndex mapIndexToSourceModelAtTheBott(const QModelIndex &index) const;
+    QModelIndexList mapIndexesToSourceModelAtTheBottom(const QModelIndexList &indexes);
     bool isTrashFolderLoaded();
     QPixmap drawDragPixmap(const QModelIndexList &indexes);
     QVector<QColor> getNMostFrequentNotesColors(const QModelIndexList &indexes, int N);

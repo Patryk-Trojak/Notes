@@ -140,6 +140,25 @@ void PersistenceManager::moveNoteToTrash(int noteId) const
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
 }
 
+void PersistenceManager::moveNotesToTrash(const QVector<int> &noteIds)
+{
+    QSqlQuery query(db);
+    QString queryString = "UPDATE note "
+                          "SET parent_folder_id = :thrash_folder_id "
+                          "WHERE id IN (";
+
+    foreach (int id, noteIds)
+        queryString.append(QString::number(id) + ",");
+    queryString.removeLast();
+    queryString.append(")");
+
+    query.prepare(queryString);
+    query.bindValue(":thrash_folder_id", SpecialFolderId::TrashFolder);
+
+    if (!query.exec())
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+}
+
 void PersistenceManager::moveAllNotesFromFolderToTrash(int folderId) const
 {
     QSqlQuery query(db);
@@ -245,6 +264,21 @@ void PersistenceManager::deleteNote(int id) const
     query.prepare("DELETE FROM note WHERE id = :id");
     query.bindValue(":id", id);
 
+    if (!query.exec())
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+}
+
+void PersistenceManager::deleteNotes(const QVector<int> &noteIds)
+{
+    QSqlQuery query(db);
+    QString queryString = "DELETE FROM note WHERE id IN (";
+
+    foreach (int id, noteIds)
+        queryString.append(QString::number(id) + ",");
+    queryString.removeLast();
+    queryString.append(")");
+
+    query.prepare(queryString);
     if (!query.exec())
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
 }

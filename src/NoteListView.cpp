@@ -180,13 +180,9 @@ void NoteListView::removeSelectedNotes()
         return;
 
     auto selected = selectionModel()->selectedIndexes();
-    std::sort(selected.begin(), selected.end(),
-              [](const QModelIndex &first, const QModelIndex &second) { return first.row() > second.row(); });
-
-    for (auto it = selected.constBegin(); it != selected.constEnd(); ++it)
-    {
-        model()->removeRow(it->row());
-    }
+    QModelIndexList noteModelIndexes = mapIndexesToSourceModelAtTheBottom(selected);
+    NoteListModel *noteModel = getSourceModelAtTheBottom();
+    noteModel->removeNotes(noteModelIndexes);
 }
 
 void NoteListView::changeColorOfSelectedNotes(const QColor &newColor)
@@ -560,6 +556,19 @@ QModelIndex NoteListView::mapIndexToSourceModelAtTheBott(const QModelIndex &inde
     }
 
     return currentIndex;
+}
+
+QModelIndexList NoteListView::mapIndexesToSourceModelAtTheBottom(const QModelIndexList &indexes)
+{
+    QModelIndexList result;
+    result.reserve(indexes.size());
+
+    for (auto const &index : indexes)
+    {
+        result.append(mapIndexToSourceModelAtTheBott(index));
+    }
+
+    return result;
 }
 
 template <> struct std::hash<QColor>
