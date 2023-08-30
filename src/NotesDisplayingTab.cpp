@@ -227,22 +227,26 @@ bool NotesDisplayingTab::eventFilter(QObject *watched, QEvent *event)
 void NotesDisplayingTab::mousePressEvent(QMouseEvent *event)
 {
     QWidget::mousePressEvent(event);
-    if (ui->middleFrame->geometry().contains(event->pos()))
-    {
-        if (!rubberBand)
-        {
-            originOfRubberBandInNoteListView =
-                noteListView->mapFromGlobal(event->globalPosition().toPoint()) + noteListView->getOffsetOfViewport();
-            if (originOfRubberBandInNoteListView.y() < noteListView->y())
-                originOfRubberBandInNoteListView.setY(noteListView->getOffsetOfViewport().y());
 
-            noteListView->startDragSelecting(noteListView->mapFromGlobal(event->globalPosition().toPoint()));
-            rubberBand = new QRubberBand(QRubberBand::Rectangle, ui->middleFrame);
-            wasRubberBandMoved = false;
-            updateRubberBand();
-            rubberBand->show();
-        }
-    }
+    if (!(event->button() & Qt::LeftButton))
+        return;
+
+    if (!ui->middleFrame->geometry().contains(event->pos()))
+        return;
+
+    if (rubberBand)
+        delete rubberBand;
+
+    originOfRubberBandInNoteListView =
+        noteListView->mapFromGlobal(event->globalPosition().toPoint()) + noteListView->getOffsetOfViewport();
+    if (originOfRubberBandInNoteListView.y() < noteListView->y())
+        originOfRubberBandInNoteListView.setY(noteListView->getOffsetOfViewport().y());
+
+    noteListView->startDragSelecting(noteListView->mapFromGlobal(event->globalPosition().toPoint()));
+    rubberBand = new QRubberBand(QRubberBand::Rectangle, ui->middleFrame);
+    wasRubberBandMoved = false;
+    updateRubberBand();
+    rubberBand->show();
 }
 
 void NotesDisplayingTab::mouseReleaseEvent(QMouseEvent *event)

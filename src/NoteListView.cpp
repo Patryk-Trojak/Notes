@@ -109,6 +109,9 @@ bool NoteListView::isTrashFolderLoaded()
 
 void NoteListView::onCustomContextMenuRequested(const QPoint &pos)
 {
+    if (isDragSelecting)
+        return;
+
     QModelIndex index = indexAt(pos);
     QMenu *menu = new QMenu(this);
 
