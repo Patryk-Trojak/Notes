@@ -24,6 +24,7 @@ class PersistenceManager
     PersistenceManager();
     int addNote(const NoteData &note) const;
     void updateNote(const NoteData &note) const;
+    void setColorOfNotes(const QVector<int> &noteIds, const QColor &color);
     NoteData loadNote(int id) const;
     QVector<NoteData> loadAllNotes() const;
     QVector<NoteData> loadAllNotesFromFolder(int folderId) const;

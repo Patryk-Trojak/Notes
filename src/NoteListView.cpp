@@ -188,10 +188,9 @@ void NoteListView::removeSelectedNotes()
 void NoteListView::changeColorOfSelectedNotes(const QColor &newColor)
 {
     auto selected = selectionModel()->selectedIndexes();
-    for (auto const &index : selected)
-    {
-        model()->setData(index, newColor, NoteListModelRole::Color);
-    }
+    QModelIndexList noteModelIndexes = mapIndexesToSourceModelAtTheBottom(selected);
+    NoteListModel *noteModel = getSourceModelAtTheBottom();
+    noteModel->setColorOfNotes(noteModelIndexes, newColor);
 }
 
 void NoteListView::toogleIsPinnedOfSelectedNotes()

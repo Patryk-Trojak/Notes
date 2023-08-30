@@ -29,10 +29,12 @@ class NoteListModel : public QAbstractItemModel
     QMimeData *mimeData(const QModelIndexList &indexes) const;
     QModelIndex createNewNote();
     void moveNotesToFolder(const QSet<int> &noteIds, int folderId);
+    void setColorOfNotes(const QModelIndexList &indexes, const QColor &color);
     void removeNotes(QModelIndexList &indexes);
     void restoreNoteFromTrash(const QModelIndex &index);
     int getCurrentSelectedFolderId() const;
     void saveDirtyIndexes();
+    QVector<int> getNoteIds(const QModelIndexList &indexes);
 
   public slots:
     void onNewFolderSelected(int selectedFolderId);

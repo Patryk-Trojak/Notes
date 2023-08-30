@@ -66,6 +66,25 @@ void PersistenceManager::updateNote(const NoteData &note) const
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
 }
 
+void PersistenceManager::setColorOfNotes(const QVector<int> &noteIds, const QColor &color)
+{
+    QSqlQuery query(db);
+    QString queryString = "UPDATE note "
+                          "SET color = :color "
+                          "WHERE id IN (";
+
+    foreach (int id, noteIds)
+        queryString.append(QString::number(id) + ",");
+    queryString.removeLast();
+    queryString.append(")");
+
+    query.prepare(queryString);
+    query.bindValue(":color", color.name());
+
+    if (!query.exec())
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+}
+
 NoteData PersistenceManager::loadNote(int id) const
 {
     QSqlQuery query(db);

@@ -220,12 +220,22 @@ void NoteListModel::moveNotesToFolder(const QSet<int> &noteIds, int folderId)
     }
 }
 
+void NoteListModel::setColorOfNotes(const QModelIndexList &indexes, const QColor &color)
+{
+    QVector<int> noteIds = getNoteIds(indexes);
+
+    persistenceManager.setColorOfNotes(noteIds, color);
+
+    for (auto const &index : indexes)
+    {
+        notes[index.row()].setColor(color);
+        emit dataChanged(index, index);
+    }
+}
+
 void NoteListModel::removeNotes(QModelIndexList &indexes)
 {
-    QVector<int> noteIds;
-    noteIds.reserve(indexes.size());
-    for (auto const &index : indexes)
-        noteIds.emplaceBack(notes[index.row()].getId());
+    QVector<int> noteIds = getNoteIds(indexes);
 
     if (currentSelectedFolderId == SpecialFolderId::TrashFolder)
         persistenceManager.deleteNotes(noteIds);
@@ -319,6 +329,16 @@ void NoteListModel::saveDirtyIndexes()
             persistenceManager.updateNote(notes[dirty.row()]);
     }
     dirtyIndexes.clear();
+}
+
+QVector<int> NoteListModel::getNoteIds(const QModelIndexList &indexes)
+{
+    QVector<int> noteIds;
+    noteIds.reserve(indexes.size());
+    for (auto const &index : indexes)
+        noteIds.emplaceBack(notes[index.row()].getId());
+
+    return noteIds;
 }
 
 int NoteListModel::getCurrentSelectedFolderId() const
