@@ -33,7 +33,7 @@ void FolderTreeDelegate::paintBackground(QPainter *painter, const QStyleOptionVi
     if (item == dropIndex.constInternalPointer())
     {
         QPainterPath path;
-        path.addRoundedRect(option.rect.adjusted(-15, 1, -1, 0), 20, 20);
+        path.addRoundedRect(option.rect.adjusted(-15, 0, -1, -1), 20, 20);
         painter->fillPath(path, QColor(218, 232, 240));
         QPen p(QColor(4, 100, 150));
         p.setWidth(2);
