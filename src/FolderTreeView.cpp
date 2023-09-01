@@ -134,17 +134,10 @@ void FolderTreeView::updateDropTooltip(const QDragMoveEvent *event)
     dropTooltip->setVisible(true);
 }
 
-FolderTreeDelegate::DropIndicatorPosition FolderTreeView::convertDropIndicatorPosition(
-    DropIndicatorPosition dropIndicator)
-{
-    return static_cast<FolderTreeDelegate::DropIndicatorPosition>(static_cast<int>(dropIndicator));
-}
-
 void FolderTreeView::dropEvent(QDropEvent *event)
 {
     QTreeView::dropEvent(event);
     delegate.setDropIndex(QModelIndex());
-    delegate.setIndicator(convertDropIndicatorPosition(dropIndicatorPosition()));
     dropTooltip->setVisible(false);
 }
 
@@ -153,7 +146,6 @@ void FolderTreeView::dragMoveEvent(QDragMoveEvent *event)
     QTreeView::dragMoveEvent(event);
     QModelIndex dropIndex = indexAt(event->position().toPoint());
     delegate.setDropIndex(dropIndex);
-    delegate.setIndicator(convertDropIndicatorPosition(dropIndicatorPosition()));
 
     if (!dropIndex.isValid())
     {
@@ -167,7 +159,6 @@ void FolderTreeView::dragLeaveEvent(QDragLeaveEvent *event)
 {
     QAbstractItemView::dragLeaveEvent(event);
     delegate.setDropIndex(QModelIndex());
-    delegate.setIndicator(convertDropIndicatorPosition(dropIndicatorPosition()));
     dropTooltip->setVisible(false);
 }
 

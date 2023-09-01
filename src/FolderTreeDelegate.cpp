@@ -118,11 +118,6 @@ void FolderTreeDelegate::setDropIndex(const QModelIndex &newDropIndex)
     dropIndex = newDropIndex;
 }
 
-void FolderTreeDelegate::setIndicator(DropIndicatorPosition newIndicator)
-{
-    dropIndicatorindicator = newIndicator;
-}
-
 QWidget *FolderTreeDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                                           const QModelIndex &index) const
 {

@@ -15,14 +15,6 @@ class FolderTreeDelegate : public QStyledItemDelegate
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    enum DropIndicatorPosition
-    {
-        OnItem,
-        AboveItem,
-        BelowItem,
-        OnViewport
-    };
-    void setIndicator(DropIndicatorPosition newIndicator);
     void setDropIndex(const QModelIndex &newDropIndex);
 
   private:
@@ -33,7 +25,6 @@ class FolderTreeDelegate : public QStyledItemDelegate
     void paintBranchArrow(QPainter *painter, const QStyleOptionViewItem &option, const FolderTreeItem *item) const;
 
     QModelIndex dropIndex;
-    DropIndicatorPosition dropIndicatorindicator;
 };
 
 #endif // FOLDERTREEDELEGATE_H

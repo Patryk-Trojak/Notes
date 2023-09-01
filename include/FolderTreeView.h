@@ -48,7 +48,6 @@ class FolderTreeView : public QTreeView
     FolderTreeDelegate delegate;
     QLabel *dropTooltip;
     void updateDropTooltip(const QDragMoveEvent *event);
-    FolderTreeDelegate::DropIndicatorPosition convertDropIndicatorPosition(QAbstractItemView::DropIndicatorPosition);
 
   private slots:
     void onCustomContextMenuRequested(const QPoint &pos);
