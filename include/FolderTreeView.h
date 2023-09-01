@@ -2,6 +2,7 @@
 #define FOLDERTREEVIEW_H
 #include "FolderTreeDelegate.h"
 #include <QLabel>
+#include <QMessageBox>
 #include <QPainter>
 #include <QPainterPath>
 #include <QProxyStyle>
@@ -11,16 +12,10 @@ class FolderTreeViewProxyStyle : public QProxyStyle
 {
   public:
     void drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter,
-                       const QWidget *widget) const
-    {
-        if (element == QStyle::PE_IndicatorItemViewItemDrop)
-        {
-            // We handle drawing indicator in delegate, bacause we only want to change background color of item.
-            // Here we cannot do that since it will be displayed on top of item and therefore on top of icon
-            // and text which changes their color. We want to avoid it. We can't also set showDropIndicator to false,
-            // because it disables drop on valid items.
-        }
-    }
+                       const QWidget *widget) const;
+
+    bool drawIndicator{false};
+    bool isIndicatorAboveItem{false};
 };
 
 class FolderTreeView : public QTreeView
@@ -40,18 +35,26 @@ class FolderTreeView : public QTreeView
     void dragMoveEvent(QDragMoveEvent *event);
     void dragEnterEvent(QDragEnterEvent *event);
     void dragLeaveEvent(QDragLeaveEvent *event);
+    void startDrag(Qt::DropActions supportedActions);
 
   protected slots:
     void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
   private:
     FolderTreeDelegate delegate;
+    FolderTreeViewProxyStyle *myStyle;
     QLabel *dropTooltip;
+    QPoint dropTooltipOffset;
     void updateDropTooltip(const QDragMoveEvent *event);
+    void updateTextOfDropTooltip(const QModelIndex &dropIndex, const QMimeData &mimeData);
+    void updateSizeOfDropTooltip();
+    void updateTextFormatingOfDropTooltip(const QModelIndex &dropIndex);
 
   private slots:
     void onCustomContextMenuRequested(const QPoint &pos);
     void deleteFolder(const QModelIndex &index);
+    QPixmap renderDragPixmap(const QModelIndexList &indexes, QPoint *hotSpot);
+    QMessageBox::StandardButton makeSureIfUserWantToDeleteFolder();
 };
 
 #endif // FOLDERTREEVIEW_H
