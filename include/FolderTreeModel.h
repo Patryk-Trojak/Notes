@@ -1,6 +1,7 @@
 #ifndef FOLDERTREEMODEL_H
 #define FOLDERTREEMODEL_H
 
+#include "FolderMimeData.h"
 #include "FolderTreeItem.h"
 #include "PersistenceManager.h"
 #include <QAbstractItemModel>
@@ -12,7 +13,7 @@ class FolderTreeModel : public QAbstractItemModel
   public:
     FolderTreeModel(PersistenceManager &persistenceManager, QObject *parent);
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
-    QModelIndex findIndex(int folderId, const QModelIndex &root = QModelIndex());
+    QModelIndex findIndex(int folderId, const QModelIndex &root = QModelIndex()) const;
     FolderTreeItem *getItemFromIndex(const QModelIndex &index) const;
     QModelIndex parent(const QModelIndex &child) const;
     int rowCount(const QModelIndex &parent) const;
@@ -23,8 +24,11 @@ class FolderTreeModel : public QAbstractItemModel
     bool insertRows(int row, int count, const QModelIndex &parent);
     bool removeRows(int row, int count, const QModelIndex &parent);
     bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
+    QMimeData *mimeData(const QModelIndexList &indexes) const;
+    bool canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
+                         const QModelIndex &parent) const;
     QStringList mimeTypes() const;
-    bool areAllDragingNotesInFolderIndex(const QModelIndex &index, const QMimeData *data);
+    bool areAllDragingNotesInFolderIndex(const QModelIndex &index, const QMimeData *data) const;
 
   public slots:
     void onNotesMoved(int sourceFolderId, int destinationFolderId, int notesCount);
@@ -38,13 +42,17 @@ class FolderTreeModel : public QAbstractItemModel
   private:
     std::unique_ptr<FolderTreeItem> rootItem;
     PersistenceManager &persistenceManager;
+    mutable const QMimeData *lastCheckedMimeData;
+    mutable QModelIndex lastParentFolderIndexOfAllDragingNotes;
+    mutable QModelIndex lastDragingFolder;
     void setupModelData();
     QVector<FolderData> setupFolderList();
     void setupChildrenRecursively(FolderTreeItem &folderTreeItem, const QVector<FolderData> &listOfFolders);
     void deleteFolderRecursivelyFromDb(const FolderTreeItem &folderTreeItem);
-    const QMimeData *lastCheckedMimeData;
-    QModelIndex lastParentFolderIndexOfAllDragingNotes;
+    void handleFolderMimeData(const QMimeData *data, const QModelIndex &parent, int row);
+    void handleNoteMimeData(const QMimeData *data, const QModelIndex &parent);
     void updateNotesInsideCountOfFolders(int updatedFolderId, int notesCount);
+    bool canFolderBeMoved(const QModelIndex &sourceFolder, const QModelIndex &desinationParent, int row) const;
 };
 
 #endif // FOLDERTREEMODEL_H

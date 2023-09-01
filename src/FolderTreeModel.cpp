@@ -1,5 +1,7 @@
 #include "FolderTreeModel.h"
 #include <NoteMimeData.h>
+#include <QApplication>
+#include <QMessageBox>
 #include <QMimeData>
 
 FolderTreeModel::FolderTreeModel(PersistenceManager &persistenceManager, QObject *parent)
@@ -14,7 +16,7 @@ QModelIndex FolderTreeModel::index(int row, int column, const QModelIndex &paren
     return createIndex(row, column, parentItem->getChild(row));
 }
 
-QModelIndex FolderTreeModel::findIndex(int folderId, const QModelIndex &root)
+QModelIndex FolderTreeModel::findIndex(int folderId, const QModelIndex &root) const
 {
     const FolderTreeItem *rootItem = getItemFromIndex(root);
     if (rootItem->data.getId() == folderId)
@@ -98,11 +100,9 @@ bool FolderTreeModel::setData(const QModelIndex &index, const QVariant &value, i
 
 Qt::ItemFlags FolderTreeModel::flags(const QModelIndex &index) const
 {
-    Qt::ItemFlags flags = QAbstractItemModel::flags(index);
-    if (index.isValid())
-        flags |= Qt::ItemIsDropEnabled;
+    Qt::ItemFlags flags = QAbstractItemModel::flags(index) | Qt::ItemIsDropEnabled;
     if (getItemFromIndex(index)->getType() == FolderTreeItem::Type::UserFolder)
-        flags |= Qt::ItemIsEditable;
+        flags |= Qt::ItemIsEditable | Qt::ItemIsDragEnabled;
 
     return flags;
 }
@@ -145,7 +145,7 @@ bool FolderTreeModel::removeRows(int row, int count, const QModelIndex &parent)
     return true;
 }
 
-bool FolderTreeModel::areAllDragingNotesInFolderIndex(const QModelIndex &index, const QMimeData *data)
+bool FolderTreeModel::areAllDragingNotesInFolderIndex(const QModelIndex &index, const QMimeData *data) const
 {
     if (data == lastCheckedMimeData)
         return lastParentFolderIndexOfAllDragingNotes == index;
@@ -216,6 +216,80 @@ void FolderTreeModel::updateNotesInsideCountOfFolders(int updatedFolderId, int n
     }
 }
 
+bool FolderTreeModel::canFolderBeMoved(const QModelIndex &sourceFolder, const QModelIndex &desinationParent,
+                                       int row) const
+{
+    if (row < 0)
+        row = 0;
+
+    if (!desinationParent.isValid())
+    {
+        if (row < 1)
+            return false;
+
+        if (row > rowCount(QModelIndex()) - 1)
+            return false;
+    }
+    else if (getItemFromIndex(desinationParent)->getType() == FolderTreeItem::Type::AllNotesItem)
+        return false;
+
+    if (sourceFolder == desinationParent)
+        return false;
+
+    if (sourceFolder.parent() == desinationParent)
+    {
+        if (sourceFolder.row() == row)
+            return false;
+        if (sourceFolder.row() == row - 1)
+            return false;
+    }
+
+    if (getItemFromIndex(desinationParent)->isSubfolderOf(getItemFromIndex(sourceFolder)))
+        return false;
+
+    return true;
+}
+
+QMimeData *FolderTreeModel::mimeData(const QModelIndexList &indexes) const
+{
+    QVector<const FolderTreeItem *> items;
+    for (auto const &index : indexes)
+        items.emplaceBack(static_cast<const FolderTreeItem *>(index.constInternalPointer()));
+
+    QMimeData *mimeData = FolderMimeData::encodeData(items);
+    return mimeData;
+}
+
+bool FolderTreeModel::canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
+                                      const QModelIndex &parent) const
+{
+    if (data->hasFormat(NoteMimeData::type))
+    {
+        if (!parent.isValid())
+            return false;
+
+        return true;
+    }
+    else if (data->hasFormat(FolderMimeData::type))
+    {
+        QModelIndex dragingFolder;
+        if (lastCheckedMimeData == data)
+            dragingFolder = lastDragingFolder;
+        else
+        {
+            lastCheckedMimeData = data;
+            QVector<FolderMimeData> folderMimeData = FolderMimeData::decodeData(data);
+            if (folderMimeData.empty())
+                return false;
+
+            lastDragingFolder = findIndex(folderMimeData.at(0).folderId);
+        }
+        return canFolderBeMoved(dragingFolder, parent, row);
+    }
+
+    return false;
+}
+
 void FolderTreeModel::setupModelData()
 {
     QVector<FolderData> folders = setupFolderList();
@@ -280,8 +354,29 @@ void FolderTreeModel::deleteFolderRecursivelyFromDb(const FolderTreeItem &folder
         deleteFolderRecursivelyFromDb(*i);
 }
 
-bool FolderTreeModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
-                                   const QModelIndex &parent)
+void FolderTreeModel::handleFolderMimeData(const QMimeData *data, const QModelIndex &parent, int row)
+{
+    QVector<FolderMimeData> decodedData = FolderMimeData::decodeData(data);
+    QModelIndex movedIndex = findIndex(decodedData[0].folderId);
+    FolderTreeItem *movedItem = getItemFromIndex(movedIndex);
+    FolderTreeItem *parentItem = getItemFromIndex(parent);
+
+    if (parentItem->getType() == FolderTreeItem::Type::TrashFolder)
+    {
+        removeRow(movedIndex.row(), movedIndex.parent());
+        return;
+    }
+
+    if (row <= 0) // Prevent adding row before special folders
+        row = 0;
+
+    beginMoveRows(movedIndex.parent(), movedIndex.row(), movedIndex.row(), parent, row);
+    parentItem->moveChildrenFrom(movedItem->getParent(), movedIndex.row(), row);
+    persistenceManager.updateFolder(parentItem->getChild(row)->data);
+    endMoveRows();
+}
+
+void FolderTreeModel::handleNoteMimeData(const QMimeData *data, const QModelIndex &parent)
 {
     QVector<NoteMimeData> decodedData = NoteMimeData::decodeData(data);
     QSet<int> noteIds;
@@ -289,10 +384,22 @@ bool FolderTreeModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
         noteIds.insert(noteData.noteId);
 
     emit moveNotesToFolderRequested(noteIds, getItemFromIndex(parent)->data.getId());
+}
+
+bool FolderTreeModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
+                                   const QModelIndex &parent)
+{
+    if (data->hasFormat(NoteMimeData::type))
+        handleNoteMimeData(data, parent);
+    else if (data->hasFormat(FolderMimeData::type))
+        handleFolderMimeData(data, parent, row);
+    else
+        return false;
+
     return true;
 }
 
 QStringList FolderTreeModel::mimeTypes() const
 {
-    return QStringList(NoteMimeData::type);
+    return QStringList{FolderMimeData::type, NoteMimeData::type};
 }
