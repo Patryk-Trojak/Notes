@@ -52,6 +52,29 @@ FolderTreeItem *FolderTreeItem::insertChild(int pos, const FolderData &noteData,
     return child->get();
 }
 
+void FolderTreeItem::moveChildrenFrom(FolderTreeItem *sourceParent, int sourceStartIndex, int destinationIndex,
+                                      int count)
+{
+    if (sourceParent == this and sourceStartIndex == destinationIndex)
+        return;
+
+    for (int i = 0; i < 1; i++)
+    {
+        auto item = std::move(sourceParent->children[sourceStartIndex + i]);
+        item->setParent(this);
+        item->data.setParentId(this->data.getId());
+        children.insert(children.begin() + destinationIndex + i, std::move(item));
+    }
+
+    if (sourceParent == this)
+    {
+        if (sourceStartIndex > destinationIndex)
+            sourceStartIndex += count;
+    }
+
+    sourceParent->removeChildren(sourceStartIndex, count);
+}
+
 void FolderTreeItem::removeChildren(int first, int count)
 {
     children.erase(children.begin() + first, children.begin() + first + count);
