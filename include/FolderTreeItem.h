@@ -27,6 +27,7 @@ class FolderTreeItem
     FolderData data;
     Type getType() const;
     void setType(Type newType);
+    bool isSubfolderOf(const FolderTreeItem *folder);
 
   private:
     std::vector<std::unique_ptr<FolderTreeItem>> children;

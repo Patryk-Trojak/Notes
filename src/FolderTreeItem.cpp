@@ -89,3 +89,18 @@ void FolderTreeItem::setType(Type newType)
 {
     type = newType;
 }
+
+bool FolderTreeItem::isSubfolderOf(const FolderTreeItem *folder)
+{
+    FolderTreeItem *parent = this->parent;
+
+    while (parent)
+    {
+        if (parent == folder)
+            return true;
+
+        parent = parent->parent;
+    }
+
+    return false;
+}
