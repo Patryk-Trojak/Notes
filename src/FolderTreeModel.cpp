@@ -230,7 +230,7 @@ bool FolderTreeModel::canFolderBeMoved(const QModelIndex &sourceFolder, const QM
         if (row > rowCount(QModelIndex()) - 1)
             return false;
     }
-    else if (getItemFromIndex(desinationParent)->getType() == FolderTreeItem::Type::AllNotesItem)
+    else if (getItemFromIndex(desinationParent)->getType() == FolderTreeItem::Type::AllNotesFolder)
         return false;
 
     if (sourceFolder == desinationParent)
@@ -305,7 +305,7 @@ void FolderTreeModel::setupModelData()
 
     int allNoteCount = persistenceManager.countAllNotes();
     FolderData allNotesFolder(SpecialFolderId::AllNotesFolder, rootItem->data.getId(), "All notes", allNoteCount);
-    rootItem->insertChild(0, allNotesFolder, FolderTreeItem::Type::AllNotesItem);
+    rootItem->insertChild(0, allNotesFolder, FolderTreeItem::Type::AllNotesFolder);
 
     int notesInTrashCount = persistenceManager.countNotesInTrash();
     FolderData trashFolder(SpecialFolderId::TrashFolder, rootItem->data.getId(), "Trash", notesInTrashCount);

@@ -9,7 +9,7 @@ class FolderTreeItem
     enum class Type
     {
         UserFolder,
-        AllNotesItem,
+        AllNotesFolder,
         RootFolder,
         TrashFolder
     };
@@ -20,8 +20,8 @@ class FolderTreeItem
     FolderTreeItem *getParent() const;
     int row() const;
     void setParent(FolderTreeItem *newParent);
-    FolderTreeItem *addChild(const FolderData &noteData);
-    FolderTreeItem *insertChild(int pos, const FolderData &noteData, Type type = Type::UserFolder);
+    FolderTreeItem *addChild(const FolderData &folderData);
+    FolderTreeItem *insertChild(int pos, const FolderData &folderData, Type type = Type::UserFolder);
     void moveChildrenFrom(FolderTreeItem *sourceParent, int sourceStartIndex, int destinationIndex, int count = 1);
     void removeChildren(int first, int count);
     FolderData data;

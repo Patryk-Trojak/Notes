@@ -40,15 +40,15 @@ void FolderTreeItem::setParent(FolderTreeItem *newParent)
     parent = newParent;
 }
 
-FolderTreeItem *FolderTreeItem::addChild(const FolderData &noteData)
+FolderTreeItem *FolderTreeItem::addChild(const FolderData &folderData)
 {
-    children.emplace_back(std::make_unique<FolderTreeItem>(this, noteData));
+    children.emplace_back(std::make_unique<FolderTreeItem>(this, folderData));
     return children.back().get();
 }
 
-FolderTreeItem *FolderTreeItem::insertChild(int pos, const FolderData &noteData, Type type)
+FolderTreeItem *FolderTreeItem::insertChild(int pos, const FolderData &folderData, Type type)
 {
-    auto child = children.insert(children.begin() + pos, std::make_unique<FolderTreeItem>(this, noteData, type));
+    auto child = children.insert(children.begin() + pos, std::make_unique<FolderTreeItem>(this, folderData, type));
     return child->get();
 }
 
