@@ -267,6 +267,7 @@ void FolderTreeView::updateTextFormatingOfDropTooltip(const QModelIndex &dropInd
 void FolderTreeView::dropEvent(QDropEvent *event)
 {
     bool handleDrop = true;
+    dropTooltip->setVisible(false);
 
     QModelIndex dropIndex = indexAt(event->position().toPoint());
     if (dropIndex.isValid() and
@@ -283,7 +284,6 @@ void FolderTreeView::dropEvent(QDropEvent *event)
         QTreeView::dropEvent(event);
 
     delegate.setDropIndex(QModelIndex());
-    dropTooltip->setVisible(false);
     myStyle->drawIndicator = false;
 }
 
