@@ -46,7 +46,7 @@ class NotesDisplayingTab : public QWidget
     void updateRubberBand();
     NoteSortFilterProxyModel noteProxyModel;
     FolderTreeModel folderModel;
-
+    void onRightFrameCustomMenuRequested(const QPoint &pos);
     void layoutNoteListView();
     void layoutSearchBar();
     void layoutOpenNoteSortOptionsButton();

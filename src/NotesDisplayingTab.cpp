@@ -13,6 +13,8 @@ NotesDisplayingTab::NotesDisplayingTab(NoteListModel &noteModel, PersistenceMana
 {
     ui->setupUi(this);
     ui->rightFrame->installEventFilter(this);
+    QObject::connect(ui->rightFrame, &QWidget::customContextMenuRequested, this,
+                     &NotesDisplayingTab::onRightFrameCustomMenuRequested);
     ui->newNoteButton->setAttribute(Qt::WA_StyledBackground, true);
     ui->splitter->handle(1)->setStyleSheet("border: none; background-color: rgb(191, 191, 191);");
     ui->splitter->handle(1)->setAttribute(Qt::WA_StyledBackground, true);
@@ -104,7 +106,7 @@ void NotesDisplayingTab::onOpenNoteSortOptionsButtonClicked()
 {
     NoteSortOptionsWidget *noteSortOptionsWidget =
         new NoteSortOptionsWidget(noteProxyModel.sortRole(), noteProxyModel.sortOrder(), ui->rightFrame, Qt::Popup);
-    
+
     QPoint positionOfNoteSortOptionsWidget = this->ui->rightFrame->mapToGlobal(openNoteSortOptionsButton->pos());
     QSize sizeOfSortOptions(210, 100);
     noteSortOptionsWidget->setGeometry(positionOfNoteSortOptionsWidget.x() - sizeOfSortOptions.width(),
@@ -128,7 +130,7 @@ void NotesDisplayingTab::updateRubberBand()
                                      noteListView->pos());
     if (currentOriginOfRubberBand.y() < noteListView->y())
         currentOriginOfRubberBand.setY(noteListView->y());
-    
+
     QPoint mousePosition = ui->rightFrame->mapFromGlobal(QCursor::pos());
     if (mousePosition.y() < noteListView->y())
     {
@@ -141,6 +143,11 @@ void NotesDisplayingTab::updateRubberBand()
     }
 
     rubberBand->setGeometry(QRect(currentOriginOfRubberBand, mousePosition).normalized());
+}
+
+void NotesDisplayingTab::onRightFrameCustomMenuRequested(const QPoint &pos)
+{
+    emit noteListView->customContextMenuRequested(noteListView->mapFromGlobal(ui->rightFrame->mapToGlobal(pos)));
 }
 
 void NotesDisplayingTab::layoutSearchBar()
@@ -187,7 +194,7 @@ void NotesDisplayingTab::layoutNoteListView()
     }
     else
         noteListView->setVisible(true);
-    
+
     int availableWidthForNoteView = ui->rightFrame->width() - rightMargin - leftMargin;
     int numberOfNotesInRow = qMin(noteListView->getHowManyNotesCanFitInRow(availableWidthForNoteView),
                                   noteListView->getHowManyNotesAreDisplayed());
@@ -230,7 +237,7 @@ void NotesDisplayingTab::mousePressEvent(QMouseEvent *event)
 
     if (!(event->button() & Qt::LeftButton))
         return;
-    
+
     if (!ui->rightFrame->geometry().contains(event->pos()))
         return;
 
