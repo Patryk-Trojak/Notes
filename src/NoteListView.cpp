@@ -268,6 +268,9 @@ void NoteListView::endDragSelecting()
 
 void NoteListView::selectAll()
 {
+    if (model()->rowCount() <= 0)
+        return;
+
     selectionModel()->select(QItemSelection(model()->index(0, 0), model()->index(model()->rowCount() - 1, 0)),
                              QItemSelectionModel::Select);
     setInSelectingState(true);
@@ -496,9 +499,12 @@ QMenu *NoteListView::createContextMenuForNormalState(const QPoint &position)
         menu->addAction(selectNote);
     }
 
-    QAction *selectAll = new QAction("Select all");
-    QObject::connect(selectAll, &QAction::triggered, this, &NoteListView::selectAll);
-    menu->addAction(selectAll);
+    if (model()->rowCount() > 0)
+    {
+        QAction *selectAll = new QAction("Select all");
+        QObject::connect(selectAll, &QAction::triggered, this, &NoteListView::selectAll);
+        menu->addAction(selectAll);
+    }
 
     return menu;
 }
