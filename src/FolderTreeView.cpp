@@ -41,10 +41,7 @@ FolderTreeView::FolderTreeView(QWidget *parent) : QTreeView(parent), delegate(th
     setContextMenuPolicy(Qt::CustomContextMenu);
     QObject::connect(this, &FolderTreeView::customContextMenuRequested, this,
                      &FolderTreeView::onCustomContextMenuRequested);
-    setStyleSheet("FolderTreeView{border: none; selection-color: transparent; selection-background-color: transparent;}"
-                  "QTreeView::branch { background: transparent; } ");
     setItemDelegate(&delegate);
-
     int widthOfScrollbar = 5;
     QString style =
         QString(
@@ -61,7 +58,6 @@ FolderTreeView::FolderTreeView(QWidget *parent) : QTreeView(parent), delegate(th
             "margin;}")
             .arg(widthOfScrollbar);
     setStyleSheet(style);
-
     myStyle = new FolderTreeViewProxyStyle;
     setStyle(myStyle);
     setDragDropOverwriteMode(true);
