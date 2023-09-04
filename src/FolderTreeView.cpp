@@ -15,7 +15,7 @@ void FolderTreeViewProxyStyle::drawPrimitive(PrimitiveElement element, const QSt
 {
 
     if (element != QStyle::PE_IndicatorItemViewItemDrop)
-        return;
+        QProxyStyle::drawPrimitive(element, option, painter, widget);
 
     if (!drawIndicator)
         return;
