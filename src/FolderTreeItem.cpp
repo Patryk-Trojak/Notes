@@ -16,6 +16,9 @@ const std::vector<std::unique_ptr<FolderTreeItem>> &FolderTreeItem::getChildren(
 
 FolderTreeItem *FolderTreeItem::getChild(int row) const
 {
+    if (row < 0 or row >= children.size())
+        return nullptr;
+
     return children.at(row).get();
 }
 

@@ -47,12 +47,15 @@ class FolderTreeModel : public QAbstractItemModel
     mutable QModelIndex lastDragingFolder;
     void setupModelData();
     QVector<FolderData> setupFolderList();
+    void updateNotesInsideCountsOfFolders(QVector<FolderData> &folders);
+    void sortFolders(QVector<FolderData> &folders);
     void setupChildrenRecursively(FolderTreeItem &folderTreeItem, const QVector<FolderData> &listOfFolders);
     void deleteFolderRecursivelyFromDb(const FolderTreeItem &folderTreeItem);
     void handleFolderMimeData(const QMimeData *data, const QModelIndex &parent, int row);
     void handleNoteMimeData(const QMimeData *data, const QModelIndex &parent);
     void updateNotesInsideCountOfFolders(int updatedFolderId, int notesCount);
     bool canFolderBeMoved(const QModelIndex &sourceFolder, const QModelIndex &desinationParent, int row) const;
+    void updatePreviousFolderId(const QModelIndex &parentIndex, int row);
 };
 
 #endif // FOLDERTREEMODEL_H

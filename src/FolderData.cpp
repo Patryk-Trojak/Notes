@@ -1,11 +1,11 @@
 #include "FolderData.h"
 
-FolderData::FolderData() : id(0), parentId(0), notesInsideCount(0)
+FolderData::FolderData() : id(0), parentId(0), notesInsideCount(0), previousFolderId(0)
 {
 }
 
-FolderData::FolderData(int id, int parentId, const QString &name, int notesInsideCount)
-    : id(id), parentId(parentId), name(name), notesInsideCount(notesInsideCount)
+FolderData::FolderData(int id, int parentId, int previousFolderId, const QString &name, int notesInsideCount)
+    : id(id), parentId(parentId), previousFolderId(previousFolderId), name(name), notesInsideCount(notesInsideCount)
 {
 }
 
@@ -37,6 +37,16 @@ const QString &FolderData::getName() const
 int FolderData::getNotesInsideCount() const
 {
     return notesInsideCount;
+}
+
+int FolderData::getPreviousFolderId() const
+{
+    return previousFolderId;
+}
+
+void FolderData::setPreviousFolderId(int newPreviousFolderId)
+{
+    previousFolderId = newPreviousFolderId;
 }
 
 void FolderData::setNotesInsideCount(int newNotesInsideCount)

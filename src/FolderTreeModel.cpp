@@ -113,17 +113,26 @@ bool FolderTreeModel::insertRows(int row, int count, const QModelIndex &parent)
     if (parentItem == rootItem.get() and row <= 0) // Prevent adding row before special folders
         row = 1;
 
+    beginInsertRows(parent, row + count - 1, row + count - 1);
+
     for (int i = 0; i < count; i++)
     {
         FolderData newFolderData;
         newFolderData.setName("New folder");
         newFolderData.setParentId(parentItem->data.getId());
+        if (row + i == 0 or parentItem->getChild(row + i - 1)->getType() != FolderTreeItem::Type::UserFolder)
+            newFolderData.setPreviousFolderId(SpecialFolderId::InvalidId);
+        else
+            newFolderData.setPreviousFolderId(parentItem->getChild(row + i - 1)->data.getId());
+
         int id = persistenceManager.addFolder(newFolderData);
         newFolderData.setId(id);
-        beginInsertRows(parent, row + i, row + i);
+
         parentItem->insertChild(row + i, newFolderData);
-        endInsertRows();
     }
+
+    endInsertRows();
+    updatePreviousFolderId(parent, row + count);
     return true;
 }
 
@@ -142,6 +151,7 @@ bool FolderTreeModel::removeRows(int row, int count, const QModelIndex &parent)
     beginRemoveRows(parent, row, row + count - 1);
     parentItem->removeChildren(row, count);
     endRemoveRows();
+    updatePreviousFolderId(parent, row);
     return true;
 }
 
@@ -250,6 +260,25 @@ bool FolderTreeModel::canFolderBeMoved(const QModelIndex &sourceFolder, const QM
     return true;
 }
 
+void FolderTreeModel::updatePreviousFolderId(const QModelIndex &parentItem, int row)
+{
+    QModelIndex folderIndex = index(row, 0, parentItem);
+    FolderTreeItem *item = getItemFromIndex(folderIndex);
+
+    if (!item or item->getType() != FolderTreeItem::Type::UserFolder)
+        return;
+
+    FolderTreeItem *previousSiblingOfItem = item->getParent()->getChild(row - 1);
+
+    if (previousSiblingOfItem and previousSiblingOfItem->getType() == FolderTreeItem::Type::UserFolder)
+        item->data.setPreviousFolderId(previousSiblingOfItem->data.getId());
+    else
+        item->data.setPreviousFolderId(SpecialFolderId::InvalidId);
+
+    persistenceManager.updateFolder(item->data);
+    emit dataChanged(folderIndex, folderIndex);
+}
+
 QMimeData *FolderTreeModel::mimeData(const QModelIndexList &indexes) const
 {
     QVector<const FolderTreeItem *> items;
@@ -294,29 +323,33 @@ void FolderTreeModel::setupModelData()
 {
     QVector<FolderData> folders = setupFolderList();
 
-    std::sort(folders.begin(), folders.end(), [](const FolderData &folder1, const FolderData &folder2) {
-        return folder1.getParentId() < folder2.getParentId();
-    });
-
-    FolderData rootFolder(SpecialFolderId::RootFolder, SpecialFolderId::InvalidId, "/", 0);
+    FolderData rootFolder(SpecialFolderId::RootFolder, SpecialFolderId::InvalidId, SpecialFolderId::InvalidId, "/", 0);
     rootItem = std::make_unique<FolderTreeItem>(nullptr, rootFolder, FolderTreeItem::Type::RootFolder);
-
     setupChildrenRecursively(*rootItem, folders);
 
     int allNoteCount = persistenceManager.countAllNotes();
-    FolderData allNotesFolder(SpecialFolderId::AllNotesFolder, rootItem->data.getId(), "All notes", allNoteCount);
+    FolderData allNotesFolder(SpecialFolderId::AllNotesFolder, rootItem->data.getId(), SpecialFolderId::InvalidId,
+                              "All notes", allNoteCount);
     rootItem->insertChild(0, allNotesFolder, FolderTreeItem::Type::AllNotesFolder);
 
     int notesInTrashCount = persistenceManager.countNotesInTrash();
-    FolderData trashFolder(SpecialFolderId::TrashFolder, rootItem->data.getId(), "Trash", notesInTrashCount);
+    FolderData trashFolder(SpecialFolderId::TrashFolder, rootItem->data.getId(),
+                           rootItem->getChild(rootItem->getChildren().size() - 1)->data.getId(), "Trash",
+                           notesInTrashCount);
     rootItem->insertChild(rootItem->getChildren().size(), trashFolder, FolderTreeItem::Type::TrashFolder);
 }
 
 QVector<FolderData> FolderTreeModel::setupFolderList()
 {
     QVector<FolderData> folders = persistenceManager.loadAllFolders();
-    QHash<int, int> notesInsideFoldersCounts = persistenceManager.getNotesInsideFoldersCounts();
+    updateNotesInsideCountsOfFolders(folders);
+    sortFolders(folders);
+    return folders;
+}
 
+void FolderTreeModel::updateNotesInsideCountsOfFolders(QVector<FolderData> &folders)
+{
+    QHash<int, int> notesInsideFoldersCounts = persistenceManager.getNotesInsideFoldersCounts();
     for (auto &folder : folders)
     {
         auto found = notesInsideFoldersCounts.find(folder.getId());
@@ -325,23 +358,56 @@ QVector<FolderData> FolderTreeModel::setupFolderList()
         else
             folder.setNotesInsideCount(0);
     }
+}
 
-    return folders;
+void FolderTreeModel::sortFolders(QVector<FolderData> &folders)
+{
+    std::sort(folders.begin(), folders.end(), [](const FolderData &folder1, const FolderData &folder2) {
+        if (folder1.getParentId() < folder2.getParentId())
+            return true;
+        if (folder1.getParentId() > folder2.getParentId())
+            return false;
+
+        if (folder1.getPreviousFolderId() == SpecialFolderId::InvalidId)
+            return true;
+
+        if (folder2.getPreviousFolderId() == SpecialFolderId::InvalidId)
+            return false;
+
+        if (folder1.getPreviousFolderId() < folder2.getPreviousFolderId())
+            return true;
+        if (folder1.getPreviousFolderId() > folder2.getPreviousFolderId())
+            return false;
+
+        return false;
+    });
 }
 
 void FolderTreeModel::setupChildrenRecursively(FolderTreeItem &folderTreeItem, const QVector<FolderData> &listOfFolders)
 {
-    auto first = std::lower_bound(listOfFolders.begin(), listOfFolders.end(), folderTreeItem.data.getId(),
-                                  [](const FolderData &folder, int id) { return folder.getParentId() < id; });
+    auto firstChild = std::lower_bound(listOfFolders.begin(), listOfFolders.end(), folderTreeItem.data.getId(),
+                                       [](const FolderData &folder, int id) { return folder.getParentId() < id; });
 
-    if (first == listOfFolders.end())
+    if (firstChild == listOfFolders.end() or firstChild->getParentId() != folderTreeItem.data.getId())
         return;
 
-    while (first->getParentId() == folderTreeItem.data.getId())
+    FolderTreeItem &addedItem = *folderTreeItem.addChild(*firstChild);
+    setupChildrenRecursively(addedItem, listOfFolders);
+
+    auto lastChild = std::upper_bound(firstChild, listOfFolders.end(), folderTreeItem.data.getId(),
+                                      [](int id, const FolderData &folder) { return folder.getParentId() > id; });
+    int numberOfChildren = lastChild - firstChild;
+    for (int i = 0; i < numberOfChildren - 1; i++)
     {
-        FolderTreeItem &addedItem = *folderTreeItem.addChild(*first);
-        setupChildrenRecursively(addedItem, listOfFolders);
-        first++;
+        auto nextInOrder =
+            std::lower_bound(firstChild, lastChild, folderTreeItem.getChild(i)->data.getId(),
+                             [](const FolderData &folder, int id) { return folder.getPreviousFolderId() < id; });
+
+        if (nextInOrder != lastChild and nextInOrder->getPreviousFolderId() == folderTreeItem.getChild(i)->data.getId())
+        {
+            FolderTreeItem &addedItem = *folderTreeItem.addChild(*nextInOrder);
+            setupChildrenRecursively(addedItem, listOfFolders);
+        }
     }
 }
 
@@ -357,8 +423,12 @@ void FolderTreeModel::deleteFolderRecursivelyFromDb(const FolderTreeItem &folder
 void FolderTreeModel::handleFolderMimeData(const QMimeData *data, const QModelIndex &parent, int row)
 {
     QVector<FolderMimeData> decodedData = FolderMimeData::decodeData(data);
+    if (decodedData.empty())
+        return;
     QModelIndex movedIndex = findIndex(decodedData[0].folderId);
+    QModelIndex movedIndexParent = movedIndex.parent();
     FolderTreeItem *movedItem = getItemFromIndex(movedIndex);
+    FolderTreeItem *movedItemParent = movedItem->getParent();
     FolderTreeItem *parentItem = getItemFromIndex(parent);
 
     if (parentItem->getType() == FolderTreeItem::Type::TrashFolder)
@@ -367,13 +437,26 @@ void FolderTreeModel::handleFolderMimeData(const QMimeData *data, const QModelIn
         return;
     }
 
-    if (row <= 0) // Prevent adding row before special folders
-        row = 0;
+    if (row <= 0)
+    {
+        if (parentItem == rootItem.get()) // Prevent adding row before special folders
+            row = 1;
+        else
+            row = 0;
+    }
 
     beginMoveRows(movedIndex.parent(), movedIndex.row(), movedIndex.row(), parent, row);
-    parentItem->moveChildrenFrom(movedItem->getParent(), movedIndex.row(), row);
-    persistenceManager.updateFolder(parentItem->getChild(row)->data);
+    parentItem->moveChildrenFrom(movedItemParent, movedIndex.row(), row);
     endMoveRows();
+
+    if (movedItemParent == parentItem and movedIndex.row() < row)
+        row -= 1;
+    updatePreviousFolderId(parent, row);
+    updatePreviousFolderId(parent, row + 1);
+    if (movedItemParent == parentItem and (movedIndex.row() > row))
+        updatePreviousFolderId(movedIndex.parent(), movedIndex.row() + 1);
+    else
+        updatePreviousFolderId(movedIndexParent, movedIndex.row());
 }
 
 void FolderTreeModel::handleNoteMimeData(const QMimeData *data, const QModelIndex &parent)
