@@ -149,7 +149,7 @@ color: white;
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="middleFrame" native="true">
+     <widget class="QWidget" name="rightFrame" native="true">
       <property name="minimumSize">
        <size>
         <width>255</width>
