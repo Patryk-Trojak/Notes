@@ -339,12 +339,6 @@ void NoteListView::startDrag(Qt::DropActions supportedActions)
     if (indexes.isEmpty() and pressedIndex.isValid()) // Special case when user want to drag note in no electing state
     {
         indexes.emplaceBack(pressedIndex);
-        if (editor)
-        {
-            closePersistentEditor(currentIndexWithEditor);
-            editor = nullptr;
-            currentIndexWithEditor = QModelIndex();
-        }
     }
 
     if (!indexes.contains(indexAt(mapFromGlobal(QCursor::pos()))))
@@ -352,6 +346,8 @@ void NoteListView::startDrag(Qt::DropActions supportedActions)
 
     if (indexes.count() > 0)
     {
+        setState(QAbstractItemView::DraggingState);
+        updateEditor();
         QMimeData *data = model()->mimeData(indexes);
         if (!data)
             return;
@@ -511,7 +507,7 @@ QMenu *NoteListView::createContextMenuForNormalState(const QPoint &position)
 
 void NoteListView::updateEditor()
 {
-    if (inSelectingState or isDragSelecting)
+    if (inSelectingState or isDragSelecting or state() == QListView::DraggingState)
     {
         if (editor)
         {
