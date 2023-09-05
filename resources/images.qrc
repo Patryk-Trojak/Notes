@@ -17,5 +17,6 @@
         <file>images/pinCheckedWhite.png</file>
         <file>images/cancelWhite.png</file>
         <file>images/cancel.png</file>
+        <file>images/addBlack.png</file>
     </qresource>
 </RCC>

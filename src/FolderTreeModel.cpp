@@ -180,6 +180,11 @@ bool FolderTreeModel::areAllDragingNotesInFolderIndex(const QModelIndex &index, 
     return lastParentFolderIndexOfAllDragingNotes == index;
 }
 
+void FolderTreeModel::createNewFolder()
+{
+    insertRow(1, QModelIndex());
+}
+
 void FolderTreeModel::onNotesMoved(int sourceFolderId, int destinationFolderId, int notesCount)
 {
     FolderTreeItem *sourceFolder = static_cast<FolderTreeItem *>(findIndex(sourceFolderId).internalPointer());

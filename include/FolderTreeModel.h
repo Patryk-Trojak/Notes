@@ -29,6 +29,7 @@ class FolderTreeModel : public QAbstractItemModel
                          const QModelIndex &parent) const;
     QStringList mimeTypes() const;
     bool areAllDragingNotesInFolderIndex(const QModelIndex &index, const QMimeData *data) const;
+    void createNewFolder();
 
   public slots:
     void onNotesMoved(int sourceFolderId, int destinationFolderId, int notesCount);

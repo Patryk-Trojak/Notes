@@ -29,8 +29,8 @@ NotesDisplayingTab::NotesDisplayingTab(NoteListModel &noteModel, PersistenceMana
     openNoteSortOptionsButton->setIconSize(QSize(22, 22));
     QObject::connect(openNoteSortOptionsButton, &QPushButton::clicked, this,
                      &NotesDisplayingTab::onOpenNoteSortOptionsButtonClicked);
-
     QObject::connect(ui->newNoteButton, &QPushButton::clicked, this, &NotesDisplayingTab::onNewNoteButtonPressed);
+    QObject::connect(ui->newFolderButton, &QPushButton::clicked, &folderModel, &FolderTreeModel::createNewFolder);
 
     QShortcut *createNewNoteShortcut = new QShortcut(QKeySequence(QKeySequence::New), this);
     QObject::connect(createNewNoteShortcut, &QShortcut::activated, this, &NotesDisplayingTab::onNewNoteButtonPressed);
