@@ -19,5 +19,6 @@
         <file>images/cancel.png</file>
         <file>images/addBlack.png</file>
         <file>images/ThreeDots.png</file>
+        <file>images/renameFolder.png</file>
     </qresource>
 </RCC>

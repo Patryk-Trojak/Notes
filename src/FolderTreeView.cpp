@@ -97,18 +97,20 @@ void FolderTreeView::onCustomContextMenuRequested(const QPoint &pos)
         index = QModelIndex(); // Treat uneditable item as when the mouse isn't over any item
 
     QMenu *menu = new QMenu(this);
-    QAction *createSubfolder = new QAction(index.isValid() ? "Create subfolder" : "Create new folder");
+    QAction *createSubfolder =
+        new QAction(QIcon(":/images/addBlack.png"), index.isValid() ? "Create subfolder" : "Create new folder");
+    //    createSubfolder->setIconSi
     QObject::connect(createSubfolder, &QAction::triggered, this,
                      [this, index]() { this->model()->insertRow(0, index); });
     menu->addAction(createSubfolder);
 
     if (index.isValid())
     {
-        QAction *deleteFolder = new QAction("Delete folder");
+        QAction *deleteFolder = new QAction(QIcon(":/images/delete.png"), "Delete folder");
         QObject::connect(deleteFolder, &QAction::triggered, this, [this, index]() { this->deleteFolder(index); });
         menu->addAction(deleteFolder);
 
-        QAction *renameFolder = new QAction("Rename folder");
+        QAction *renameFolder = new QAction(QIcon(":/images/renameFolder.png"), "Rename folder");
         QObject::connect(renameFolder, &QAction::triggered, this, [this, index]() { this->edit(index); });
         menu->addAction(renameFolder);
     }
