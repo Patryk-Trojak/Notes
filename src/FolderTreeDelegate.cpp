@@ -1,6 +1,8 @@
 #include "FolderTreeDelegate.h"
+#include <QEvent>
 #include <QFontMetrics>
 #include <QLineEdit>
+#include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
 
@@ -18,6 +20,7 @@ void FolderTreeDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
     paintIcon(painter, option, item);
     paintName(painter, option, item);
     paintNotesInsideCount(painter, option, item);
+    paintContextMenuButton(painter, option, item);
 
     painter->restore();
 }
@@ -85,10 +88,24 @@ void FolderTreeDelegate::paintName(QPainter *painter, const QStyleOptionViewItem
 void FolderTreeDelegate::paintNotesInsideCount(QPainter *painter, const QStyleOptionViewItem &option,
                                                const FolderTreeItem *item) const
 {
-    QRect notesInsideCountRect =
-        QRect(option.rect.left() + option.rect.width() - 28, option.rect.top(), 30, option.rect.height());
-    painter->setPen(QColor(26, 26, 26, 127));
-    painter->drawText(notesInsideCountRect, Qt::AlignCenter, QString::number(item->data.getNotesInsideCount()));
+    if (!(option.state & QStyle::State_MouseOver))
+    {
+        QRect notesInsideCountRect =
+            QRect(option.rect.left() + option.rect.width() - 28, option.rect.top(), 30, option.rect.height());
+        painter->setPen(QColor(26, 26, 26, 127));
+        painter->drawText(notesInsideCountRect, Qt::AlignCenter, QString::number(item->data.getNotesInsideCount()));
+    }
+}
+
+void FolderTreeDelegate::paintContextMenuButton(QPainter *painter, const QStyleOptionViewItem &option,
+                                                const FolderTreeItem *item) const
+{
+    if ((option.state & QStyle::State_MouseOver))
+    {
+        QRect iconRect = getContextMenuButtonRect(option);
+        QIcon icon(":/images/ThreeDots.png");
+        painter->drawPixmap(iconRect, icon.pixmap(iconRect.size()));
+    }
 }
 
 void FolderTreeDelegate::paintBranchArrow(QPainter *painter, const QStyleOptionViewItem &option,
@@ -111,6 +128,31 @@ void FolderTreeDelegate::paintBranchArrow(QPainter *painter, const QStyleOptionV
     }
 
     painter->drawPixmap(iconRect, icon.pixmap(iconSize));
+}
+
+QRect FolderTreeDelegate::getContextMenuButtonRect(const QStyleOptionViewItem &option) const
+{
+    constexpr QSize iconSize(16, 16);
+    QRect iconRect =
+        QRect(option.rect.right() - 20, option.rect.top() + (option.rect.height() - iconSize.height()) / 2 + 1,
+              iconSize.width(), iconSize.height());
+
+    return iconRect;
+}
+
+bool FolderTreeDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
+                                     const QModelIndex &index)
+{
+    if (event->type() == QEvent::MouseButtonRelease)
+    {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+        QRect rect = getContextMenuButtonRect(option);
+
+        if (rect.contains(mouseEvent->position().toPoint()))
+            emit contextMenuRequested(mouseEvent->position().toPoint());
+    }
+
+    return false;
 }
 
 void FolderTreeDelegate::setDropIndex(const QModelIndex &newDropIndex)

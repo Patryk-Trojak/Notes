@@ -39,8 +39,12 @@ void FolderTreeViewProxyStyle::drawPrimitive(PrimitiveElement element, const QSt
 FolderTreeView::FolderTreeView(QWidget *parent) : QTreeView(parent), delegate(this)
 {
     setContextMenuPolicy(Qt::CustomContextMenu);
+    viewport()->setAttribute(Qt::WA_Hover);
     QObject::connect(this, &FolderTreeView::customContextMenuRequested, this,
                      &FolderTreeView::onCustomContextMenuRequested);
+    QObject::connect(&delegate, &FolderTreeDelegate::contextMenuRequested, this,
+                     &FolderTreeView::customContextMenuRequested);
+
     setItemDelegate(&delegate);
     int widthOfScrollbar = 5;
     QString style =

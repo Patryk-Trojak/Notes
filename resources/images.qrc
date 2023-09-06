@@ -18,5 +18,6 @@
         <file>images/cancelWhite.png</file>
         <file>images/cancel.png</file>
         <file>images/addBlack.png</file>
+        <file>images/ThreeDots.png</file>
     </qresource>
 </RCC>
