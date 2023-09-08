@@ -14,6 +14,7 @@ class ColorPicker : public QWidget
     void insertColor(const QColor &color, int pos = 0, bool isDefault = false);
     void setColumnCount(int columnCount);
     int getButtonCount() const;
+    void setCancelButtonVisible(bool visible);
 
   signals:
     void colorSelected(const QColor &color);

@@ -76,6 +76,11 @@ int ColorPicker::getButtonCount() const
     return colorButtons.size();
 }
 
+void ColorPicker::setCancelButtonVisible(bool visible)
+{
+    cancelButton->setVisible(visible);
+}
+
 void ColorPicker::onColorButtonClicked()
 {
     ColorButton *button = static_cast<ColorButton *>(QObject::sender());
