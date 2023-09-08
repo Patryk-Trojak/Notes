@@ -3,6 +3,7 @@
 
 #include "FolderMimeData.h"
 #include "FolderTreeItem.h"
+#include "FolderTreeModelRole.h"
 #include "PersistenceManager.h"
 #include <QAbstractItemModel>
 

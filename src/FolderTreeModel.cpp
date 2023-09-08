@@ -75,26 +75,60 @@ QVariant FolderTreeModel::data(const QModelIndex &index, int role) const
 
     switch (role)
     {
-    case Qt::EditRole:
-    case Qt::DisplayRole:
+    case FolderTreeModelRole::EditRole:
+    case FolderTreeModelRole::DisplayRole:
+    case FolderTreeModelRole::Name:
         return item->data.getName();
-    default:
-        return QVariant();
+    case FolderTreeModelRole::Id:
+        return item->data.getId();
+    case FolderTreeModelRole::ParentId:
+        return item->data.getParentId();
+    case FolderTreeModelRole::PreviousFolderId:
+        return item->data.getPreviousFolderId();
+    case FolderTreeModelRole::NotesInsideCount:
+        return item->data.getNotesInsideCount();
     }
+
+    return QVariant();
 }
 
 bool FolderTreeModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     FolderTreeItem *item = getItemFromIndex(index);
-
+    bool dataHasBeenChanged = false;
     switch (role)
     {
-    case Qt::EditRole:
+    case FolderTreeModelRole::EditRole:
+    case FolderTreeModelRole::DisplayRole:
+    case FolderTreeModelRole::Name:
         item->data.setName(value.toString());
+        dataHasBeenChanged = true;
+        break;
+    case FolderTreeModelRole::Id:
+        item->data.setId(value.toInt());
+        dataHasBeenChanged = true;
+        break;
+    case FolderTreeModelRole::ParentId:
+        item->data.setParentId(value.toInt());
+        dataHasBeenChanged = true;
+        break;
+    case FolderTreeModelRole::PreviousFolderId:
+        item->data.setPreviousFolderId(value.toInt());
+        dataHasBeenChanged = true;
+        break;
+    case FolderTreeModelRole::NotesInsideCount:
+        item->data.setNotesInsideCount(value.toInt());
+        dataHasBeenChanged = true;
+        break;
+    }
+
+    if (dataHasBeenChanged)
+    {
         persistenceManager.updateFolder(item->data);
         emit dataChanged(index, index);
         return true;
     }
+
     return false;
 }
 

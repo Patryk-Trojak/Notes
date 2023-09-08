@@ -45,7 +45,7 @@ set(PROJECT_SOURCES
         ${INCLUDE_DIR}/FolderTreeDelegate.h ${SOURCE_DIR}/FolderTreeDelegate.cpp
         ${INCLUDE_DIR}/NoteSortOptionsWidget.h ${SOURCE_DIR}/NoteSortOptionsWidget.cpp ${FORMS_DIR}/NoteSortOptionsWidget.ui
         ${INCLUDE_DIR}/NoteListViewSelectionMenu.h ${SOURCE_DIR}/NoteListViewSelectionMenu.cpp
-        ${INCLUDE_DIR}/NoteListModelRole.h
+        ${INCLUDE_DIR}/NoteListModelRole.h ${INCLUDE_DIR}/FolderTreeModelRole.h
         ${INCLUDE_DIR}/NoteMimeData.h ${SOURCE_DIR}/NoteMimeData.cpp
         ${INCLUDE_DIR}/FolderMimeData.h ${SOURCE_DIR}/FolderMimeData.cpp
 )
