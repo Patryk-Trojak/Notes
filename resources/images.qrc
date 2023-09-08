@@ -20,5 +20,6 @@
         <file>images/addBlack.png</file>
         <file>images/ThreeDots.png</file>
         <file>images/renameFolder.png</file>
+        <file>images/defaultColor.png</file>
     </qresource>
 </RCC>

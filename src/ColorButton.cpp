@@ -2,8 +2,10 @@
 #include <QPainter>
 #include <QResizeEvent>
 
-ColorButton::ColorButton(QWidget *parent, const QColor &color) : QPushButton(parent), color(color)
+ColorButton::ColorButton(QWidget *parent, const QColor &color, bool drawAsDefaultColor)
+    : QPushButton(parent), color(color), drawAsDefaultColor(drawAsDefaultColor)
 {
+    setStyleSheet(QString("background-color: %1").arg(color.name()));
 }
 
 QColor ColorButton::getColor() const
@@ -14,6 +16,7 @@ QColor ColorButton::getColor() const
 void ColorButton::setColor(const QColor &newColor)
 {
     color = newColor;
+    setStyleSheet(QString("background-color: %1").arg(color.name()));
 }
 
 void ColorButton::resizeEvent(QResizeEvent *event)
@@ -24,16 +27,27 @@ void ColorButton::resizeEvent(QResizeEvent *event)
 
 void ColorButton::paintEvent(QPaintEvent *event)
 {
-    QColor backgroundColor = isDown() ? color.darker() : color;
+    QColor backgroundColor;
+    if (drawAsDefaultColor)
+        backgroundColor = Qt::transparent;
+    else
+        backgroundColor = isDown() ? color.darker() : color;
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.translate(rect().topLeft());
     painter.setPen(QPen(backgroundColor, 0));
     painter.setBrush(QBrush(backgroundColor));
+
     QRect drawRect = getSquereInCenterOfButton();
     drawRect.adjust(2, 2, -2, -2);
     painter.drawEllipse(drawRect);
+
+    if (drawAsDefaultColor)
+    {
+        QIcon defaultColorIcon(QString(":/images/defaultColor.png"));
+        painter.drawPixmap(drawRect, defaultColorIcon.pixmap(drawRect.size()));
+    }
 }
 
 QRect ColorButton::getSquereInCenterOfButton()
