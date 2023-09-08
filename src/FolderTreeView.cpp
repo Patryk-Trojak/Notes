@@ -1,4 +1,5 @@
 #include "FolderTreeView.h"
+#include "ColorPicker.h"
 #include "FolderData.h"
 #include "FolderTreeModel.h"
 #include "NoteMimeData.h"
@@ -9,11 +10,11 @@
 #include <QModelIndex>
 #include <QPainter>
 #include <QRegularExpression>
+#include <QWidgetAction>
 
 void FolderTreeViewProxyStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter,
                                              const QWidget *widget) const
 {
-
     if (element != QStyle::PE_IndicatorItemViewItemDrop)
         QProxyStyle::drawPrimitive(element, option, painter, widget);
 
@@ -99,20 +100,39 @@ void FolderTreeView::onCustomContextMenuRequested(const QPoint &pos)
     QMenu *menu = new QMenu(this);
     QAction *createSubfolder =
         new QAction(QIcon(":/images/addBlack.png"), index.isValid() ? "Create subfolder" : "Create new folder");
-    //    createSubfolder->setIconSi
     QObject::connect(createSubfolder, &QAction::triggered, this,
                      [this, index]() { this->model()->insertRow(0, index); });
     menu->addAction(createSubfolder);
 
     if (index.isValid())
     {
-        QAction *deleteFolder = new QAction(QIcon(":/images/delete.png"), "Delete folder");
-        QObject::connect(deleteFolder, &QAction::triggered, this, [this, index]() { this->deleteFolder(index); });
-        menu->addAction(deleteFolder);
-
         QAction *renameFolder = new QAction(QIcon(":/images/renameFolder.png"), "Rename folder");
         QObject::connect(renameFolder, &QAction::triggered, this, [this, index]() { this->edit(index); });
         menu->addAction(renameFolder);
+
+        ColorPicker *colorPicker = new ColorPicker(nullptr);
+        colorPicker->insertColor(QColor(255, 255, 255), 0, true);
+        colorPicker->setColumnCount(colorPicker->getButtonCount());
+        colorPicker->setCancelButtonVisible(false);
+        colorPicker->setFixedSize(QSize(200, 50));
+        colorPicker->setStyleSheet(
+            "background-color: white; border-style: solid: border-color: black; border-width: 1");
+        QObject::connect(colorPicker, &ColorPicker::colorSelected, this, [index, menu, this](const QColor &color) {
+            FolderTreeItem *folder = static_cast<FolderTreeItem *>(index.internalPointer());
+            this->model()->setData(index, color, FolderTreeModelRole::Color);
+            folder->data.setColor(color);
+            menu->close();
+        });
+
+        QWidgetAction *changeColorAction = new QWidgetAction(nullptr);
+        changeColorAction->setDefaultWidget(colorPicker);
+
+        QMenu *submenu = menu->addMenu(QIcon(":/images/palette.png"), "Change color");
+        submenu->addAction(changeColorAction);
+
+        QAction *deleteFolder = new QAction(QIcon(":/images/delete.png"), "Delete folder");
+        QObject::connect(deleteFolder, &QAction::triggered, this, [this, index]() { this->deleteFolder(index); });
+        menu->addAction(deleteFolder);
     }
 
     menu->exec(mapToGlobal(pos));
