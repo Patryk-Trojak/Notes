@@ -11,6 +11,9 @@ class ColorPicker : public QWidget
     Q_OBJECT
   public:
     ColorPicker(QWidget *parent);
+    void insertColor(const QColor &color, int pos = 0, bool isDefault = false);
+    void setColumnCount(int columnCount);
+    int getButtonCount() const;
 
   signals:
     void colorSelected(const QColor &color);

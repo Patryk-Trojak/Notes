@@ -34,6 +34,48 @@ ColorPicker::ColorPicker(QWidget *parent) : QWidget(parent)
     setStyleSheet("background-color: white");
 }
 
+void ColorPicker::insertColor(const QColor &color, int pos, bool isDefault)
+{
+    ColorButton *newButton = new ColorButton(this, color, isDefault);
+    newButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy ::Expanding);
+    QObject::connect(newButton, &QPushButton::clicked, this, &ColorPicker::onColorButtonClicked);
+    colorButtons.insert(pos, newButton);
+}
+
+void ColorPicker::setColumnCount(int columnCount)
+{
+    if (columnCount <= 0)
+        return;
+
+    int rowNumber = 0;
+    int columnNumber = 0;
+
+    QGridLayout *newLayout = new QGridLayout();
+    newLayout->setSpacing(0);
+    for (int buttonNumber = 0; buttonNumber < colorButtons.size(); buttonNumber++)
+    {
+        newLayout->addWidget(colorButtons[buttonNumber], rowNumber, columnNumber);
+        columnNumber++;
+        if (columnNumber == columnCount)
+        {
+            columnNumber = 0;
+            rowNumber++;
+        }
+    }
+    if (cancelButton->isVisible())
+        newLayout->addWidget(cancelButton, rowNumber, columnNumber);
+    delete layout();
+    setLayout(newLayout);
+}
+
+int ColorPicker::getButtonCount() const
+{
+    if (cancelButton->isVisible())
+        return colorButtons.size() + 1;
+
+    return colorButtons.size();
+}
+
 void ColorPicker::onColorButtonClicked()
 {
     ColorButton *button = static_cast<ColorButton *>(QObject::sender());
