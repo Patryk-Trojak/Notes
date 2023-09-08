@@ -13,6 +13,7 @@ struct FolderTreeModelRole
         ParentId,
         PreviousFolderId,
         Name,
+        Color,
         NotesInsideCount
     };
 };

@@ -4,8 +4,10 @@ FolderData::FolderData() : id(0), parentId(0), notesInsideCount(0), previousFold
 {
 }
 
-FolderData::FolderData(int id, int parentId, int previousFolderId, const QString &name, int notesInsideCount)
-    : id(id), parentId(parentId), previousFolderId(previousFolderId), name(name), notesInsideCount(notesInsideCount)
+FolderData::FolderData(int id, int parentId, int previousFolderId, const QString &name, const QColor &color,
+                       int notesInsideCount)
+    : id(id), parentId(parentId), previousFolderId(previousFolderId), name(name), color(color),
+      notesInsideCount(notesInsideCount)
 {
 }
 
@@ -42,6 +44,16 @@ int FolderData::getNotesInsideCount() const
 int FolderData::getPreviousFolderId() const
 {
     return previousFolderId;
+}
+
+QColor FolderData::getColor() const
+{
+    return color;
+}
+
+void FolderData::setColor(const QColor &newColor)
+{
+    color = newColor;
 }
 
 void FolderData::setPreviousFolderId(int newPreviousFolderId)

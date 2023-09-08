@@ -85,6 +85,8 @@ QVariant FolderTreeModel::data(const QModelIndex &index, int role) const
         return item->data.getParentId();
     case FolderTreeModelRole::PreviousFolderId:
         return item->data.getPreviousFolderId();
+    case FolderTreeModelRole::Color:
+        return item->data.getColor();
     case FolderTreeModelRole::NotesInsideCount:
         return item->data.getNotesInsideCount();
     }
@@ -114,6 +116,10 @@ bool FolderTreeModel::setData(const QModelIndex &index, const QVariant &value, i
         break;
     case FolderTreeModelRole::PreviousFolderId:
         item->data.setPreviousFolderId(value.toInt());
+        dataHasBeenChanged = true;
+        break;
+    case FolderTreeModelRole::Color:
+        item->data.setColor(value.value<QColor>());
         dataHasBeenChanged = true;
         break;
     case FolderTreeModelRole::NotesInsideCount:
@@ -362,19 +368,20 @@ void FolderTreeModel::setupModelData()
 {
     QVector<FolderData> folders = setupFolderList();
 
-    FolderData rootFolder(SpecialFolderId::RootFolder, SpecialFolderId::InvalidId, SpecialFolderId::InvalidId, "/", 0);
+    FolderData rootFolder(SpecialFolderId::RootFolder, SpecialFolderId::InvalidId, SpecialFolderId::InvalidId, "/",
+                          QColor(255, 255, 255), 0);
     rootItem = std::make_unique<FolderTreeItem>(nullptr, rootFolder, FolderTreeItem::Type::RootFolder);
     setupChildrenRecursively(*rootItem, folders);
 
     int allNoteCount = persistenceManager.countAllNotes();
     FolderData allNotesFolder(SpecialFolderId::AllNotesFolder, rootItem->data.getId(), SpecialFolderId::InvalidId,
-                              "All notes", allNoteCount);
+                              "All notes", QColor(255, 255, 255), allNoteCount);
     rootItem->insertChild(0, allNotesFolder, FolderTreeItem::Type::AllNotesFolder);
 
     int notesInTrashCount = persistenceManager.countNotesInTrash();
     FolderData trashFolder(SpecialFolderId::TrashFolder, rootItem->data.getId(),
                            rootItem->getChild(rootItem->getChildren().size() - 1)->data.getId(), "Trash",
-                           notesInTrashCount);
+                           QColor(255, 255, 255), notesInTrashCount);
     rootItem->insertChild(rootItem->getChildren().size(), trashFolder, FolderTreeItem::Type::TrashFolder);
 }
 
