@@ -1,6 +1,6 @@
 #include "FolderData.h"
 
-FolderData::FolderData() : id(0), parentId(0), notesInsideCount(0), previousFolderId(0)
+FolderData::FolderData() : id(0), parentId(0), notesInsideCount(0), previousFolderId(0), color(255, 255, 255)
 {
 }
 

@@ -7,8 +7,8 @@ class FolderData
 {
   public:
     FolderData();
-    FolderData(int id, int parentId, int previousFolderId, const QString &name, const QColor &color = QColor(0, 0, 0),
-               int notesInsideCount = 0);
+    FolderData(int id, int parentId, int previousFolderId, const QString &name,
+               const QColor &color = QColor(255, 255, 255), int notesInsideCount = 0);
     void setId(int newId);
     void setParentId(int newParentId);
     void setName(const QString &newName);
