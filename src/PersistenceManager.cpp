@@ -369,6 +369,7 @@ QVector<FolderData> PersistenceManager::loadAllFolders() const
         folders.back().setName(query.value(1).toString());
         folders.back().setParentId(query.value(2).toInt());
         folders.back().setPreviousFolderId(query.value(3).toInt());
+        folders.back().setColor(query.value(4).value<QColor>());
     }
 
     return folders;
@@ -399,12 +400,13 @@ int PersistenceManager::addFolder(const FolderData &folder) const
 {
     QSqlQuery query(db);
     query.prepare("INSERT INTO folder "
-                  "(name, parent_id, previous_folder_id) "
-                  "VALUES(:name, :parent_id, :previous_folder_id)");
+                  "(name, parent_id, previous_folder_id, color) "
+                  "VALUES(:name, :parent_id, :previous_folder_id, :color)");
 
     query.bindValue(":name", folder.getName());
     query.bindValue(":parent_id", folder.getParentId());
     query.bindValue(":previous_folder_id", folder.getPreviousFolderId());
+    query.bindValue(":color", folder.getColor().name());
 
     if (!query.exec())
     {
@@ -419,12 +421,13 @@ void PersistenceManager::updateFolder(const FolderData &folder) const
     QSqlQuery query(db);
 
     query.prepare("UPDATE folder "
-                  "SET name = :name, parent_id = :parent_id, previous_folder_id = :previous_folder_id "
+                  "SET name = :name, parent_id = :parent_id, previous_folder_id = :previous_folder_id, color = :color "
                   "WHERE id = :id");
 
     query.bindValue(":name", folder.getName());
     query.bindValue(":parent_id", folder.getParentId());
     query.bindValue(":previous_folder_id", folder.getPreviousFolderId());
+    query.bindValue(":color", folder.getColor().name());
 
     query.bindValue(":id", folder.getId());
 
@@ -486,7 +489,8 @@ void PersistenceManager::createNewDefaultTables() const
                                 "id INTEGER PRIMARY KEY, "
                                 "name TEXT, "
                                 "parent_id INTEGER NOT NULL DEFAULT 0, "
-                                "previous_folder_id INTEGER NOT NULL DEFAULT  0"
+                                "previous_folder_id INTEGER NOT NULL DEFAULT 0, "
+                                "color TEXT NOT NULL "
                                 ")";
 
     if (!query.exec(createFolderTable))
