@@ -48,6 +48,7 @@ set(PROJECT_SOURCES
         ${INCLUDE_DIR}/NoteListModelRole.h ${INCLUDE_DIR}/FolderTreeModelRole.h
         ${INCLUDE_DIR}/NoteMimeData.h ${SOURCE_DIR}/NoteMimeData.cpp
         ${INCLUDE_DIR}/FolderMimeData.h ${SOURCE_DIR}/FolderMimeData.cpp
+        ${INCLUDE_DIR}/SpecialFolderId.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

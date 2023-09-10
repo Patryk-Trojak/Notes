@@ -1,5 +1,6 @@
 #include "NoteListView.h"
 #include "NoteListModel.h"
+#include "SpecialFolderId.h"
 #include <QAbstractProxyModel>
 #include <QApplication>
 #include <QDrag>

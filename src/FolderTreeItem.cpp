@@ -4,8 +4,7 @@ FolderTreeItem::FolderTreeItem() : parent(nullptr)
 {
 }
 
-FolderTreeItem::FolderTreeItem(FolderTreeItem *parent, const FolderData &data, Type type)
-    : parent(parent), data(data), type(type)
+FolderTreeItem::FolderTreeItem(FolderTreeItem *parent, const FolderData &data) : parent(parent), data(data)
 {
 }
 
@@ -49,9 +48,9 @@ FolderTreeItem *FolderTreeItem::addChild(const FolderData &folderData)
     return children.back().get();
 }
 
-FolderTreeItem *FolderTreeItem::insertChild(int pos, const FolderData &folderData, Type type)
+FolderTreeItem *FolderTreeItem::insertChild(int pos, const FolderData &folderData)
 {
-    auto child = children.insert(children.begin() + pos, std::make_unique<FolderTreeItem>(this, folderData, type));
+    auto child = children.insert(children.begin() + pos, std::make_unique<FolderTreeItem>(this, folderData));
     return child->get();
 }
 
@@ -81,16 +80,6 @@ void FolderTreeItem::moveChildrenFrom(FolderTreeItem *sourceParent, int sourceSt
 void FolderTreeItem::removeChildren(int first, int count)
 {
     children.erase(children.begin() + first, children.begin() + first + count);
-}
-
-FolderTreeItem::Type FolderTreeItem::getType() const
-{
-    return type;
-}
-
-void FolderTreeItem::setType(Type newType)
-{
-    type = newType;
 }
 
 bool FolderTreeItem::isSubfolderOf(const FolderTreeItem *folder)

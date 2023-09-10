@@ -1,4 +1,5 @@
 #include "FolderTreeDelegate.h"
+#include "SpecialFolderId.h"
 #include <QEvent>
 #include <QFontMetrics>
 #include <QLineEdit>
@@ -61,7 +62,7 @@ void FolderTreeDelegate::paintIcon(QPainter *painter, const QStyleOptionViewItem
                            iconSize.width(), iconSize.height());
 
     QIcon icon;
-    if (item->getType() == FolderTreeItem::Type::TrashFolder)
+    if (item->data.getId() == SpecialFolderId::TrashFolder)
     {
         icon.addFile(QString(":/images/delete.png"));
     }

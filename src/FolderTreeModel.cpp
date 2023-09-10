@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QMimeData>
+#include <SpecialFolderId.h>
 
 FolderTreeModel::FolderTreeModel(PersistenceManager &persistenceManager, QObject *parent)
     : persistenceManager(persistenceManager), QAbstractItemModel(parent)
@@ -141,7 +142,7 @@ bool FolderTreeModel::setData(const QModelIndex &index, const QVariant &value, i
 Qt::ItemFlags FolderTreeModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags flags = QAbstractItemModel::flags(index) | Qt::ItemIsDropEnabled;
-    if (getItemFromIndex(index)->getType() == FolderTreeItem::Type::UserFolder)
+    if (getItemFromIndex(index)->data.getId() >= SpecialFolderId::UserFolder)
         flags |= Qt::ItemIsEditable | Qt::ItemIsDragEnabled;
 
     return flags;
@@ -160,7 +161,7 @@ bool FolderTreeModel::insertRows(int row, int count, const QModelIndex &parent)
         FolderData newFolderData;
         newFolderData.setName("New folder");
         newFolderData.setParentId(parentItem->data.getId());
-        if (row + i == 0 or parentItem->getChild(row + i - 1)->getType() != FolderTreeItem::Type::UserFolder)
+        if (row + i == 0 or parentItem->getChild(row + i - 1)->data.getId() < SpecialFolderId::UserFolder)
             newFolderData.setPreviousFolderId(SpecialFolderId::InvalidId);
         else
             newFolderData.setPreviousFolderId(parentItem->getChild(row + i - 1)->data.getId());
@@ -285,7 +286,7 @@ bool FolderTreeModel::canFolderBeMoved(const QModelIndex &sourceFolder, const QM
         if (row > rowCount(QModelIndex()) - 1)
             return false;
     }
-    else if (getItemFromIndex(desinationParent)->getType() == FolderTreeItem::Type::AllNotesFolder)
+    else if (getItemFromIndex(desinationParent)->data.getId() == SpecialFolderId::AllNotesFolder)
         return false;
 
     if (sourceFolder == desinationParent)
@@ -310,12 +311,12 @@ void FolderTreeModel::updatePreviousFolderId(const QModelIndex &parentItem, int 
     QModelIndex folderIndex = index(row, 0, parentItem);
     FolderTreeItem *item = getItemFromIndex(folderIndex);
 
-    if (!item or item->getType() != FolderTreeItem::Type::UserFolder)
+    if (!item or item->data.getId() < SpecialFolderId::UserFolder)
         return;
 
     FolderTreeItem *previousSiblingOfItem = item->getParent()->getChild(row - 1);
 
-    if (previousSiblingOfItem and previousSiblingOfItem->getType() == FolderTreeItem::Type::UserFolder)
+    if (previousSiblingOfItem and previousSiblingOfItem->data.getId() >= SpecialFolderId::UserFolder)
         item->data.setPreviousFolderId(previousSiblingOfItem->data.getId());
     else
         item->data.setPreviousFolderId(SpecialFolderId::InvalidId);
@@ -370,19 +371,19 @@ void FolderTreeModel::setupModelData()
 
     FolderData rootFolder(SpecialFolderId::RootFolder, SpecialFolderId::InvalidId, SpecialFolderId::InvalidId, "/",
                           QColor(255, 255, 255), 0);
-    rootItem = std::make_unique<FolderTreeItem>(nullptr, rootFolder, FolderTreeItem::Type::RootFolder);
+    rootItem = std::make_unique<FolderTreeItem>(nullptr, rootFolder);
     setupChildrenRecursively(*rootItem, folders);
 
     int allNoteCount = persistenceManager.countAllNotes();
     FolderData allNotesFolder(SpecialFolderId::AllNotesFolder, rootItem->data.getId(), SpecialFolderId::InvalidId,
                               "All notes", QColor(255, 255, 255), allNoteCount);
-    rootItem->insertChild(0, allNotesFolder, FolderTreeItem::Type::AllNotesFolder);
+    rootItem->insertChild(0, allNotesFolder);
 
     int notesInTrashCount = persistenceManager.countNotesInTrash();
     FolderData trashFolder(SpecialFolderId::TrashFolder, rootItem->data.getId(),
                            rootItem->getChild(rootItem->getChildren().size() - 1)->data.getId(), "Trash",
                            QColor(255, 255, 255), notesInTrashCount);
-    rootItem->insertChild(rootItem->getChildren().size(), trashFolder, FolderTreeItem::Type::TrashFolder);
+    rootItem->insertChild(rootItem->getChildren().size(), trashFolder);
 }
 
 QVector<FolderData> FolderTreeModel::setupFolderList()
@@ -477,7 +478,7 @@ void FolderTreeModel::handleFolderMimeData(const QMimeData *data, const QModelIn
     FolderTreeItem *movedItemParent = movedItem->getParent();
     FolderTreeItem *parentItem = getItemFromIndex(parent);
 
-    if (parentItem->getType() == FolderTreeItem::Type::TrashFolder)
+    if (parentItem->data.getId() == SpecialFolderId::TrashFolder)
     {
         removeRow(movedIndex.row(), movedIndex.parent());
         return;

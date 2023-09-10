@@ -10,14 +10,6 @@
 #include <QtSql/QSqlDatabase>
 #include <random>
 
-enum SpecialFolderId
-{
-    RootFolder = -1,
-    AllNotesFolder = -2,
-    TrashFolder = -3,
-    InvalidId = -10
-};
-
 class PersistenceManager
 {
   public:

@@ -1,7 +1,9 @@
 #include "PersistenceManager.h"
+#include "SpecialFolderId.h"
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QtGlobal>
+
 PersistenceManager::PersistenceManager() : dbFullFilepath(QCoreApplication::applicationDirPath() + QString("/notes.db"))
 {
     bool needCreateNewDefaultTables = false;

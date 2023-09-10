@@ -1,4 +1,5 @@
 #include "NoteListModel.h"
+#include "SpecialFolderId.h"
 #include <QHash>
 #include <QMimeData>
 #include <QTimer>

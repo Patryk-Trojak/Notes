@@ -4,6 +4,7 @@
 #include "FolderTreeModel.h"
 #include "NoteMimeData.h"
 #include "PersistenceManager.h"
+#include "SpecialFolderId.h"
 #include <QDrag>
 #include <QDragMoveEvent>
 #include <QMenu>
@@ -266,9 +267,7 @@ void FolderTreeView::updateTextFormatingOfDropTooltip(const QModelIndex &dropInd
 {
     QString tooltipText = dropTooltip->text();
 
-    if (static_cast<const FolderTreeItem *>(dropIndex.constInternalPointer())->getType() ==
-            FolderTreeItem::Type::TrashFolder and
-        dropIndicatorPosition() == OnItem)
+    if (dropIndex.data(FolderTreeModelRole::Id) == SpecialFolderId::TrashFolder and dropIndicatorPosition() == OnItem)
     {
         tooltipText.insert(tooltipText.size(), "</font>");
         tooltipText.insert(0, "<font color = red>");
@@ -296,9 +295,7 @@ void FolderTreeView::dropEvent(QDropEvent *event)
     dropTooltip->setVisible(false);
 
     QModelIndex dropIndex = indexAt(event->position().toPoint());
-    if (dropIndex.isValid() and
-        static_cast<const FolderTreeItem *>(dropIndex.constInternalPointer())->getType() ==
-            FolderTreeItem::Type::TrashFolder and
+    if (dropIndex.isValid() and dropIndex.data(FolderTreeModelRole::Id) == SpecialFolderId::TrashFolder and
         dropIndicatorPosition() == OnItem)
     {
         auto reply = makeSureIfUserWantToDeleteFolder();
