@@ -3,7 +3,6 @@
 #include "FolderData.h"
 #include "FolderTreeModel.h"
 #include "NoteMimeData.h"
-#include "PersistenceManager.h"
 #include "SpecialFolderId.h"
 #include <QDrag>
 #include <QDragMoveEvent>
@@ -226,7 +225,6 @@ void FolderTreeView::updateDropTooltip(const QDragMoveEvent *event)
 
 void FolderTreeView::updateTextOfDropTooltip(const QModelIndex &dropIndex, const QMimeData &mimeData)
 {
-    qDebug() << dropIndex;
     FolderTreeModel *folderModel = static_cast<FolderTreeModel *>(model());
     if (dropIndicatorPosition() == OnItem)
     {
