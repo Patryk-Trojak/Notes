@@ -94,22 +94,26 @@ int FolderTreeView::getCurrentFolderSelectedId() const
 void FolderTreeView::onCustomContextMenuRequested(const QPoint &pos)
 {
     QModelIndex index = QTreeView::indexAt(pos);
-    if (!(index.flags() & Qt::ItemIsEditable))
-        index = QModelIndex(); // Treat uneditable item as when the mouse isn't over any item
-
     QMenu *menu = new QMenu(this);
-    QAction *createSubfolder =
-        new QAction(QIcon(":/images/addBlack.png"), index.isValid() ? "Create subfolder" : "Create new folder");
-    QObject::connect(createSubfolder, &QAction::triggered, this,
-                     [this, index]() { this->model()->insertRow(0, index); });
-    menu->addAction(createSubfolder);
+
+    if (!index.isValid() or index.data(FolderTreeModelRole::Id).toInt() >= SpecialFolderId::UserFolder)
+    {
+        QAction *createSubfolder =
+            new QAction(QIcon(":/images/addBlack.png"), index.isValid() ? "Create subfolder" : "Create new folder");
+        QObject::connect(createSubfolder, &QAction::triggered, this,
+                         [this, index]() { this->model()->insertRow(0, index); });
+        menu->addAction(createSubfolder);
+    }
 
     if (index.isValid())
     {
-        QAction *renameFolder = new QAction(QIcon(":/images/renameFolder.png"), "Rename folder");
-        QObject::connect(renameFolder, &QAction::triggered, this, [this, index]() { this->edit(index); });
-        menu->addAction(renameFolder);
 
+        if (index.data(FolderTreeModelRole::Id).toInt() >= SpecialFolderId::UserFolder)
+        {
+            QAction *renameFolder = new QAction(QIcon(":/images/renameFolder.png"), "Rename folder");
+            QObject::connect(renameFolder, &QAction::triggered, this, [this, index]() { this->edit(index); });
+            menu->addAction(renameFolder);
+        }
         ColorPicker *colorPicker = new ColorPicker(nullptr);
         colorPicker->insertColor(QColor(255, 255, 255), 0, true);
         colorPicker->setColumnCount(colorPicker->getButtonCount());
@@ -126,15 +130,16 @@ void FolderTreeView::onCustomContextMenuRequested(const QPoint &pos)
 
         QWidgetAction *changeColorAction = new QWidgetAction(nullptr);
         changeColorAction->setDefaultWidget(colorPicker);
-
         QMenu *submenu = menu->addMenu(QIcon(":/images/palette.png"), "Change color");
         submenu->addAction(changeColorAction);
 
-        QAction *deleteFolder = new QAction(QIcon(":/images/delete.png"), "Delete folder");
-        QObject::connect(deleteFolder, &QAction::triggered, this, [this, index]() { this->deleteFolder(index); });
-        menu->addAction(deleteFolder);
+        if (index.data(FolderTreeModelRole::Id).toInt() >= SpecialFolderId::UserFolder)
+        {
+            QAction *deleteFolder = new QAction(QIcon(":/images/delete.png"), "Delete folder");
+            QObject::connect(deleteFolder, &QAction::triggered, this, [this, index]() { this->deleteFolder(index); });
+            menu->addAction(deleteFolder);
+        }
     }
-
     menu->exec(mapToGlobal(pos));
 }
 
