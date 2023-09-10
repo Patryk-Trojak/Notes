@@ -52,6 +52,7 @@ class FolderTreeModel : public QAbstractItemModel
     void updateNotesInsideCountsOfFolders(QVector<FolderData> &folders);
     void sortFolders(QVector<FolderData> &folders);
     void setupChildrenRecursively(FolderTreeItem &folderTreeItem, const QVector<FolderData> &listOfFolders);
+    void findRootFolder();
     void deleteFolderRecursivelyFromDb(const FolderTreeItem &folderTreeItem);
     void handleFolderMimeData(const QMimeData *data, const QModelIndex &parent, int row);
     void handleNoteMimeData(const QMimeData *data, const QModelIndex &parent);

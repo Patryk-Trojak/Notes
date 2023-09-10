@@ -49,6 +49,7 @@ class PersistenceManager
 
     void createNewDefaultTables() const;
     int getIdOfLastInsertedRow() const;
+    void addFolderWithGivenId(const FolderData &folder, int id) const;
     NoteData createNoteDataFromQueryRecord(const QSqlQuery &query) const;
 };
 

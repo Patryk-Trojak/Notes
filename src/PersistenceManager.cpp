@@ -498,12 +498,26 @@ void PersistenceManager::createNewDefaultTables() const
     if (!query.exec(createFolderTable))
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
 
+    FolderData allNotesFolder;
+    allNotesFolder.setName("All notes");
+    allNotesFolder.setParentId(SpecialFolderId::RootFolder);
+    allNotesFolder.setPreviousFolderId(SpecialFolderId::InvalidId);
+    addFolderWithGivenId(allNotesFolder, SpecialFolderId::AllNotesFolder);
+
+    FolderData trashFolder;
+    trashFolder.setName("Trash");
+    trashFolder.setParentId(SpecialFolderId::RootFolder);
+    addFolderWithGivenId(trashFolder, SpecialFolderId::TrashFolder);
+
     FolderData notesFolder;
-    notesFolder.setName("Folder");
+    notesFolder.setName("New Folder");
     notesFolder.setParentId(SpecialFolderId::RootFolder);
-    notesFolder.setPreviousFolderId(SpecialFolderId::InvalidId);
-    notesFolder.setNotesInsideCount(0);
-    addFolder(notesFolder);
+    notesFolder.setPreviousFolderId(SpecialFolderId::AllNotesFolder);
+    int userFolderId = addFolder(notesFolder);
+
+    trashFolder.setId(SpecialFolderId::TrashFolder);
+    trashFolder.setPreviousFolderId(userFolderId);
+    updateFolder(trashFolder);
 }
 
 int PersistenceManager::getIdOfLastInsertedRow() const
@@ -540,4 +554,23 @@ NoteData PersistenceManager::createNoteDataFromQueryRecord(const QSqlQuery &quer
         noteData.setIsInTrash(false);
 
     return noteData;
+}
+
+void PersistenceManager::addFolderWithGivenId(const FolderData &folder, int id) const
+{
+    QSqlQuery query(db);
+    query.prepare("INSERT INTO folder "
+                  "(id, name, parent_id, previous_folder_id, color) "
+                  "VALUES(:id, :name, :parent_id, :previous_folder_id, :color)");
+
+    query.bindValue(":id", id);
+    query.bindValue(":name", folder.getName());
+    query.bindValue(":parent_id", folder.getParentId());
+    query.bindValue(":previous_folder_id", folder.getPreviousFolderId());
+    query.bindValue(":color", folder.getColor().name());
+
+    if (!query.exec())
+    {
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+    }
 }
