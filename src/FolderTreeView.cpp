@@ -119,8 +119,7 @@ void FolderTreeView::onCustomContextMenuRequested(const QPoint &pos)
         colorPicker->setColumnCount(colorPicker->getButtonCount());
         colorPicker->setCancelButtonVisible(false);
         colorPicker->setFixedSize(QSize(200, 50));
-        colorPicker->setStyleSheet(
-            "background-color: white; border-style: solid: border-color: black; border-width: 1");
+        colorPicker->setStyleSheet("");
         QObject::connect(colorPicker, &ColorPicker::colorSelected, this, [index, menu, this](const QColor &color) {
             FolderTreeItem *folder = static_cast<FolderTreeItem *>(index.internalPointer());
             this->model()->setData(index, color, FolderTreeModelRole::Color);
