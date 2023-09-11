@@ -120,7 +120,7 @@ void NoteListView::onCustomContextMenuRequested(const QPoint &pos)
     else
         menu = createContextMenuForNormalState(pos);
 
-    menu->exec(mapToGlobal(pos));
+    menu->popup(mapToGlobal(pos));
 }
 
 void NoteListView::onRestoreNoteFromTrashRequested(const QModelIndex &index)

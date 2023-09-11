@@ -139,7 +139,7 @@ void FolderTreeView::onCustomContextMenuRequested(const QPoint &pos)
             menu->addAction(deleteFolder);
         }
     }
-    menu->exec(mapToGlobal(pos));
+    menu->popup(mapToGlobal(pos));
 }
 
 void FolderTreeView::deleteFolder(const QModelIndex &index)
