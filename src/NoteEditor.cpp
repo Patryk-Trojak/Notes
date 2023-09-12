@@ -29,7 +29,7 @@ NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent) : QWidge
     ui->creationTime->setStyleSheet("QLabel{color: black}");
     ui->modificationTime->setStyleSheet("QLabel{color: black}");
     ui->titleEdit->setText(editingNote.data(NoteListModelRole::Title).toString());
-    ui->contentEdit->setText(editingNote.data(NoteListModelRole::Content).toString());
+    ui->contentEdit->setHtml(editingNote.data(NoteListModelRole::Content).toString());
     setCreationTime(editingNote.data(NoteListModelRole::CreationTime).toDateTime());
     setModificationTime(editingNote.data(NoteListModelRole::ModificationTime).toDateTime());
 
@@ -44,7 +44,7 @@ NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent) : QWidge
     QObject::connect(ui->titleEdit, &QLineEdit::textChanged, this,
                      [this]() { setModificationTime(QDateTime::currentDateTime()); });
     QObject::connect(ui->contentEdit, &QTextEdit::textChanged, this,
-                     [this]() { emit contentChanged(this->ui->contentEdit->toPlainText()); });
+                     [this]() { emit contentChanged(this->ui->contentEdit->toHtml()); });
     QObject::connect(ui->contentEdit, &QTextEdit::textChanged, this,
                      [this]() { setModificationTime(QDateTime::currentDateTime()); });
 }

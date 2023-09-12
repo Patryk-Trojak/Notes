@@ -3,6 +3,7 @@
 
 #include <QPainter>
 #include <QResizeEvent>
+#include <QTextDocumentFragment>
 
 NoteButton::NoteButton(QWidget *parent)
     : QPushButton{parent}, ui(new Ui::NoteButton), colorPicker(nullptr), isSelected(false)
@@ -84,7 +85,7 @@ void NoteButton::setTitle(const QString &title)
 
 void NoteButton::setContent(const QString &content)
 {
-    ui->content->setText(content);
+    ui->content->setText(QTextDocumentFragment::fromHtml(content).toPlainText());
 }
 
 void NoteButton::setModificationTime(const QDateTime &newModificationTime)
