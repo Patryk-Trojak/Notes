@@ -50,7 +50,9 @@ FolderTreeView::FolderTreeView(QWidget *parent) : QTreeView(parent), delegate(th
     int widthOfScrollbar = 5;
     QString style =
         QString(
-            "FolderTreeView{border: none; selection-color: transparent; selection-background-color: transparent;}"
+            "QTreeView::item { margin-top: -15px;}"
+            "FolderTreeView{border: none; selection-color: transparent; selection-background-color: transparent; "
+            "background-color: transparent;}"
             "QTreeView::branch { background: transparent; } "
             "QScrollBar { margin-left: 2px; width: %1px; background: transparent; } "
             "QScrollBar::handle:vertical:hover {background: rgba(40, 40, 40, 0.5);} "

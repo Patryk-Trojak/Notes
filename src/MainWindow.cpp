@@ -5,6 +5,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), noteModel(this, persistenceManager), noteEditingTab(nullptr)
 {
+    setStyleSheet("QMainWindow{background-color: #2B2C31;}");
     notesDisplayingTab = new NotesDisplayingTab(noteModel, persistenceManager, this);
     QObject::connect(notesDisplayingTab, &NotesDisplayingTab::enterEditingNote, this, &MainWindow::enterEditingNote);
     setMinimumSize(420, 200);

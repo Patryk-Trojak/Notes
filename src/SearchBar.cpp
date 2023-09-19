@@ -24,6 +24,7 @@ SearchBar::SearchBar(QWidget *parent) : QLineEdit(parent)
     QObject::connect(clear, &QAction::triggered, this, [this]() { this->setText(""); });
     setPlaceholderText("Search");
 
-    setStyleSheet("QLineEdit{border: 1px solid rgba(100, 100, 100, 0.5); "
-                  "border-radius:15px;} QLineEdit::focus{border-color: black;}");
+    setStyleSheet(
+        "QLineEdit{background-color: transparent; border: 1px solid rgba(100, 100, 100, 0.5); border-radius:15px;} "
+        "QLineEdit::focus{border-color: black;}");
 }
