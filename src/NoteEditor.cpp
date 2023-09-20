@@ -8,22 +8,11 @@ NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent) : QWidge
 {
     ui->setupUi(this);
     int widthOfScrollbar = 14;
-    QString style =
-        QString(
-            "QWidget#NoteEditor{border-style: solid; border-color: transparent; border-width:10px; "
-            "border-radius:30px; background-color: %1;} "
-            "QLineEdit{background-color: transparent; border: none;}"
-            "QTextEdit{background-color: transparent; border: none;}"
-            "QScrollBar{background-color: transparent;}"
-            "QScrollBar::handle:vertical:hover {background: rgba(40, 40, 40, 0.5);} "
-            "QScrollBar::handle:vertical:pressed {background: rgba(40, 40, 40, 0.5);}"
-            "QScrollBar::handle:vertical {border-radius: 4px;background: rgba(100, 100, 100, 0.5);min-height: 20px;}"
-            "QScrollBar::vertical {border-radius: 6px;width: 10px;color: rgba(255, 255, 255, 0);}"
-            "QScrollBar::add-line:vertical {width: 0px; height: 0px;subcontrol-position: bottom;subcontrol-origin: "
-            "margin;}"
-            "QScrollBar::sub-line:vertical {width: 0px;height: 0px;subcontrol-position: top;subcontrol-origin: "
-            "margin;}")
-            .arg(editingNote.data(NoteListModelRole::Color).value<QColor>().name());
+    QString style = QString("QWidget#NoteEditor{border-style: solid; border-color: transparent; border-width:10px; "
+                            "border-radius:30px; background-color: %1;} "
+                            "QLineEdit{background-color: transparent; border: none;}"
+                            "QTextEdit{background-color: transparent; border: none;}")
+                        .arg(editingNote.data(NoteListModelRole::Color).value<QColor>().name());
     setStyleSheet(style);
     setAttribute(Qt::WA_StyledBackground, true);
     ui->creationTime->setStyleSheet("QLabel{color: black}");

@@ -33,23 +33,7 @@ NoteListView::NoteListView(QWidget *parent)
     QObject::connect(&noteListDelegate, &NoteListDelegate::newEditorCreated, this, &NoteListView::onNewEditorCreated);
     QObject::connect(this, &QListView::customContextMenuRequested, this, &NoteListView::onCustomContextMenuRequested);
 
-    int widthOfScrollbar = 14;
-    QString style =
-        QString(
-            "QListView{border: none; background-color: transparent;} QScrollBar { width: %1px; background: "
-            "transparent; } "
-            "QScrollBar::handle:vertical:hover {background: rgba(40, 40, 40, 0.5);} "
-            "QScrollBar::handle:vertical:pressed {background: rgba(40, 40, 40, 0.5);}"
-            "QScrollBar::handle:vertical {border-radius: 4px;background: rgba(100, 100, 100, 0.5);min-height: 20px;}"
-            "QScrollBar::vertical {border-radius: 6px;width: 10px;color: rgba(255, 255, 255, 0);}"
-            "QScrollBar::add-line:vertical {width: 0px; height: 0px;subcontrol-position: bottom;subcontrol-origin: "
-            "margin;}"
-            "QScrollBar::sub-line:vertical {width: 0px;height: 0px;subcontrol-position: top; subcontrol-origin: "
-            "margin;}")
-            .arg(widthOfScrollbar);
-
-    verticalScrollBar()->resize(widthOfScrollbar, 0);
-    setStyleSheet(style);
+    setStyleSheet("QListView{border: none; background-color: transparent;}");
 
     selectionMenu = new NoteListViewSelectionMenu(this);
     QObject::connect(selectionMenu, &NoteListViewSelectionMenu::colorSelected, this,
@@ -202,7 +186,6 @@ bool NoteListView::eventFilter(QObject *watched, QEvent *event)
 
     if (QApplication::keyboardModifiers() & Qt::ControlModifier)
     {
-
         if (event->type() == QEvent::MouseButtonPress or event->type() == QEvent::MouseButtonDblClick or
             event->type() == QEvent::MouseMove)
             return true;

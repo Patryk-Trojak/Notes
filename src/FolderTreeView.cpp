@@ -10,6 +10,7 @@
 #include <QModelIndex>
 #include <QPainter>
 #include <QRegularExpression>
+#include <QScrollBar>
 #include <QWidgetAction>
 
 void FolderTreeViewProxyStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter,
@@ -47,24 +48,11 @@ FolderTreeView::FolderTreeView(QWidget *parent) : QTreeView(parent), delegate(th
                      &FolderTreeView::customContextMenuRequested);
 
     setItemDelegate(&delegate);
-    int widthOfScrollbar = 5;
-    QString style =
-        QString(
-            "QTreeView::item { margin-top: -15px;}"
-            "FolderTreeView{border: none; selection-color: transparent; selection-background-color: transparent; "
-            "background-color: transparent;}"
-            "QTreeView::branch { background: transparent; } "
-            "QScrollBar { margin-left: 2px; width: %1px; background: transparent; } "
-            "QScrollBar::handle:vertical:hover {background: rgba(40, 40, 40, 0.5);} "
-            "QScrollBar::handle:vertical:pressed {background: rgba(40, 40, 40, 0.5);}"
-            "QScrollBar::handle:vertical {border-radius: 4px;background: rgba(100, 100, 100, 0.5);min-height: 20px;}"
-            "QScrollBar::vertical {border-radius: 6px;width: 10px;color: rgba(255, 255, 255, 0);}"
-            "QScrollBar::add-line:vertical {width: 0px; height: 0px;subcontrol-position: bottom;subcontrol-origin: "
-            "margin;}"
-            "QScrollBar::sub-line:vertical {width: 0px;height: 0px;subcontrol-position: top;subcontrol-origin: "
-            "margin;}")
-            .arg(widthOfScrollbar);
-    setStyleSheet(style);
+
+    setStyleSheet("FolderTreeView{border: none; selection-color: transparent; selection-background-color: transparent; "
+                  "background-color: transparent;}"
+                  "QTreeView::branch { background: transparent; } "
+                  "QScrollBar::vertical {width: 10px; border-radius: 5px; margin-left: 2px;}");
     myStyle = new FolderTreeViewProxyStyle;
     setStyle(myStyle);
     setDragDropOverwriteMode(true);
