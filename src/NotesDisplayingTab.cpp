@@ -53,6 +53,8 @@ NotesDisplayingTab::NotesDisplayingTab(NoteListModel &noteModel, PersistenceMana
         auto sourceIndex = this->noteProxyModel.mapToSource(index);
         emit this->enterEditingNote(sourceIndex);
     });
+    QObject::connect(noteListView, &NoteListView::verticalScrollBarWidthChanged, this,
+                     &NotesDisplayingTab::layoutAllElementsWhichDependsOnNumberOfNotes);
     QObject::connect(noteListView->verticalScrollBar(), &QScrollBar::valueChanged, this,
                      &NotesDisplayingTab::updateRubberBand);
     onNewFolderSelected(ui->folderTreeView->getCurrentFolderSelectedId());

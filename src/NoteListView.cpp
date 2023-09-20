@@ -163,6 +163,9 @@ void NoteListView::toogleIsPinnedOfSelectedNotes()
 
 bool NoteListView::eventFilter(QObject *watched, QEvent *event)
 {
+    if (event->type() == QEvent::Resize and watched == verticalScrollBar())
+        emit verticalScrollBarWidthChanged();
+
     if (watched == verticalScrollBar() or watched == horizontalScrollBar())
         return QListView::eventFilter(watched, event);
 

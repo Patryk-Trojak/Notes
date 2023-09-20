@@ -28,6 +28,7 @@ class NoteListView : public QListView
 
   signals:
     void noteSelected(const QModelIndex &index);
+    void verticalScrollBarWidthChanged();
 
   protected:
     void resizeEvent(QResizeEvent *event);
