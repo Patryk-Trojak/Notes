@@ -186,9 +186,9 @@ void NotesDisplayingTab::layoutOpenNoteSortOptionsButton()
 
 void NotesDisplayingTab::layoutNoteListView()
 {
-    int leftMargin = 7;
-    int rightMargin = 7;
-    int marginTop = 51;
+    constexpr int leftMargin = 7;
+    constexpr int rightMargin = 7;
+    constexpr int marginTop = 51;
     if (ui->splitter->sizes().at(1) == 0)
     {
         noteListView->setVisible(false);
