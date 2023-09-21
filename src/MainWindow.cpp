@@ -7,14 +7,14 @@ MainWindow::MainWindow(QWidget *parent)
 {
     setStyleSheet(
         "QMainWindow{background-color: white;}"
-        "QScrollBar { background: transparent; color: rgba(255, 255, 255, 0)} "
-        "QScrollBar::vertical {width: 10px; border-radius: 5px;}"
-        "QScrollBar::handle:vertical:hover {background: rgba(40, 40, 40, 0.5);} "
-        "QScrollBar::handle:vertical:pressed {background: rgba(40, 40, 40, 0.5);} "
-        "QScrollBar::handle:vertical {border-radius: 4px; background: rgba(100, 100, 100, 0.5); "
+        "QScrollBar { background: transparent; color: rgba(255, 255, 255, 0); width: 10px; height: 10px; "
+        "border-radius: 5px;} "
+        "QScrollBar::handle:hover {background: rgba(40, 40, 40, 0.5);} "
+        "QScrollBar::handle:pressed {background: rgba(40, 40, 40, 0.5);} "
+        "QScrollBar::handle {border-radius: 4px; background: rgba(100, 100, 100, 0.5); "
         "min-height: 20px;}"
-        "QScrollBar::add-line:vertical {width: 0px; height: 0px;subcontrol-position: bottom;subcontrol-origin: margin;}"
-        "QScrollBar::sub-line:vertical {width: 0px;height: 0px;subcontrol-position: top;subcontrol-origin: margin;}");
+        "QScrollBar::add-line {width: 0px; height: 0px;subcontrol-position: bottom;subcontrol-origin: margin;}"
+        "QScrollBar::sub-line {width: 0px;height: 0px;subcontrol-position: top;subcontrol-origin: margin;}");
 
     notesDisplayingTab = new NotesDisplayingTab(noteModel, persistenceManager, this);
     QObject::connect(notesDisplayingTab, &NotesDisplayingTab::enterEditingNote, this, &MainWindow::enterEditingNote);
