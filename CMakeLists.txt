@@ -49,6 +49,7 @@ set(PROJECT_SOURCES
         ${INCLUDE_DIR}/NoteMimeData.h ${SOURCE_DIR}/NoteMimeData.cpp
         ${INCLUDE_DIR}/FolderMimeData.h ${SOURCE_DIR}/FolderMimeData.cpp
         ${INCLUDE_DIR}/SpecialFolderId.h
+        ${INCLUDE_DIR}/NoteContentEdit.h ${SOURCE_DIR}/NoteContentEdit.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

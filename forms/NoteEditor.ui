@@ -45,7 +45,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QTextEdit" name="contentEdit">
+    <widget class="NoteContentEdit" name="contentEdit">
      <property name="font">
       <font>
        <pointsize>15</pointsize>
@@ -96,6 +96,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>NoteContentEdit</class>
+   <extends>QTextEdit</extends>
+   <header location="global">NoteContentEdit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
