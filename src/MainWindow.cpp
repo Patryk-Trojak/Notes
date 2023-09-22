@@ -27,7 +27,7 @@ void MainWindow::enterEditingNote(const QModelIndex &note)
     if (noteEditingTab)
         delete noteEditingTab;
 
-    noteEditingTab = new NoteEditingTab(noteModel, note, this);
+    noteEditingTab = new NoteEditingTab(persistenceManager, noteModel, note, this);
     QObject::connect(noteEditingTab, &NoteEditingTab::exitEditingNoteRequested, this, &MainWindow::exitEditingNote);
     noteEditingTab->show();
 }

@@ -6,8 +6,11 @@
 #include <QPropertyAnimation>
 #include <QShortcut>
 
-NoteEditingTab::NoteEditingTab(NoteListModel &noteModel, const QModelIndex &editingNote, QWidget *parent)
-    : QWidget(parent), editingNote(editingNote), noteModel(noteModel), editor(new NoteEditor(editingNote, this))
+NoteEditingTab::NoteEditingTab(PersistenceManager &persistenceManager, NoteListModel &noteModel,
+                               const QModelIndex &editingNote, QWidget *parent)
+    : QWidget(parent), persistenceManager(persistenceManager), editingNote(editingNote), noteModel(noteModel),
+      editor(new NoteEditor(editingNote, this))
+
 {
     QObject::connect(editor, &NoteEditor::closeNoteRequested, this, &NoteEditingTab::saveNoteAndEmitExitSignal);
     QObject::connect(new QShortcut(QKeySequence(Qt::Key_Escape), this), &QShortcut::activated, this,
@@ -27,6 +30,25 @@ NoteEditingTab::NoteEditingTab(NoteListModel &noteModel, const QModelIndex &edit
     openingEditorAnimation->setEndValue(calculateGeometryOfEditor());
     openingEditorAnimation->setDuration(150);
     openingEditorAnimation->start();
+
+    auto resourceLoader = [&persistenceManager](const QUrl &url, QTextDocument::ResourceType resourceType) {
+        if (resourceType != QTextDocument::ImageResource)
+            QVariant();
+
+        return QVariant::fromValue(persistenceManager.loadImage(url.toString().toInt()));
+    };
+
+    auto resourceSaver = [&persistenceManager, noteId = editingNote.data(NoteListModelRole::Id).toInt()](
+                             const QVariant &resource, QTextDocument::ResourceType resourceType) {
+        if (resourceType != QTextDocument::ImageResource)
+            return -1;
+
+        int imageId = persistenceManager.addImage(resource.value<QImage>(), noteId);
+        return imageId;
+    };
+
+    editor->setResourceLoader(resourceLoader);
+    editor->setResourceSaver(resourceSaver);
 }
 
 void NoteEditingTab::onTitleChanged(const QString &newTitle)

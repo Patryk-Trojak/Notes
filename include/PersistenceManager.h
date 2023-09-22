@@ -43,6 +43,10 @@ class PersistenceManager
     void updateFolder(const FolderData &folder) const;
     void deleteFolder(int id) const;
 
+    int addImage(const QImage &image, int noteId) const;
+    QImage loadImage(int id) const;
+    void deleteAllImagesFromNotes(const QVector<int> &noteIds) const;
+
   private:
     QSqlDatabase db;
     QString dbFullFilepath;

@@ -3,6 +3,7 @@
 #include "NoteListModelRole.h"
 #include <QDateTime>
 #include <QResizeEvent>
+#include <QTextDocument>
 
 NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent) : QWidget(parent), ui(new Ui::NoteEditor)
 {
@@ -41,6 +42,16 @@ NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent) : QWidge
 NoteEditor::~NoteEditor()
 {
     delete ui;
+}
+
+void NoteEditor::setResourceLoader(const NoteContentEdit::ResourceLoader &resourceProvider)
+{
+    ui->contentEdit->setResourceLoader(resourceProvider);
+}
+
+void NoteEditor::setResourceSaver(const NoteContentEdit::ResourceSaver &resourceSaver)
+{
+    ui->contentEdit->setResourceSaver(resourceSaver);
 }
 
 void NoteEditor::setCreationTime(const QDateTime &creationTime)

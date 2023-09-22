@@ -10,13 +10,15 @@ class NoteEditingTab : public QWidget
 {
     Q_OBJECT
   public:
-    explicit NoteEditingTab(NoteListModel &noteModel, const QModelIndex &editingNote, QWidget *parent = nullptr);
+    explicit NoteEditingTab(PersistenceManager &persistenceManager, NoteListModel &noteModel,
+                            const QModelIndex &editingNote, QWidget *parent = nullptr);
 
   signals:
     void exitEditingNoteRequested();
 
   private:
     NoteListModel &noteModel;
+    PersistenceManager &persistenceManager;
     const QModelIndex editingNote;
     NoteEditor *editor;
     QPropertyAnimation *openingEditorAnimation;

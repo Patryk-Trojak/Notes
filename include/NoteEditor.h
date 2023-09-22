@@ -1,8 +1,10 @@
 #ifndef NOTEEDITOR_H
 #define NOTEEDITOR_H
 
+#include "NoteContentEdit.h"
 #include <QModelIndex>
 #include <QPushButton>
+#include <QTextDocument>
 #include <QWidget>
 
 namespace Ui
@@ -16,6 +18,8 @@ class NoteEditor : public QWidget
   public:
     NoteEditor(const QModelIndex &editingNote, QWidget *parent = nullptr);
     ~NoteEditor();
+    void setResourceLoader(const NoteContentEdit::ResourceLoader &resourceProvider);
+    void setResourceSaver(const NoteContentEdit::ResourceSaver &resourceSaver);
 
   signals:
     void closeNoteRequested();

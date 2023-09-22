@@ -1,5 +1,7 @@
 #include "PersistenceManager.h"
 #include "SpecialFolderId.h"
+#include <QBuffer>
+#include <QImage>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QtGlobal>
@@ -305,7 +307,12 @@ void PersistenceManager::deleteNote(int id) const
     query.bindValue(":id", id);
 
     if (!query.exec())
+    {
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+        return;
+    }
+
+    deleteAllImagesFromNotes({id});
 }
 
 void PersistenceManager::deleteNotes(const QVector<int> &noteIds)
@@ -320,7 +327,11 @@ void PersistenceManager::deleteNotes(const QVector<int> &noteIds)
 
     query.prepare(queryString);
     if (!query.exec())
+    {
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+        return;
+    }
+    deleteAllImagesFromNotes(noteIds);
 }
 
 int PersistenceManager::countAllNotes()
@@ -447,6 +458,57 @@ void PersistenceManager::deleteFolder(int id) const
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
 }
 
+int PersistenceManager::addImage(const QImage &image, int noteID) const
+{
+    QSqlQuery query(db);
+    query.prepare("INSERT INTO image "
+                  "(data, note_id) "
+                  "VALUES(:data, :note_id)");
+
+    QByteArray imageData;
+    QBuffer buffer(&imageData);
+    buffer.open(QIODevice::WriteOnly);
+    image.save(&buffer, "PNG");
+    query.bindValue(":data", imageData);
+    query.bindValue(":note_id", noteID);
+
+    if (!query.exec())
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+
+    return getIdOfLastInsertedRow();
+}
+
+QImage PersistenceManager::loadImage(int id) const
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT data FROM image WHERE id = :id");
+    query.bindValue(":id", id);
+    if (!query.exec())
+    {
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+        return QImage();
+    }
+    query.next();
+    QImage image;
+    image.loadFromData(query.value(0).toByteArray());
+    return image;
+}
+
+void PersistenceManager::deleteAllImagesFromNotes(const QVector<int> &noteIds) const
+{
+    QSqlQuery query(db);
+    QString queryString = "DELETE FROM image WHERE note_id IN (";
+
+    foreach (int id, noteIds)
+        queryString.append(QString::number(id) + ",");
+    queryString.removeLast();
+    queryString.append(")");
+
+    query.prepare(queryString);
+    if (!query.exec())
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+}
+
 QHash<int, int> PersistenceManager::getNotesInsideFoldersCounts()
 {
     QHash<int, int> result;
@@ -496,6 +558,15 @@ void PersistenceManager::createNewDefaultTables() const
                                 ")";
 
     if (!query.exec(createFolderTable))
+        qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
+
+    QString createImageTable = "CREATE TABLE image("
+                               "id INTEGER PRIMARY KEY, "
+                               "data MEDIUMBLOB, "
+                               "note_id INTEGER "
+                               ")";
+
+    if (!query.exec(createImageTable))
         qDebug() << __FUNCTION__ << __LINE__ << query.lastError();
 
     FolderData allNotesFolder;
