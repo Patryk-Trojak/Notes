@@ -85,7 +85,9 @@ void NoteButton::setTitle(const QString &title)
 
 void NoteButton::setContent(const QString &content)
 {
-    ui->content->setText(QTextDocumentFragment::fromHtml(content).toPlainText());
+    QString plainContent = QTextDocumentFragment::fromHtml(content).toPlainText();
+    plainContent.remove(QChar::ObjectReplacementCharacter);
+    ui->content->setText(plainContent);
 }
 
 void NoteButton::setModificationTime(const QDateTime &newModificationTime)
