@@ -59,7 +59,6 @@ void NoteListView::removeNote(const QModelIndex &index)
     auto reply = QMessageBox::question(this, "Delete note?", message);
     if (reply == QMessageBox::No)
         return;
-
     model()->removeRow(index.row());
 }
 
@@ -75,8 +74,7 @@ void NoteListView::onNewEditorCreated(NoteButton *editor, const QModelIndex &ind
     if (inSelectingState and !editor->getIsPinned())
         editor->setPinCheckboxVisible(false);
 
-    QObject::connect(editor, &NoteButton::deleteNote, this,
-                     [this, index]() { this->removeNote(this->currentIndex()); });
+    QObject::connect(editor, &NoteButton::deleteNote, this, [this, index]() { this->removeNote(index); });
     QObject::connect(editor, &NoteButton::clicked, this, [this, index]() { emit this->noteSelected(index); });
     QObject::connect(editor, &NoteButton::pinCheckboxToogled, this,
                      [this, editor, index]() { noteListDelegate.setModelData(editor, this->model(), index); });
