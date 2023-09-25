@@ -343,6 +343,8 @@ void NoteListView::startDrag(Qt::DropActions supportedActions)
         drag->setMimeData(data);
         drag->setHotSpot(QPoint((qMin(indexes.size(), 4) - 1) * 3 + 20, (qMin(indexes.size(), 4) - 1) * 3 + 40));
         drag->exec(supportedActions);
+        setState(QAbstractItemView::NoState);
+        updateEditor();
     }
 }
 
