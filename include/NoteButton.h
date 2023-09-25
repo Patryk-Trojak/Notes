@@ -39,7 +39,7 @@ class NoteButton : public QPushButton
 
   signals:
     void deleteNote();
-    void pinCheckboxToogled(bool checked);
+    void pinCheckboxClicked(bool isChecked);
     void colorChanged(const QColor &newColor);
 
   private:

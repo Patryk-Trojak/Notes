@@ -30,7 +30,8 @@ NoteButton::NoteButton(QWidget *parent)
     changeColorButton->setIconSize(QSize(28, 28));
     changeColorButton->resize(28, 28);
 
-    QObject::connect(pinCheckBox, &QCheckBox::toggled, this, &NoteButton::pinCheckboxToogled);
+    QObject::connect(pinCheckBox, &QCheckBox::clicked, this,
+                     [this]() { emit pinCheckboxClicked(this->pinCheckBox->isChecked()); });
     QObject::connect(deleteButton, &QPushButton::clicked, this, &NoteButton::deleteNote);
 
     updateStyleSheets();

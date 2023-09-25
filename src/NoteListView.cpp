@@ -76,7 +76,7 @@ void NoteListView::onNewEditorCreated(NoteButton *editor, const QModelIndex &ind
 
     QObject::connect(editor, &NoteButton::deleteNote, this, [this, index]() { this->removeNote(index); });
     QObject::connect(editor, &NoteButton::clicked, this, [this, index]() { emit this->noteSelected(index); });
-    QObject::connect(editor, &NoteButton::pinCheckboxToogled, this,
+    QObject::connect(editor, &NoteButton::pinCheckboxClicked, this,
                      [this, editor, index]() { noteListDelegate.setModelData(editor, this->model(), index); });
     QObject::connect(editor, &NoteButton::colorChanged, this,
                      [this, editor, index]() { noteListDelegate.setModelData(editor, this->model(), index); });
