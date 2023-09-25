@@ -37,6 +37,9 @@ class NoteListView : public QListView
     void verticalScrollbarValueChanged(int value);
     void startDrag(Qt::DropActions supportedActions);
 
+  protected slots:
+    void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles);
+
   private:
     NoteListDelegate noteListDelegate;
     NoteButton *editor;

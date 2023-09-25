@@ -114,6 +114,13 @@ void NoteListView::onRestoreNoteFromTrashRequested(const QModelIndex &index)
         noteModel->restoreNoteFromTrash(noteModelIndex);
 }
 
+void NoteListView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
+{
+    updateEditor(); // Data change might change order of notes, so we need to update editor for current note which is
+                    // under the mouse.
+    QListView::dataChanged(topLeft, bottomRight, roles);
+}
+
 void NoteListView::removeSelectedNotes()
 {
     const QString message = [this]() {
@@ -447,8 +454,10 @@ QMenu *NoteListView::createContextMenuForNormalState(const QPoint &position)
             if (!index.data(NoteListModelRole::isPinned).toBool())
             {
                 QAction *pinNote = new QAction("Pin note");
-                QObject::connect(pinNote, &QAction::triggered, this,
-                                 [this, index]() { this->model()->setData(index, true, NoteListModelRole::isPinned); });
+                QObject::connect(pinNote, &QAction::triggered, this, [this, index]() {
+                    qDebug() << "PINNED INDEX: " << index.row();
+                    this->model()->setData(index, true, NoteListModelRole::isPinned);
+                });
                 menu->addAction(pinNote);
             }
             else
