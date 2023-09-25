@@ -1,5 +1,6 @@
 #ifndef NOTECONTENTEDIT_H
 #define NOTECONTENTEDIT_H
+#include "ImageDownloader.h"
 #include <QTextEdit>
 
 class NoteContentEdit : public QTextEdit
@@ -23,7 +24,10 @@ class NoteContentEdit : public QTextEdit
     ResourceLoader resourceLoader;
 
   private:
+    ImageDownloader urlDownloader;
     void insertImage(const QVariant &imageData);
+    void onImageDownloaded(const QImage &image, const QUrl &sourceUrl);
+    void onImageDownloadedFailed(const QUrl &sourceUrl);
 };
 
 #endif // NOTECONTENTEDIT_H

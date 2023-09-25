@@ -15,8 +15,8 @@ set(FORMS_DIR ${CMAKE_SOURCE_DIR}/forms)
 set(RESOURCES_DIR ${CMAKE_SOURCE_DIR}/resources)
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${FORMS_DIR})
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql Network)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql Network)
 
 set(PROJECT_SOURCES
         ${SOURCE_DIR}/main.cpp
@@ -50,6 +50,7 @@ set(PROJECT_SOURCES
         ${INCLUDE_DIR}/FolderMimeData.h ${SOURCE_DIR}/FolderMimeData.cpp
         ${INCLUDE_DIR}/SpecialFolderId.h
         ${INCLUDE_DIR}/NoteContentEdit.h ${SOURCE_DIR}/NoteContentEdit.cpp
+        ${INCLUDE_DIR}/ImageDownloader.h ${SOURCE_DIR}/ImageDownloader.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -76,7 +77,7 @@ else()
     endif()
 endif()
 
-target_link_libraries(Notes PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Sql)
+target_link_libraries(Notes PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::Network)
 target_include_directories(Notes PRIVATE ${INCLUDE_DIR})
 set_target_properties(Notes PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

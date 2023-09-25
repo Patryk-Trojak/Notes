@@ -7,6 +7,9 @@
 
 NoteContentEdit::NoteContentEdit(QWidget *parent) : QTextEdit(parent)
 {
+    QObject::connect(&urlDownloader, &ImageDownloader::downloadFinishedSuccessfully, this,
+                     &NoteContentEdit::onImageDownloaded);
+    QObject::connect(&urlDownloader, &ImageDownloader::downloadFailed, this, &NoteContentEdit::onImageDownloadedFailed);
 }
 
 bool NoteContentEdit::canInsertFromMimeData(const QMimeData *source) const
@@ -21,6 +24,12 @@ void NoteContentEdit::insertFromMimeData(const QMimeData *source)
         insertImage(source->imageData());
         return;
     }
+    else if (source->hasUrls())
+    {
+        foreach (QUrl url, source->urls())
+            urlDownloader.tryDownloadImage(url);
+        return;
+    }
 
     QTextEdit::insertFromMimeData(source);
 }
@@ -31,6 +40,16 @@ void NoteContentEdit::insertImage(const QVariant &imageData)
     QUrl url = QUrl(QString::number(idOfResource));
     document()->addResource(QTextDocument::ImageResource, url, imageData);
     textCursor().insertImage(url.toString());
+}
+
+void NoteContentEdit::onImageDownloaded(const QImage &image, const QUrl &sourceUrl)
+{
+    insertImage(image);
+}
+
+void NoteContentEdit::onImageDownloadedFailed(const QUrl &sourceUrl)
+{
+    textCursor().insertText(sourceUrl.toString());
 }
 
 QVariant NoteContentEdit::loadResource(int type, const QUrl &name)
