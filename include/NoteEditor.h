@@ -36,6 +36,7 @@ class NoteEditor : public QWidget
     void switchTextBold();
     void switchTextItalic();
     void switchTextUnderline();
+    void switchTextStrikeOut();
 
     void onCurrentCharFormatChanged(const QTextCharFormat &f);
 

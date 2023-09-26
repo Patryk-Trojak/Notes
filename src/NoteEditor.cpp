@@ -47,6 +47,7 @@ NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent) : QWidge
     QObject::connect(ui->contentEdit, &QTextEdit::currentCharFormatChanged, this,
                      &NoteEditor::onCurrentCharFormatChanged);
     QObject::connect(ui->underlineCheckBox, &QCheckBox::clicked, this, &NoteEditor::switchTextUnderline);
+    QObject::connect(ui->strikeOutCheckBox, &QCheckBox::clicked, this, &NoteEditor::switchTextStrikeOut);
 
     onCurrentCharFormatChanged(ui->contentEdit->currentCharFormat());
 }
@@ -97,6 +98,13 @@ void NoteEditor::switchTextUnderline()
     ui->contentEdit->mergeCurrentCharFormat(fmt);
 }
 
+void NoteEditor::switchTextStrikeOut()
+{
+    QTextCharFormat fmt;
+    fmt.setFontStrikeOut(ui->strikeOutCheckBox->isChecked());
+    ui->contentEdit->mergeCurrentCharFormat(fmt);
+}
+
 void NoteEditor::resizeEvent(QResizeEvent *event)
 {
     QPoint rightTop = QPoint(event->size().width(), 0);
@@ -108,4 +116,5 @@ void NoteEditor::onCurrentCharFormatChanged(const QTextCharFormat &f)
     ui->boldCheckBox->setChecked(f.font().bold());
     ui->italicCheckBox->setChecked(f.font().italic());
     ui->underlineCheckBox->setChecked(f.font().underline());
+    ui->strikeOutCheckBox->setChecked(f.font().strikeOut());
 }
