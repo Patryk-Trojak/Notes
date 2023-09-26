@@ -31,5 +31,7 @@
         <file>images/alignJustify.png</file>
         <file>images/alignLeft.png</file>
         <file>images/alignRight.png</file>
+        <file>images/indent.png</file>
+        <file>images/unindent.png</file>
     </qresource>
 </RCC>

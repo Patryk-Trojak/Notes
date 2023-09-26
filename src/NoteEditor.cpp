@@ -54,6 +54,8 @@ NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent) : QWidge
     QObject::connect(ui->textColorButton, &QPushButton::clicked, this, &NoteEditor::setTextColor);
     QObject::connect(ui->textBackgroundColorButton, &QPushButton::clicked, this, &NoteEditor::setTextBackgroundColor);
     QObject::connect(ui->alignMenuButton, &QPushButton::clicked, this, &NoteEditor::openAlignPopupMenu);
+    QObject::connect(ui->indentButton, &QPushButton::clicked, this, [this]() { this->modifyIndentation(1); });
+    QObject::connect(ui->unindentButton, &QPushButton::clicked, this, [this]() { this->modifyIndentation(-1); });
 
     onCurrentCharFormatChanged(ui->contentEdit->currentCharFormat());
     onCurrentBlockFormatChanged();
@@ -215,6 +217,16 @@ void NoteEditor::onAlignmentChanged()
         ui->alignMenuButton->setIcon(QIcon(":/images/alignRight.png"));
     else if (alignment.testFlag(Qt::AlignJustify))
         ui->alignMenuButton->setIcon(QIcon(":/images/alignJustify.png"));
+}
+
+void NoteEditor::modifyIndentation(int amount)
+{
+    QTextCursor cursor = ui->contentEdit->textCursor();
+    cursor.beginEditBlock();
+    QTextBlockFormat blockFmt = cursor.blockFormat();
+    blockFmt.setIndent(qMax(0, blockFmt.indent() + amount));
+    cursor.setBlockFormat(blockFmt);
+    cursor.endEditBlock();
 }
 
 void NoteEditor::onCurrentBlockFormatChanged()
