@@ -46,6 +46,7 @@ NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent) : QWidge
     QObject::connect(ui->italicCheckBox, &QCheckBox::clicked, this, &NoteEditor::switchTextItalic);
     QObject::connect(ui->contentEdit, &QTextEdit::currentCharFormatChanged, this,
                      &NoteEditor::onCurrentCharFormatChanged);
+    QObject::connect(ui->underlineCheckBox, &QCheckBox::clicked, this, &NoteEditor::switchTextUnderline);
 
     onCurrentCharFormatChanged(ui->contentEdit->currentCharFormat());
 }
@@ -89,6 +90,13 @@ void NoteEditor::switchTextItalic()
     ui->contentEdit->mergeCurrentCharFormat(fmt);
 }
 
+void NoteEditor::switchTextUnderline()
+{
+    QTextCharFormat fmt;
+    fmt.setFontUnderline(ui->underlineCheckBox->isChecked());
+    ui->contentEdit->mergeCurrentCharFormat(fmt);
+}
+
 void NoteEditor::resizeEvent(QResizeEvent *event)
 {
     QPoint rightTop = QPoint(event->size().width(), 0);
@@ -99,4 +107,5 @@ void NoteEditor::onCurrentCharFormatChanged(const QTextCharFormat &f)
 {
     ui->boldCheckBox->setChecked(f.font().bold());
     ui->italicCheckBox->setChecked(f.font().italic());
+    ui->underlineCheckBox->setChecked(f.font().underline());
 }

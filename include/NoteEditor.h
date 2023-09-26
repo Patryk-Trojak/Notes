@@ -35,6 +35,8 @@ class NoteEditor : public QWidget
     void setModificationTime(const QDateTime &modificationTime);
     void switchTextBold();
     void switchTextItalic();
+    void switchTextUnderline();
+
     void onCurrentCharFormatChanged(const QTextCharFormat &f);
 
   protected:
