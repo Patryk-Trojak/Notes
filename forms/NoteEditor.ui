@@ -314,8 +314,42 @@ QCheckBox::hover{background-color: rgba(200, 200, 200, 200);  border-radius: 3px
           <string/>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../resources/images.qrc">
            <normaloff>:/images/textBackgroundColor.png</normaloff>:/images/textBackgroundColor.png</iconset>
+         </property>
+         <property name="flat">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="alignMenuButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string/>
          </property>
          <property name="flat">
           <bool>true</bool>

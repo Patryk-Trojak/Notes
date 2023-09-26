@@ -41,17 +41,22 @@ NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent) : QWidge
                      [this]() { emit contentChanged(this->ui->contentEdit->toHtml()); });
     QObject::connect(ui->contentEdit, &QTextEdit::textChanged, this,
                      [this]() { setModificationTime(QDateTime::currentDateTime()); });
+    QObject::connect(ui->contentEdit, &QTextEdit::textChanged, this, &NoteEditor::onCurrentBlockFormatChanged);
+    QObject::connect(ui->contentEdit, &QTextEdit::currentCharFormatChanged, this,
+                     &NoteEditor::onCurrentBlockFormatChanged);
+    QObject::connect(ui->contentEdit, &QTextEdit::currentCharFormatChanged, this,
+                     &NoteEditor::onCurrentCharFormatChanged);
 
     QObject::connect(ui->boldCheckBox, &QCheckBox::clicked, this, &NoteEditor::switchTextBold);
     QObject::connect(ui->italicCheckBox, &QCheckBox::clicked, this, &NoteEditor::switchTextItalic);
-    QObject::connect(ui->contentEdit, &QTextEdit::currentCharFormatChanged, this,
-                     &NoteEditor::onCurrentCharFormatChanged);
     QObject::connect(ui->underlineCheckBox, &QCheckBox::clicked, this, &NoteEditor::switchTextUnderline);
     QObject::connect(ui->strikeOutCheckBox, &QCheckBox::clicked, this, &NoteEditor::switchTextStrikeOut);
     QObject::connect(ui->textColorButton, &QPushButton::clicked, this, &NoteEditor::setTextColor);
     QObject::connect(ui->textBackgroundColorButton, &QPushButton::clicked, this, &NoteEditor::setTextBackgroundColor);
+    QObject::connect(ui->alignMenuButton, &QPushButton::clicked, this, &NoteEditor::openAlignPopupMenu);
 
     onCurrentCharFormatChanged(ui->contentEdit->currentCharFormat());
+    onCurrentBlockFormatChanged();
 }
 
 NoteEditor::~NoteEditor()
@@ -118,6 +123,103 @@ void NoteEditor::setTextBackgroundColor()
     QColor textBackgroundColor =
         QColorDialog::getColor(ui->contentEdit->textBackgroundColor(), this, "", QColorDialog::ShowAlphaChannel);
     ui->contentEdit->setTextBackgroundColor(textBackgroundColor);
+}
+
+void NoteEditor::alignParagraph(Qt::Alignment alignment)
+{
+    ui->contentEdit->setAlignment(alignment);
+}
+
+void NoteEditor::openAlignPopupMenu()
+{
+    QWidget *cursor = new QWidget(ui->contentEdit);
+    cursor->setGeometry(ui->contentEdit->cursorRect());
+    cursor->setStyleSheet({"background-color: black;"});
+    cursor->setAttribute(Qt::WA_StyledBackground);
+    cursor->show();
+
+    QWidget *alignPopupMenu = new QWidget(this, Qt::Popup);
+    alignPopupMenu->setFixedSize(150, 40);
+    alignPopupMenu->setStyleSheet(ui->toolbarScrollArea->styleSheet());
+    alignPopupMenu->setFocusPolicy(Qt::NoFocus);
+
+    QCheckBox *alignLeftButton = new QCheckBox(alignPopupMenu);
+    QObject::connect(alignLeftButton, &QPushButton::clicked, this, [this, alignPopupMenu]() {
+        this->alignParagraph(Qt::AlignLeft);
+        alignPopupMenu->close();
+    });
+    alignLeftButton->setFocusPolicy(Qt::NoFocus);
+    alignLeftButton->setStyleSheet(
+        "QCheckBox::indicator{image: url(:/images/alignLeft.png); width: 30px; height: 30px;}");
+    alignLeftButton->setChecked(ui->contentEdit->alignment().testFlag(Qt::AlignLeft));
+    alignLeftButton->setFixedSize(ui->alignMenuButton->size());
+
+    QCheckBox *alignRightButton = new QCheckBox(alignPopupMenu);
+    QObject::connect(alignRightButton, &QPushButton::clicked, this, [this, alignPopupMenu]() {
+        this->alignParagraph(Qt::AlignRight);
+        alignPopupMenu->close();
+    });
+    alignRightButton->setFocusPolicy(Qt::NoFocus);
+    alignRightButton->setStyleSheet(
+        "QCheckBox::indicator{image: url(:/images/alignRight.png); width: 30px; height: 30px;}");
+    alignRightButton->setChecked(ui->contentEdit->alignment().testFlag(Qt::AlignRight));
+    alignRightButton->setFixedSize(ui->alignMenuButton->size());
+
+    QCheckBox *alignCenterButton = new QCheckBox(alignPopupMenu);
+    QObject::connect(alignCenterButton, &QPushButton::clicked, this, [this, alignPopupMenu]() {
+        this->alignParagraph(Qt::AlignCenter);
+        alignPopupMenu->close();
+    });
+    alignCenterButton->setFocusPolicy(Qt::NoFocus);
+    alignCenterButton->setStyleSheet(
+        "QCheckBox::indicator{image: url(:/images/alignCenter.png); width: 30px; height: 30px;}");
+    alignCenterButton->setChecked(ui->contentEdit->alignment().testFlag(Qt::AlignHCenter));
+    alignCenterButton->setFixedSize(ui->alignMenuButton->size());
+
+    QCheckBox *alignJustifyButton = new QCheckBox(alignPopupMenu);
+    QObject::connect(alignJustifyButton, &QPushButton::clicked, this, [this, alignPopupMenu]() {
+        this->alignParagraph(Qt::AlignJustify);
+        alignPopupMenu->close();
+    });
+    alignJustifyButton->setFocusPolicy(Qt::NoFocus);
+    alignJustifyButton->setStyleSheet(
+        "QCheckBox::indicator{image: url(:/images/alignJustify.png); width: 30px; height: 30px;}");
+    alignJustifyButton->setChecked(ui->contentEdit->alignment().testFlag(Qt::AlignJustify));
+    alignJustifyButton->setFixedSize(ui->alignMenuButton->size());
+
+    QHBoxLayout *layout = new QHBoxLayout(alignPopupMenu);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(alignLeftButton);
+    layout->addWidget(alignRightButton);
+    layout->addWidget(alignCenterButton);
+    layout->addWidget(alignJustifyButton);
+
+    alignPopupMenu->move(ui->alignMenuButton->mapToGlobal(QPoint(0, ui->alignMenuButton->height())));
+    alignPopupMenu->setAttribute(Qt::WA_DeleteOnClose);
+    QObject::connect(alignPopupMenu, &QWidget::destroyed, this, [this, cursor]() {
+        this->ui->contentEdit->setFocus();
+        delete cursor;
+    });
+
+    alignPopupMenu->show();
+}
+
+void NoteEditor::onAlignmentChanged()
+{
+    Qt::Alignment alignment = ui->contentEdit->alignment();
+    if (alignment.testFlag(Qt::AlignLeft))
+        ui->alignMenuButton->setIcon(QIcon(":/images/alignLeft.png"));
+    else if (alignment.testFlag(Qt::AlignHCenter))
+        ui->alignMenuButton->setIcon(QIcon(":/images/alignCenter.png"));
+    else if (alignment.testFlag(Qt::AlignRight))
+        ui->alignMenuButton->setIcon(QIcon(":/images/alignRight.png"));
+    else if (alignment.testFlag(Qt::AlignJustify))
+        ui->alignMenuButton->setIcon(QIcon(":/images/alignJustify.png"));
+}
+
+void NoteEditor::onCurrentBlockFormatChanged()
+{
+    onAlignmentChanged();
 }
 
 void NoteEditor::resizeEvent(QResizeEvent *event)

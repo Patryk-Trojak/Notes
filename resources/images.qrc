@@ -27,5 +27,9 @@
         <file>images/strikeOut.png</file>
         <file>images/textColor.png</file>
         <file>images/textBackgroundColor.png</file>
+        <file>images/alignCenter.png</file>
+        <file>images/alignJustify.png</file>
+        <file>images/alignLeft.png</file>
+        <file>images/alignRight.png</file>
     </qresource>
 </RCC>
