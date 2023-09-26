@@ -26,5 +26,6 @@
         <file>images/underline.png</file>
         <file>images/strikeOut.png</file>
         <file>images/textColor.png</file>
+        <file>images/textBackgroundColor.png</file>
     </qresource>
 </RCC>

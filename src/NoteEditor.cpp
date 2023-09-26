@@ -49,6 +49,7 @@ NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent) : QWidge
     QObject::connect(ui->underlineCheckBox, &QCheckBox::clicked, this, &NoteEditor::switchTextUnderline);
     QObject::connect(ui->strikeOutCheckBox, &QCheckBox::clicked, this, &NoteEditor::switchTextStrikeOut);
     QObject::connect(ui->textColorButton, &QPushButton::clicked, this, &NoteEditor::setTextColor);
+    QObject::connect(ui->textBackgroundColorButton, &QPushButton::clicked, this, &NoteEditor::setTextBackgroundColor);
 
     onCurrentCharFormatChanged(ui->contentEdit->currentCharFormat());
 }
@@ -110,6 +111,13 @@ void NoteEditor::setTextColor()
 {
     QColor textColor = QColorDialog::getColor(ui->contentEdit->textColor(), this, "", QColorDialog::ShowAlphaChannel);
     ui->contentEdit->setTextColor(textColor);
+}
+
+void NoteEditor::setTextBackgroundColor()
+{
+    QColor textBackgroundColor =
+        QColorDialog::getColor(ui->contentEdit->textBackgroundColor(), this, "", QColorDialog::ShowAlphaChannel);
+    ui->contentEdit->setTextBackgroundColor(textBackgroundColor);
 }
 
 void NoteEditor::resizeEvent(QResizeEvent *event)
