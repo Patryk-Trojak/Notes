@@ -21,5 +21,6 @@
         <file>images/ThreeDots.png</file>
         <file>images/renameFolder.png</file>
         <file>images/defaultColor.png</file>
+        <file>images/bold.png</file>
     </qresource>
 </RCC>

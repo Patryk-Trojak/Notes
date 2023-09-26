@@ -4,8 +4,9 @@
 #include "NoteContentEdit.h"
 #include <QModelIndex>
 #include <QPushButton>
+#include <QTextCharFormat>
 #include <QTextDocument>
-#include <QWidget>
+#include <QToolBar>
 
 namespace Ui
 {
@@ -32,6 +33,8 @@ class NoteEditor : public QWidget
 
     void setCreationTime(const QDateTime &creationTime);
     void setModificationTime(const QDateTime &modificationTime);
+    void switchTextBold();
+    void onCurrentCharFormatChanged(const QTextCharFormat &f);
 
   protected:
     void resizeEvent(QResizeEvent *event);
