@@ -43,6 +43,7 @@ NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent) : QWidge
                      [this]() { setModificationTime(QDateTime::currentDateTime()); });
 
     QObject::connect(ui->boldCheckBox, &QCheckBox::clicked, this, &NoteEditor::switchTextBold);
+    QObject::connect(ui->italicCheckBox, &QCheckBox::clicked, this, &NoteEditor::switchTextItalic);
     QObject::connect(ui->contentEdit, &QTextEdit::currentCharFormatChanged, this,
                      &NoteEditor::onCurrentCharFormatChanged);
 
@@ -81,6 +82,13 @@ void NoteEditor::switchTextBold()
     ui->contentEdit->mergeCurrentCharFormat(fmt);
 }
 
+void NoteEditor::switchTextItalic()
+{
+    QTextCharFormat fmt;
+    fmt.setFontItalic(ui->italicCheckBox->isChecked());
+    ui->contentEdit->mergeCurrentCharFormat(fmt);
+}
+
 void NoteEditor::resizeEvent(QResizeEvent *event)
 {
     QPoint rightTop = QPoint(event->size().width(), 0);
@@ -90,4 +98,5 @@ void NoteEditor::resizeEvent(QResizeEvent *event)
 void NoteEditor::onCurrentCharFormatChanged(const QTextCharFormat &f)
 {
     ui->boldCheckBox->setChecked(f.font().bold());
+    ui->italicCheckBox->setChecked(f.font().italic());
 }

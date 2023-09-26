@@ -22,5 +22,6 @@
         <file>images/renameFolder.png</file>
         <file>images/defaultColor.png</file>
         <file>images/bold.png</file>
+        <file>images/italic.png</file>
     </qresource>
 </RCC>
