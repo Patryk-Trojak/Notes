@@ -67,6 +67,8 @@ NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent) : QWidge
     QObject::connect(ui->taskListCheckBox, &QPushButton::clicked, this, [this] {
         this->switchListStyle(QTextListFormat::ListDisc, QTextBlockFormat::MarkerType::Unchecked);
     });
+    QObject::connect(ui->fontFamilyComboBox, &QComboBox::textActivated, this, &NoteEditor::setFontFamily);
+
     onCurrentCharFormatChanged(ui->contentEdit->currentCharFormat());
     onCurrentBlockFormatChanged();
 }
@@ -287,6 +289,13 @@ void NoteEditor::setFontSize()
     ui->contentEdit->mergeCurrentCharFormat(fmt);
 }
 
+void NoteEditor::setFontFamily(const QString &fontFamily)
+{
+    QTextCharFormat fmt;
+    fmt.setFontFamilies({fontFamily});
+    ui->contentEdit->mergeCurrentCharFormat(fmt);
+}
+
 void NoteEditor::onCurrentBlockFormatChanged()
 {
     onAlignmentChanged();
@@ -307,4 +316,5 @@ void NoteEditor::onCurrentCharFormatChanged(const QTextCharFormat &f)
     ui->strikeOutCheckBox->setChecked(f.font().strikeOut());
     QSignalBlocker blocker(ui->fontSizeSpinBox);
     ui->fontSizeSpinBox->setValue(f.font().pointSize());
+    ui->fontFamilyComboBox->setCurrentIndex(ui->fontFamilyComboBox->findText(QFontInfo(f.font()).family()));
 }

@@ -46,7 +46,7 @@ class NoteEditor : public QWidget
     void switchListStyle(QTextListFormat::Style listFormat, QTextBlockFormat::MarkerType);
     void onListStyleChanged();
     void setFontSize();
-
+    void setFontFamily(const QString &fontFamily);
     void onCurrentBlockFormatChanged();
     void onCurrentCharFormatChanged(const QTextCharFormat &f);
 
