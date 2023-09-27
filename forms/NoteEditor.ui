@@ -99,7 +99,7 @@ QSpinBox::up-arrow{image: url(:/images/plus.png); width: 11px; height: 11px;}
         <x>0</x>
         <y>0</y>
         <width>744</width>
-        <height>52</height>
+        <height>43</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -118,6 +118,12 @@ QSpinBox::up-arrow{image: url(:/images/plus.png); width: 11px; height: 11px;}
        <string notr="true"/>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
         <widget class="QCheckBox" name="boldCheckBox">
          <property name="sizePolicy">
