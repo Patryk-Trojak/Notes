@@ -50,6 +50,7 @@ class NoteEditor : public QWidget
     void setFontFamily(const QString &fontFamily);
     void onCurrentBlockFormatChanged();
     void onCurrentCharFormatChanged(const QTextCharFormat &f);
+    QWidget *fakeTextCursor;
 
   protected:
     void resizeEvent(QResizeEvent *event);

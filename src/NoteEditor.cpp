@@ -8,17 +8,20 @@
 #include <QTextDocument>
 #include <QTextList>
 
-NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent) : QWidget(parent), ui(new Ui::NoteEditor)
+NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent)
+    : QWidget(parent), ui(new Ui::NoteEditor), fakeTextCursor(new QWidget())
 {
     ui->setupUi(this);
-    int widthOfScrollbar = 14;
     QString style = QString("QWidget#NoteEditor{border-style: solid; border-color: transparent; border-width:10px; "
                             "border-radius:30px;} "
                             "QWidget{ background-color: %1;}"
                             "QLineEdit{background-color: transparent; border: none;}"
                             "QTextEdit{background-color: transparent; border: none;}")
                         .arg(editingNote.data(NoteListModelRole::Color).value<QColor>().name());
-
+    fakeTextCursor->setParent(ui->contentEdit);
+    fakeTextCursor->setStyleSheet({"background-color: black;"});
+    fakeTextCursor->setAttribute(Qt::WA_StyledBackground);
+    fakeTextCursor->hide();
     ui->fontSizeSpinBox->setAlignment(Qt::AlignHCenter);
     setStyleSheet(style);
     setAttribute(Qt::WA_StyledBackground, true);
@@ -147,12 +150,6 @@ void NoteEditor::alignParagraph(Qt::Alignment alignment)
 
 void NoteEditor::openAlignPopupMenu()
 {
-    QWidget *cursor = new QWidget(ui->contentEdit);
-    cursor->setGeometry(ui->contentEdit->cursorRect());
-    cursor->setStyleSheet({"background-color: black;"});
-    cursor->setAttribute(Qt::WA_StyledBackground);
-    cursor->show();
-
     QWidget *alignPopupMenu = new QWidget(this, Qt::Popup);
     alignPopupMenu->setFixedSize(150, 40);
     alignPopupMenu->setStyleSheet(ui->toolbarScrollArea->styleSheet());
@@ -211,10 +208,7 @@ void NoteEditor::openAlignPopupMenu()
 
     alignPopupMenu->move(ui->alignMenuButton->mapToGlobal(QPoint(0, ui->alignMenuButton->height())));
     alignPopupMenu->setAttribute(Qt::WA_DeleteOnClose);
-    QObject::connect(alignPopupMenu, &QWidget::destroyed, this, [this, cursor]() {
-        this->ui->contentEdit->setFocus();
-        delete cursor;
-    });
+    QObject::connect(alignPopupMenu, &QWidget::destroyed, this, [this]() { this->ui->contentEdit->setFocus(); });
 
     alignPopupMenu->show();
 }
@@ -337,17 +331,27 @@ void NoteEditor::resizeEvent(QResizeEvent *event)
 
 bool NoteEditor::eventFilter(QObject *watched, QEvent *event)
 {
-    if (watched == ui->contentEdit and event->type() == QEvent::KeyPress and
-        ui->contentEdit->textCursor().atBlockStart())
+    if (watched == ui->contentEdit)
     {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        if (keyEvent->key() == Qt::Key_Tab)
+        if (event->type() == QEvent::KeyPress and ui->contentEdit->textCursor().atBlockStart())
         {
-            this->modifyIndentation(1);
-            return true;
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+            if (keyEvent->key() == Qt::Key_Tab)
+            {
+                this->modifyIndentation(1);
+                return true;
+            }
+        }
+        if (event->type() == QEvent::FocusOut and !ui->titleEdit->hasFocus())
+        {
+            fakeTextCursor->setGeometry(ui->contentEdit->cursorRect());
+            fakeTextCursor->show();
+        }
+        if (event->type() == QEvent::FocusIn)
+        {
+            fakeTextCursor->hide();
         }
     }
-
     return QWidget::eventFilter(watched, event);
 }
 
@@ -360,4 +364,5 @@ void NoteEditor::onCurrentCharFormatChanged(const QTextCharFormat &f)
     QSignalBlocker blocker(ui->fontSizeSpinBox);
     ui->fontSizeSpinBox->setValue(f.font().pointSize());
     ui->fontFamilyComboBox->setCurrentIndex(ui->fontFamilyComboBox->findText(QFontInfo(f.font()).family()));
+    fakeTextCursor->setGeometry(ui->contentEdit->cursorRect());
 }
