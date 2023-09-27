@@ -72,6 +72,9 @@
 QScrollArea &gt; QWidget &gt; QWidget { background: transparent;}
 QCheckBox::checked{background-color: rgba(100, 100, 100, 200);  border-radius: 3px;}
 QCheckBox::hover{background-color: rgba(200, 200, 200, 200);  border-radius: 3px;}
+QPushButton{background-color: transparent; border: none;} 
+QPushButton::hover{background-color: rgba(200, 200, 200, 200); border: none;}
+QPushButton::pressed{background-color: rgba(100, 100, 100, 200); border: none;}
 QSpinBox{padding-left: 5px; padding-right: 5px; width: 40px; height: 28px; font-size: 18px; text-align: center;}
 QSpinBox::down-button{subcontrol-position: center left; height: 20px; width: 20; border: none;}
 QSpinBox::up-button{subcontrol-position: center right; height: 20px; width: 20; border: none;}
