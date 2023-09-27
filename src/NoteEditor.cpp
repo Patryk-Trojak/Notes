@@ -69,6 +69,7 @@ NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent) : QWidge
     });
     QObject::connect(ui->fontFamilyComboBox, &QComboBox::textActivated, this, &NoteEditor::setFontFamily);
 
+    ui->contentEdit->installEventFilter(this);
     onCurrentCharFormatChanged(ui->contentEdit->currentCharFormat());
     onCurrentBlockFormatChanged();
 }
@@ -332,6 +333,22 @@ void NoteEditor::resizeEvent(QResizeEvent *event)
 {
     QPoint rightTop = QPoint(event->size().width(), 0);
     closeButton->move(rightTop + QPoint(-closeButton->width() - 20, 20));
+}
+
+bool NoteEditor::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == ui->contentEdit and event->type() == QEvent::KeyPress and
+        ui->contentEdit->textCursor().atBlockStart())
+    {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        if (keyEvent->key() == Qt::Key_Tab)
+        {
+            this->modifyIndentation(1);
+            return true;
+        }
+    }
+
+    return QWidget::eventFilter(watched, event);
 }
 
 void NoteEditor::onCurrentCharFormatChanged(const QTextCharFormat &f)

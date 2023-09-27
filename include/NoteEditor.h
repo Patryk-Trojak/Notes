@@ -21,6 +21,7 @@ class NoteEditor : public QWidget
     ~NoteEditor();
     void setResourceLoader(const NoteContentEdit::ResourceLoader &resourceProvider);
     void setResourceSaver(const NoteContentEdit::ResourceSaver &resourceSaver);
+    bool eventFilter(QObject *watched, QEvent *event);
 
   signals:
     void closeNoteRequested();
