@@ -32,7 +32,7 @@
     <number>15</number>
    </property>
    <property name="bottomMargin">
-    <number>10</number>
+    <number>20</number>
    </property>
    <item>
     <widget class="QLineEdit" name="titleEdit">
@@ -598,6 +598,12 @@ QSpinBox::up-arrow{image: url(:/images/plus.png); width: 11px; height: 11px;}
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="leftMargin">
+      <number>15</number>
+     </property>
+     <property name="rightMargin">
+      <number>15</number>
+     </property>
      <item alignment="Qt::AlignLeft">
       <widget class="QLabel" name="modificationTime">
        <property name="sizePolicy">
