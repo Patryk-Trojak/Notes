@@ -574,6 +574,12 @@ QSpinBox::up-arrow{image: url(:/images/plus.png); width: 11px; height: 11px;}
            <height>16777215</height>
           </size>
          </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="editable">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
        <item>
