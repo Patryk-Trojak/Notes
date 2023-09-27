@@ -19,6 +19,7 @@ NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent) : QWidge
                             "QTextEdit{background-color: transparent; border: none;}")
                         .arg(editingNote.data(NoteListModelRole::Color).value<QColor>().name());
 
+    ui->fontSizeSpinBox->setAlignment(Qt::AlignHCenter);
     setStyleSheet(style);
     setAttribute(Qt::WA_StyledBackground, true);
     ui->creationTime->setStyleSheet("QLabel{color: black}");
@@ -56,6 +57,7 @@ NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent) : QWidge
     QObject::connect(ui->alignMenuButton, &QPushButton::clicked, this, &NoteEditor::openAlignPopupMenu);
     QObject::connect(ui->indentButton, &QPushButton::clicked, this, [this]() { this->modifyIndentation(1); });
     QObject::connect(ui->unindentButton, &QPushButton::clicked, this, [this]() { this->modifyIndentation(-1); });
+    QObject::connect(ui->fontSizeSpinBox, &QSpinBox::valueChanged, this, &NoteEditor::setFontSize);
     QObject::connect(ui->unorderedListCheckBox, &QPushButton::clicked, this, [this] {
         this->switchListStyle(QTextListFormat::ListDisc, QTextBlockFormat::MarkerType::NoMarker);
     });
@@ -278,6 +280,13 @@ void NoteEditor::onListStyleChanged()
         ui->taskListCheckBox->setChecked(true);
 }
 
+void NoteEditor::setFontSize()
+{
+    QTextCharFormat fmt;
+    fmt.setFontPointSize(ui->fontSizeSpinBox->value());
+    ui->contentEdit->mergeCurrentCharFormat(fmt);
+}
+
 void NoteEditor::onCurrentBlockFormatChanged()
 {
     onAlignmentChanged();
@@ -296,4 +305,6 @@ void NoteEditor::onCurrentCharFormatChanged(const QTextCharFormat &f)
     ui->italicCheckBox->setChecked(f.font().italic());
     ui->underlineCheckBox->setChecked(f.font().underline());
     ui->strikeOutCheckBox->setChecked(f.font().strikeOut());
+    QSignalBlocker blocker(ui->fontSizeSpinBox);
+    ui->fontSizeSpinBox->setValue(f.font().pointSize());
 }

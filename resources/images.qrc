@@ -36,5 +36,8 @@
         <file>images/orderedList.png</file>
         <file>images/taskList.png</file>
         <file>images/unorderedList.png</file>
+        <file>images/plus.png</file>
+        <file>images/minus.png</file>
+        <file>images/roundedRect.png</file>
     </qresource>
 </RCC>

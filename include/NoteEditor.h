@@ -45,6 +45,7 @@ class NoteEditor : public QWidget
     void modifyIndentation(int amount);
     void switchListStyle(QTextListFormat::Style listFormat, QTextBlockFormat::MarkerType);
     void onListStyleChanged();
+    void setFontSize();
 
     void onCurrentBlockFormatChanged();
     void onCurrentCharFormatChanged(const QTextCharFormat &f);
