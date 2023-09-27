@@ -56,7 +56,15 @@ NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent) : QWidge
     QObject::connect(ui->alignMenuButton, &QPushButton::clicked, this, &NoteEditor::openAlignPopupMenu);
     QObject::connect(ui->indentButton, &QPushButton::clicked, this, [this]() { this->modifyIndentation(1); });
     QObject::connect(ui->unindentButton, &QPushButton::clicked, this, [this]() { this->modifyIndentation(-1); });
-
+    QObject::connect(ui->unorderedListCheckBox, &QPushButton::clicked, this, [this] {
+        this->switchListStyle(QTextListFormat::ListDisc, QTextBlockFormat::MarkerType::NoMarker);
+    });
+    QObject::connect(ui->orderedListCheckBox, &QPushButton::clicked, this, [this] {
+        this->switchListStyle(QTextListFormat::ListDecimal, QTextBlockFormat::MarkerType::NoMarker);
+    });
+    QObject::connect(ui->taskListCheckBox, &QPushButton::clicked, this, [this] {
+        this->switchListStyle(QTextListFormat::ListDisc, QTextBlockFormat::MarkerType::Unchecked);
+    });
     onCurrentCharFormatChanged(ui->contentEdit->currentCharFormat());
     onCurrentBlockFormatChanged();
 }
@@ -223,15 +231,57 @@ void NoteEditor::modifyIndentation(int amount)
 {
     QTextCursor cursor = ui->contentEdit->textCursor();
     cursor.beginEditBlock();
+
     QTextBlockFormat blockFmt = cursor.blockFormat();
     blockFmt.setIndent(qMax(0, blockFmt.indent() + amount));
     cursor.setBlockFormat(blockFmt);
+
     cursor.endEditBlock();
+}
+
+void NoteEditor::switchListStyle(QTextListFormat::Style listFormat, QTextBlockFormat::MarkerType markerType)
+{
+    QTextCursor cursor = ui->contentEdit->textCursor();
+    if (cursor.currentList() and cursor.currentList()->format().style() == listFormat and
+        cursor.blockFormat().marker() == markerType)
+    {
+        QTextBlockFormat blockFmt;
+        cursor.setBlockFormat(blockFmt);
+    }
+    else
+    {
+        cursor.createList(listFormat);
+        QTextBlockFormat format = cursor.blockFormat();
+        format.setMarker(markerType);
+        cursor.setBlockFormat(format);
+    }
+    onListStyleChanged();
+}
+
+void NoteEditor::onListStyleChanged()
+{
+    QTextCursor cursor = ui->contentEdit->textCursor();
+    for (auto &checkbox : ui->listCheckBoxes->buttons())
+        static_cast<QCheckBox *>(checkbox)->setChecked(false);
+
+    if (!cursor.currentList())
+        return;
+
+    if (cursor.blockFormat().marker() == QTextBlockFormat::MarkerType::NoMarker)
+    {
+        if (cursor.currentList()->format().style() == QTextListFormat::ListDisc)
+            ui->unorderedListCheckBox->setChecked(true);
+        else if (cursor.currentList()->format().style() == QTextListFormat::ListDecimal)
+            ui->orderedListCheckBox->setChecked(true);
+    }
+    else
+        ui->taskListCheckBox->setChecked(true);
 }
 
 void NoteEditor::onCurrentBlockFormatChanged()
 {
     onAlignmentChanged();
+    onListStyleChanged();
 }
 
 void NoteEditor::resizeEvent(QResizeEvent *event)

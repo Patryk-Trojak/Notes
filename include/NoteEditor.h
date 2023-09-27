@@ -43,6 +43,8 @@ class NoteEditor : public QWidget
     void openAlignPopupMenu();
     void onAlignmentChanged();
     void modifyIndentation(int amount);
+    void switchListStyle(QTextListFormat::Style listFormat, QTextBlockFormat::MarkerType);
+    void onListStyleChanged();
 
     void onCurrentBlockFormatChanged();
     void onCurrentCharFormatChanged(const QTextCharFormat &f);

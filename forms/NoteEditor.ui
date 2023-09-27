@@ -89,7 +89,7 @@ QCheckBox::hover{background-color: rgba(200, 200, 200, 200);  border-radius: 3px
         <x>0</x>
         <y>0</y>
         <width>600</width>
-        <height>43</height>
+        <height>48</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -105,21 +105,6 @@ QCheckBox::hover{background-color: rgba(200, 200, 200, 200);  border-radius: 3px
        </size>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <property name="spacing">
-        <number>2</number>
-       </property>
-       <property name="leftMargin">
-        <number>10</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
        <item>
         <widget class="QCheckBox" name="boldCheckBox">
          <property name="sizePolicy">
@@ -383,7 +368,7 @@ QCheckBox::hover{background-color: rgba(200, 200, 200, 200);  border-radius: 3px
           <string/>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../resources/images.qrc">
            <normaloff>:/images/unindent.png</normaloff>:/images/unindent.png</iconset>
          </property>
          <property name="flat">
@@ -418,12 +403,129 @@ QCheckBox::hover{background-color: rgba(200, 200, 200, 200);  border-radius: 3px
           <string/>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../resources/images.qrc">
            <normaloff>:/images/indent.png</normaloff>:/images/indent.png</iconset>
          </property>
          <property name="flat">
           <bool>true</bool>
          </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="orderedListCheckBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QCheckBox::indicator {image: url(:/images/orderedList.png); width: 30px; height: 30px;}
+</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../resources/images.qrc">
+           <normaloff>:/images/indent.png</normaloff>:/images/indent.png</iconset>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">listCheckBoxes</string>
+         </attribute>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="unorderedListCheckBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QCheckBox::indicator {image: url(:/images/unorderedList.png); width: 30px; height: 30px;}
+</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../resources/images.qrc">
+           <normaloff>:/images/indent.png</normaloff>:/images/indent.png</iconset>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">listCheckBoxes</string>
+         </attribute>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="taskListCheckBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QCheckBox::indicator {image: url(:/images/taskList.png); width: 30px; height: 30px;}
+</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../resources/images.qrc">
+           <normaloff>:/images/indent.png</normaloff>:/images/indent.png</iconset>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">listCheckBoxes</string>
+         </attribute>
         </widget>
        </item>
        <item>
@@ -506,7 +608,7 @@ QCheckBox::hover{background-color: rgba(200, 200, 200, 200);  border-radius: 3px
  </resources>
  <connections/>
  <buttongroups>
-  <buttongroup name="listCheckboxes">
+  <buttongroup name="listCheckBoxes">
    <property name="exclusive">
     <bool>false</bool>
    </property>

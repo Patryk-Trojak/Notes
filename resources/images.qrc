@@ -33,5 +33,8 @@
         <file>images/alignRight.png</file>
         <file>images/indent.png</file>
         <file>images/unindent.png</file>
+        <file>images/orderedList.png</file>
+        <file>images/taskList.png</file>
+        <file>images/unorderedList.png</file>
     </qresource>
 </RCC>
