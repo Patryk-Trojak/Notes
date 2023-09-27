@@ -236,9 +236,35 @@ void NoteEditor::modifyIndentation(int amount)
     QTextCursor cursor = ui->contentEdit->textCursor();
     cursor.beginEditBlock();
 
-    QTextBlockFormat blockFmt = cursor.blockFormat();
-    blockFmt.setIndent(qMax(0, blockFmt.indent() + amount));
-    cursor.setBlockFormat(blockFmt);
+    if (cursor.currentList())
+    {
+        QTextListFormat listFmt = cursor.currentList()->format();
+        QTextCursor above(cursor);
+        above.movePosition(QTextCursor::Up);
+        QTextCursor below(cursor);
+        below.movePosition(QTextCursor::Down);
+        if (above.currentList() && listFmt.indent() + amount == above.currentList()->format().indent())
+        {
+            above.currentList()->add(cursor.block());
+            cursor.setBlockFormat(above.blockFormat());
+        }
+        else if (below.currentList() && listFmt.indent() + amount == below.currentList()->format().indent())
+        {
+            below.currentList()->add(cursor.block());
+            cursor.setBlockFormat(below.blockFormat());
+        }
+        else
+        {
+            listFmt.setIndent(qMax(1, listFmt.indent() + amount));
+            cursor.createList(listFmt);
+        }
+    }
+    else
+    {
+        QTextBlockFormat blockFmt = cursor.blockFormat();
+        blockFmt.setIndent(qMax(0, blockFmt.indent() + amount));
+        cursor.setBlockFormat(blockFmt);
+    }
 
     cursor.endEditBlock();
 }
