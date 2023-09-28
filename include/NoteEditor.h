@@ -39,6 +39,7 @@ class NoteEditor : public QWidget
     void switchTextUnderline();
     void switchTextStrikeOut();
     void setTextColor();
+    void onTextColorChanged();
     void setTextBackgroundColor();
     void alignParagraph(Qt::Alignment alignment);
     void openAlignPopupMenu();

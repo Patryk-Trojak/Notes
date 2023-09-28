@@ -1,13 +1,13 @@
 #include "NoteEditor.h"
 #include "./ui_NoteEditor.h"
 #include "NoteListModelRole.h"
+#include "Utils.h"
 #include <QColorDialog>
 #include <QDateTime>
 #include <QFontInfo>
 #include <QResizeEvent>
 #include <QTextDocument>
 #include <QTextList>
-
 NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent)
     : QWidget(parent), ui(new Ui::NoteEditor), fakeTextCursor(new QWidget())
 {
@@ -134,6 +134,13 @@ void NoteEditor::setTextColor()
 {
     QColor textColor = QColorDialog::getColor(ui->contentEdit->textColor(), this, "", QColorDialog::ShowAlphaChannel);
     ui->contentEdit->setTextColor(textColor);
+}
+
+void NoteEditor::onTextColorChanged()
+{
+    QImage textColorButtonIcon(":/images/textColor");
+    myUtils::replaceColor(textColorButtonIcon, Qt::white, QColor(ui->contentEdit->textColor()));
+    ui->textColorButton->setIcon(QPixmap::fromImage(textColorButtonIcon));
 }
 
 void NoteEditor::setTextBackgroundColor()
@@ -365,4 +372,5 @@ void NoteEditor::onCurrentCharFormatChanged(const QTextCharFormat &f)
     ui->fontSizeSpinBox->setValue(f.font().pointSize());
     ui->fontFamilyComboBox->setCurrentIndex(ui->fontFamilyComboBox->findText(QFontInfo(f.font()).family()));
     fakeTextCursor->setGeometry(ui->contentEdit->cursorRect());
+    onTextColorChanged();
 }
