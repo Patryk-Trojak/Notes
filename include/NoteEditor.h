@@ -27,6 +27,7 @@ class NoteEditor : public QWidget
     void closeNoteRequested();
     void titleChanged(const QString &newTitle);
     void contentChanged(const QString &newContent);
+    void deleteNoteRequested();
 
   private:
     Ui::NoteEditor *ui;

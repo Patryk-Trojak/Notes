@@ -17,6 +17,7 @@ NoteEditingTab::NoteEditingTab(PersistenceManager &persistenceManager, NoteListM
                      &NoteEditingTab::saveNoteAndEmitExitSignal);
     QObject::connect(editor, &NoteEditor::titleChanged, this, &NoteEditingTab::onTitleChanged);
     QObject::connect(editor, &NoteEditor::contentChanged, this, &NoteEditingTab::onContentChanged);
+    QObject::connect(editor, &NoteEditor::deleteNoteRequested, this, &NoteEditingTab::maybeDeleteNote);
 
     setPalette(QPalette(QColor(0, 0, 0, 190)));
     setAutoFillBackground(true);
@@ -63,6 +64,24 @@ void NoteEditingTab::onContentChanged(const QString &newContent)
     QDateTime modificationTime = QDateTime::currentDateTime();
     noteModel.setData(editingNote, newContent, NoteListModelRole::Content);
     noteModel.setData(editingNote, modificationTime, NoteListModelRole::ModificationTime);
+}
+
+bool NoteEditingTab::maybeDeleteNote()
+{
+    const QString message = [this]() {
+        if (this->editingNote.data(NoteListModelRole::isInTrash).toBool())
+            return "Are you sure you want to delete this note? You won't be able to recover deleted note";
+        else
+            return "Are you sure you want to remove this note? You will be able to restore it from trash folder";
+    }();
+
+    auto reply = QMessageBox::question(this, "Delete note?", message);
+    if (reply == QMessageBox::No)
+        return false;
+
+    noteModel.removeRow(editingNote.row());
+    emit exitEditingNoteRequested();
+    return true;
 }
 
 void NoteEditingTab::saveNoteAndEmitExitSignal()

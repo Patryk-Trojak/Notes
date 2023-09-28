@@ -28,6 +28,7 @@ class NoteEditingTab : public QWidget
   private slots:
     void onTitleChanged(const QString &newTitle);
     void onContentChanged(const QString &newContent);
+    bool maybeDeleteNote();
 
   protected:
     void resizeEvent(QResizeEvent *event) override;

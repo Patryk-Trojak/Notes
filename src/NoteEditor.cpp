@@ -71,6 +71,7 @@ NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent)
         this->switchListStyle(QTextListFormat::ListDisc, QTextBlockFormat::MarkerType::Unchecked);
     });
     QObject::connect(ui->fontFamilyComboBox, &QComboBox::textActivated, this, &NoteEditor::setFontFamily);
+    QObject::connect(ui->deleteNoteButton, &QPushButton::clicked, this, &NoteEditor::deleteNoteRequested);
 
     ui->contentEdit->installEventFilter(this);
     onCurrentCharFormatChanged(ui->contentEdit->currentCharFormat());
