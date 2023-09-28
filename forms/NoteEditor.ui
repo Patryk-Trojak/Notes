@@ -82,6 +82,7 @@ QSpinBox::down-button:hover{background-color: rgba(200, 200, 200, 200);  border-
 QSpinBox::up-button:hover{background-color: rgba(200, 200, 200, 200);  border-radius: 3px; }
 QSpinBox::down-arrow{image: url(:/images/minus.png); width: 11px; height: 11px;}
 QSpinBox::up-arrow{image: url(:/images/plus.png); width: 11px; height: 11px;}
+QScrollBar::horizontal {height: 8px; border-radius: 4px;}
 </string>
      </property>
      <property name="verticalScrollBarPolicy">
