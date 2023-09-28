@@ -83,7 +83,9 @@ QSpinBox::up-button:hover{background-color: rgba(200, 200, 200, 200);  border-ra
 QSpinBox::down-arrow{image: url(:/images/minus.png); width: 11px; height: 11px;}
 QSpinBox::up-arrow{image: url(:/images/plus.png); width: 11px; height: 11px;}
 QScrollBar::horizontal {height: 8px; border-radius: 4px;}
-</string>
+QComboBox{border: none; font-size: 18px}
+QComboBox::down-arrow {image: url(&quot;:/images/arrowDown&quot;); subcontrol-position: center center;}
+QComboBox::drop-down {border: none;background-color: transparent;}</string>
      </property>
      <property name="verticalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -571,7 +573,7 @@ QScrollBar::horizontal {height: 8px; border-radius: 4px;}
          </property>
          <property name="maximumSize">
           <size>
-           <width>130</width>
+           <width>120</width>
            <height>16777215</height>
           </size>
          </property>
@@ -579,7 +581,19 @@ QScrollBar::horizontal {height: 8px; border-radius: 4px;}
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="styleSheet">
-          <string notr="true"/>
+          <string notr="true">QComboBox{border: none;}
+QComboBox::down-arrow {
+    image: url(&quot;:/images/arrowDown&quot;);
+	height: 12px;
+	widht:12px;
+}
+
+QComboBox::drop-down {
+  	border: none;
+	background-color: transparent;
+}
+
+</string>
          </property>
          <property name="editable">
           <bool>false</bool>
