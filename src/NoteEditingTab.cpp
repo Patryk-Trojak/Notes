@@ -18,6 +18,7 @@ NoteEditingTab::NoteEditingTab(PersistenceManager &persistenceManager, NoteListM
     QObject::connect(editor, &NoteEditor::titleChanged, this, &NoteEditingTab::onTitleChanged);
     QObject::connect(editor, &NoteEditor::contentChanged, this, &NoteEditingTab::onContentChanged);
     QObject::connect(editor, &NoteEditor::deleteNoteRequested, this, &NoteEditingTab::maybeDeleteNote);
+    QObject::connect(editor, &NoteEditor::pinNoteChanged, this, &NoteEditingTab::onNotePinChanged);
 
     setPalette(QPalette(QColor(0, 0, 0, 190)));
     setAutoFillBackground(true);
@@ -82,6 +83,11 @@ bool NoteEditingTab::maybeDeleteNote()
     noteModel.removeRow(editingNote.row());
     emit exitEditingNoteRequested();
     return true;
+}
+
+void NoteEditingTab::onNotePinChanged(bool isPinned)
+{
+    noteModel.setData(editingNote, isPinned, NoteListModelRole::isPinned);
 }
 
 void NoteEditingTab::saveNoteAndEmitExitSignal()

@@ -29,6 +29,7 @@ NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent)
     ui->modificationTime->setStyleSheet("QLabel{color: black}");
     ui->titleEdit->setText(editingNote.data(NoteListModelRole::Title).toString());
     ui->contentEdit->setHtml(editingNote.data(NoteListModelRole::Content).toString());
+    ui->pinNoteCheckbox->setChecked(editingNote.data(NoteListModelRole::isPinned).toBool());
     setCreationTime(editingNote.data(NoteListModelRole::CreationTime).toDateTime());
     setModificationTime(editingNote.data(NoteListModelRole::ModificationTime).toDateTime());
 
@@ -72,6 +73,7 @@ NoteEditor::NoteEditor(const QModelIndex &editingNote, QWidget *parent)
     });
     QObject::connect(ui->fontFamilyComboBox, &QComboBox::textActivated, this, &NoteEditor::setFontFamily);
     QObject::connect(ui->deleteNoteButton, &QPushButton::clicked, this, &NoteEditor::deleteNoteRequested);
+    QObject::connect(ui->pinNoteCheckbox, &QCheckBox::toggled, this, &NoteEditor::pinNoteChanged);
 
     ui->contentEdit->installEventFilter(this);
     onCurrentCharFormatChanged(ui->contentEdit->currentCharFormat());

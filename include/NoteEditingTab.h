@@ -29,6 +29,7 @@ class NoteEditingTab : public QWidget
     void onTitleChanged(const QString &newTitle);
     void onContentChanged(const QString &newContent);
     bool maybeDeleteNote();
+    void onNotePinChanged(bool isPinned);
 
   protected:
     void resizeEvent(QResizeEvent *event) override;

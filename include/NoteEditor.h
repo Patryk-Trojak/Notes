@@ -28,6 +28,7 @@ class NoteEditor : public QWidget
     void titleChanged(const QString &newTitle);
     void contentChanged(const QString &newContent);
     void deleteNoteRequested();
+    void pinNoteChanged(bool isPinned);
 
   private:
     Ui::NoteEditor *ui;

@@ -628,6 +628,9 @@ QComboBox::drop-down {
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>12</number>
+     </property>
      <property name="leftMargin">
       <number>15</number>
      </property>
@@ -652,7 +655,25 @@ QComboBox::drop-down {
        </property>
       </widget>
      </item>
-     <item alignment="Qt::AlignHCenter">
+     <item>
+      <widget class="QCheckBox" name="pinNoteCheckbox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QCheckBox::indicator {width: 20px; height: 20px;}
+QCheckBox::indicator:unchecked {image: url(:/images/pinUnchecked.png); }
+QCheckBox::indicator:checked {image: url(:/images/pinChecked.png); }</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="deleteNoteButton">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
